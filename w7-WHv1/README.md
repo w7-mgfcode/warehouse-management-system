@@ -74,9 +74,9 @@ w7-WHv1/
    ```
 
 5. **Access the API:**
-   - API: http://localhost:8000
-   - Docs: http://localhost:8000/docs
-   - Health: http://localhost:8000/health
+   - API: [http://localhost:8000](http://localhost:8000)
+   - Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+   - Health: [http://localhost:8000/health](http://localhost:8000/health)
 
 ### Local Development
 

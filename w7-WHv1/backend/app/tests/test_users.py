@@ -1,5 +1,7 @@
 """Tests for user management endpoints."""
 
+import uuid
+
 from httpx import AsyncClient
 
 from app.db.models.user import User
@@ -149,8 +151,6 @@ class TestGetUser:
         admin_token: str,
     ) -> None:
         """Test getting non-existent user returns 404."""
-        import uuid
-
         response = await client.get(
             f"/api/v1/users/{uuid.uuid4()}",
             headers=auth_header(admin_token),
@@ -220,8 +220,6 @@ class TestDeleteUser:
         admin_token: str,
     ) -> None:
         """Test deleting non-existent user returns 404."""
-        import uuid
-
         response = await client.delete(
             f"/api/v1/users/{uuid.uuid4()}",
             headers=auth_header(admin_token),

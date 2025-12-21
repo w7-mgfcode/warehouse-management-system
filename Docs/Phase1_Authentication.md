@@ -17,7 +17,7 @@ The WMS uses JWT (JSON Web Token) authentication with role-based access control 
 
 ## Authentication Flow
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────────────────┐
 │                           Authentication Flow                               │
 └────────────────────────────────────────────────────────────────────────────┘

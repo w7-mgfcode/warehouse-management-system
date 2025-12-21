@@ -1,13 +1,13 @@
 """Authentication schemas."""
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LoginRequest(BaseModel):
     """Login request schema."""
 
-    username: str
-    password: str
+    username: str = Field(..., min_length=1, description="Username")
+    password: str = Field(..., min_length=1, description="Password")
 
     model_config = ConfigDict(str_strip_whitespace=True)
 

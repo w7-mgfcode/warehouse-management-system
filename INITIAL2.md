@@ -276,7 +276,7 @@ Bins bulk generation needs:
 
 ### Files to Create
 
-```
+```text
 app/
 ├── schemas/
 │   ├── product.py      # ProductCreate, ProductUpdate, ProductResponse
