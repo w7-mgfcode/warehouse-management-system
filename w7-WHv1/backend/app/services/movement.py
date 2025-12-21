@@ -57,7 +57,7 @@ async def create_movement(
         notes: Optional notes.
 
     Returns:
-        BinMovement: Created movement record.
+        BinMovement: Created movement record with eagerly loaded bin_content.
     """
     movement = BinMovement(
         bin_content_id=bin_content_id,
@@ -75,9 +75,15 @@ async def create_movement(
     )
     db.add(movement)
     await db.flush()
-    # Eager load bin_content relationship for API responses
-    await db.refresh(movement, ["bin_content"])
-    return movement
+    
+    # Reload with eager loading to ensure bin_content is available in async context
+    # This prevents lazy-load issues when bin_content is None in issue_goods()
+    result = await db.execute(
+        select(BinMovement)
+        .options(selectinload(BinMovement.bin_content))
+        .where(BinMovement.id == movement.id)
+    )
+    return result.scalar_one()
 
 
 async def get_movements(
