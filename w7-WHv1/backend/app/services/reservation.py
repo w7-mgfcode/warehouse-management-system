@@ -256,6 +256,8 @@ async def cancel_reservation(
         raise ValueError(HU_RESERVATION_MESSAGES["reservation_already_fulfilled"])
     if reservation.status == "cancelled":
         raise ValueError(HU_RESERVATION_MESSAGES["reservation_already_cancelled"])
+    if reservation.status == "expired":
+        raise ValueError(HU_RESERVATION_MESSAGES["reservation_expired"])
 
     # 2. Release reserved quantities
     for item in reservation.items:

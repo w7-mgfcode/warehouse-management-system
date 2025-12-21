@@ -22,7 +22,6 @@ async def _log_job_execution(
     status: str,
     result: dict | None = None,
     error_message: str | None = None,
-    duration_seconds: float | None = None,
 ) -> JobExecution:
     """Log a job execution to the database."""
     job = JobExecution(
@@ -30,7 +29,6 @@ async def _log_job_execution(
         status=status,
         result=result,
         error_message=error_message,
-        duration_seconds=duration_seconds,
     )
     db.add(job)
     await db.commit()
@@ -44,17 +42,14 @@ async def _update_job_execution(
     status: str,
     result: dict | None = None,
     error_message: str | None = None,
-    duration_seconds: float | None = None,
 ) -> None:
     """Update an existing job execution record."""
     job.status = status
-    job.completed_at = datetime.now(UTC)
+    job.finished_at = datetime.now(UTC)
     if result:
         job.result = result
     if error_message:
         job.error_message = error_message
-    if duration_seconds is not None:
-        job.duration_seconds = duration_seconds
     await db.commit()
 
 

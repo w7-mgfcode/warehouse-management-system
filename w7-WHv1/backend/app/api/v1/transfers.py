@@ -243,6 +243,11 @@ async def dispatch_transfer_endpoint(
     try:
         await dispatch_transfer(db, transfer_id, current_user.id)
         transfer = await get_transfer_by_id(db, transfer_id)
+        if not transfer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=HU_TRANSFER_MESSAGES["transfer_not_found"],
+            )
 
         return TransferDetail(
             id=transfer.id,
@@ -324,6 +329,11 @@ async def cancel_transfer_endpoint(
     try:
         await cancel_transfer(db, transfer_id, cancel_data.reason, current_user.id)
         transfer = await get_transfer_by_id(db, transfer_id)
+        if not transfer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=HU_TRANSFER_MESSAGES["transfer_not_found"],
+            )
 
         return TransferDetail(
             id=transfer.id,

@@ -137,8 +137,7 @@ async def list_job_executions(
             job_name=job.job_name,
             status=job.status,
             started_at=job.started_at,
-            completed_at=job.completed_at,
-            duration_seconds=job.duration_seconds,
+            finished_at=job.finished_at,
             result=job.result,
             error_message=job.error_message,
         )
@@ -177,8 +176,7 @@ async def get_job_execution(
         job_name=job.job_name,
         status=job.status,
         started_at=job.started_at,
-        completed_at=job.completed_at,
-        duration_seconds=job.duration_seconds,
+        finished_at=job.finished_at,
         result=job.result,
         error_message=job.error_message,
     )

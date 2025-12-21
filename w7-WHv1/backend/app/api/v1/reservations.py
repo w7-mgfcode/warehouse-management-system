@@ -267,6 +267,11 @@ async def cancel_reservation_endpoint(
 
         # Reload with full relationships for response
         reservation = await get_reservation_by_id(db, reservation_id)
+        if not reservation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=HU_RESERVATION_MESSAGES["reservation_not_found"],
+            )
 
         items = [
             ReservationItemResponse(
