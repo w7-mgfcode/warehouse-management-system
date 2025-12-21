@@ -151,6 +151,11 @@ echo -e "${BLUE}🧪 Running quality checks...${NC}"
 
 cd "w7-WHv1/backend"
 
+# Activate virtual environment if it exists
+if [ -f "../../venv_linux/bin/activate" ]; then
+    source "../../venv_linux/bin/activate"
+fi
+
 echo "▶ Running ruff check..."
 if ruff check .; then
     echo -e "${GREEN}✅ Ruff passed${NC}"
