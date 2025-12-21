@@ -203,12 +203,20 @@ async def issue_goods(
         if not issue_data.override_reason:
             raise ValueError(HU_MESSAGES["fefo_override_required"])
 
-    # 5. Update quantity
+    # 5. Validate reserved quantity constraint
+    available_to_issue = bin_content.quantity - bin_content.reserved_quantity
+    if issue_data.quantity > available_to_issue:
+        raise ValueError(
+            f"Nem lehet kiadni: {issue_data.quantity} kért, "
+            f"de csak {available_to_issue} elérhető (lefoglalva: {bin_content.reserved_quantity})"
+        )
+
+    # 6. Update quantity
     quantity_before = bin_content.quantity
     bin_content.quantity -= issue_data.quantity
     quantity_after = bin_content.quantity
 
-    # 6. Create BinMovement (issue)
+    # 7. Create BinMovement (issue)
     movement = await create_movement(
         db=db,
         bin_content_id=bin_content.id,
@@ -225,7 +233,7 @@ async def issue_goods(
         notes=issue_data.notes,
     )
 
-    # 7. Update bin status if empty
+    # 8. Update bin status if empty
     if bin_content.quantity == 0:
         bin = await get_bin_by_id(db, bin_content.bin_id)
         if bin:
@@ -265,6 +273,13 @@ async def adjust_stock(
     bin_content = bin_content_result.scalar_one_or_none()
     if not bin_content:
         raise ValueError(HU_MESSAGES["bin_content_not_found"])
+
+    # Validate new quantity won't violate reserved constraint
+    if adjustment_data.new_quantity < bin_content.reserved_quantity:
+        raise ValueError(
+            f"Az új mennyiség ({adjustment_data.new_quantity}) nem lehet kevesebb, "
+            f"mint a lefoglalt mennyiség ({bin_content.reserved_quantity})"
+        )
 
     quantity_before = bin_content.quantity
     quantity_change = adjustment_data.new_quantity - quantity_before

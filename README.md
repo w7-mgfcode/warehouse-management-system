@@ -4,7 +4,7 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 
 ## Features
 
-### Completed (Phase 1, 2 & 3)
+### Completed (Phase 1, 2, 3 & 4)
 
 **Phase 1 - Foundation**
 - ✅ JWT authentication with access/refresh tokens
@@ -26,17 +26,24 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 - ✅ Expiry warnings with 4 urgency levels (critical < 7 days)
 - ✅ Stock reports (levels, locations, summaries)
 
-**Test Coverage**: 136 tests passing (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
+**Phase 4 - Advanced Operations & Automation**
+- ✅ Stock reservations with FEFO allocation for customer orders
+- ✅ Same-warehouse transfers between bins
+- ✅ Cross-warehouse transfers with dispatch/confirm workflow
+- ✅ Celery background jobs for automated maintenance
+- ✅ Hungarian email alerts for expiring products
+- ✅ Job monitoring and manual trigger capabilities
 
-### Planned (Phase 4+)
-- 🔄 Phase 4: Bin transfers, stock reservations, scheduled jobs
+**Test Coverage**: 140 tests passing (Phase 1 + 2 + 3 + 4)
+
+### Planned (Phase 5+)
 - 🔄 Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui)
 
 ## Technology Stack
 
 **Backend**: Python 3.13+, FastAPI 0.125.0, SQLAlchemy 2.0.45, PostgreSQL 17, Valkey 8.1
 **Frontend**: React 19, Tailwind CSS 4.0, shadcn/ui, TanStack Query 5.90+, Zustand 5.x
-**Testing**: pytest with 136 passing tests (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
+**Testing**: pytest with 140 tests passing (Phase 1 + 2 + 3 + 4)
 **Code Quality**: ruff (linting + formatting), mypy (type checking)
 
 ## Quick Start
@@ -97,6 +104,12 @@ warehouse-management-system/
 - [FEFO Compliance](Docs/Phase3_FEFO_Compliance.md) - Algorithm deep dive and food safety
 - [Movement Audit](Docs/Phase3_Movement_Audit.md) - Audit trail and traceability
 - [Testing Guide](Docs/Phase3_Testing_Guide.md) - Phase 3 test patterns
+
+### Phase 4 - Advanced Operations & Automation
+- [Overview](Docs/Phase4_Overview.md) - Phase 4 features and quick reference
+- [API Reference](Docs/Phase4_API_Reference.md) - Transfers, reservations, jobs endpoints
+- [Database Schema](Docs/Phase4_Database_Schema.md) - New tables and modifications
+- [Testing Guide](Docs/Phase4_Testing_Guide.md) - Phase 4 test patterns
 
 ## Repo Governance (Agents + Workflow)
 

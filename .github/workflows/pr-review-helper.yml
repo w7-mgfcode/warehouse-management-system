@@ -1,0 +1,55 @@
+name: PR Review Helper
+
+# This workflow provides helpful information when review comments are added
+# It's optional and complements the local VS Code automation
+
+on:
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  review-helper:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      
+    steps:
+      - name: Comment Information
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comment } = await github.rest.pulls.getReviewComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id
+            });
+            
+            console.log('Review Comment Details:');
+            console.log('ID:', comment.id);
+            console.log('File:', comment.path);
+            console.log('Position:', comment.position);
+            console.log('Author:', comment.user.login);
+            
+            // Optionally, add a reaction or label to track unresolved comments
+            if (comment.user.login === 'github-actions[bot]' || 
+                comment.user.login.includes('copilot')) {
+              await github.rest.reactions.createForPullRequestReviewComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+                content: 'eyes'
+              });
+            }
+            
+      - name: Notify PR Author
+        if: github.event.comment.user.login != github.event.pull_request.user.login
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Optional: Add a label to track PRs with pending reviews
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['pending-review-responses']
+            });

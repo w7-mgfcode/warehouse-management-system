@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
@@ -56,7 +57,7 @@ async def create_movement(
         notes: Optional notes.
 
     Returns:
-        BinMovement: Created movement record.
+        BinMovement: Created movement record with eagerly loaded bin_content.
     """
     movement = BinMovement(
         bin_content_id=bin_content_id,
@@ -74,8 +75,15 @@ async def create_movement(
     )
     db.add(movement)
     await db.flush()
-    await db.refresh(movement)
-    return movement
+
+    # Reload with eager loading to ensure bin_content is available in async context
+    # This prevents lazy-load issues when bin_content is None in issue_goods()
+    result = await db.execute(
+        select(BinMovement)
+        .options(selectinload(BinMovement.bin_content))
+        .where(BinMovement.id == movement.id)
+    )
+    return result.scalar_one()
 
 
 async def get_movements(
@@ -121,16 +129,12 @@ async def get_movements(
     if start_date:
         from datetime import datetime
 
-        start_datetime = datetime.combine(start_date, datetime.min.time()).replace(
-            tzinfo=UTC
-        )
+        start_datetime = datetime.combine(start_date, datetime.min.time()).replace(tzinfo=UTC)
         query = query.where(BinMovement.created_at >= start_datetime)
     if end_date:
         from datetime import datetime
 
-        end_datetime = datetime.combine(end_date, datetime.max.time()).replace(
-            tzinfo=UTC
-        )
+        end_datetime = datetime.combine(end_date, datetime.max.time()).replace(tzinfo=UTC)
         query = query.where(BinMovement.created_at <= end_datetime)
     if created_by:
         query = query.where(BinMovement.created_by == created_by)
@@ -187,6 +191,10 @@ async def movement_to_response(
         select(BinContent)
         .join(Bin, BinContent.bin_id == Bin.id)
         .join(Product, BinContent.product_id == Product.id)
+        .options(
+            selectinload(BinContent.bin),
+            selectinload(BinContent.product),
+        )
         .where(BinContent.id == movement.bin_content_id)
     )
     bin_content = bin_content_result.scalar_one_or_none()

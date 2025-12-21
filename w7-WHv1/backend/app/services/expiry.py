@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.db.models.bin import Bin
 from app.db.models.bin_content import BinContent
@@ -64,6 +65,10 @@ async def get_expiry_warnings(
         .join(Bin, BinContent.bin_id == Bin.id)
         .join(Warehouse, Bin.warehouse_id == Warehouse.id)
         .join(Product, BinContent.product_id == Product.id)
+        .options(
+            selectinload(BinContent.bin).selectinload(Bin.warehouse),
+            selectinload(BinContent.product),
+        )
         .where(
             BinContent.status == "available",
             BinContent.quantity > 0,
@@ -152,6 +157,10 @@ async def get_expired_products(
         .join(Bin, BinContent.bin_id == Bin.id)
         .join(Warehouse, Bin.warehouse_id == Warehouse.id)
         .join(Product, BinContent.product_id == Product.id)
+        .options(
+            selectinload(BinContent.bin).selectinload(Bin.warehouse),
+            selectinload(BinContent.product),
+        )
         .where(
             BinContent.status == "available",
             BinContent.use_by_date < today,
