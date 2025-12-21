@@ -21,6 +21,13 @@ python-multipart>=0.0.20
 # HTTP Client
 httpx>=0.28.0
 
+# Task Queue
+celery>=5.4.0
+valkey>=6.0.0
+
+# Email
+aiosmtplib>=3.0.0
+
 # Testing database
 aiosqlite>=0.20.0
 

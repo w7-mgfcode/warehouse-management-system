@@ -22,6 +22,25 @@ class Settings(BaseSettings):
     LANGUAGE: str = "hu"
     DEBUG: bool = True
 
+    # Celery
+    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/0"
+
+    # Email (SMTP)
+    SMTP_HOST: str = "localhost"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "wms@example.com"
+    SMTP_FROM_NAME: str = "WMS - Raktárkezelő Rendszer"
+    SMTP_TLS: bool = True
+    EMAIL_ENABLED: bool = False
+
+    # Expiry alert settings
+    EXPIRY_WARNING_DAYS: int = 14
+    EXPIRY_CRITICAL_DAYS: int = 7
+    ALERT_RECIPIENT_EMAILS: str = ""  # Comma-separated list
+
     # API
     API_V1_PREFIX: str = "/api/v1"
     PROJECT_NAME: str = "WMS - Warehouse Management System"

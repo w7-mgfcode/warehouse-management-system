@@ -57,6 +57,9 @@ class BinContent(Base):
     best_before_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     freeze_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     quantity: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    reserved_quantity: Mapped[Decimal] = mapped_column(
+        Numeric(10, 2), default=Decimal("0"), nullable=False
+    )
     unit: Mapped[str] = mapped_column(String(50), nullable=False)
     pallet_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     weight_kg: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
@@ -86,6 +89,10 @@ class BinContent(Base):
         CheckConstraint(
             "quantity >= 0",
             name="check_positive_quantity",
+        ),
+        CheckConstraint(
+            "reserved_quantity >= 0 AND reserved_quantity <= quantity",
+            name="check_reserved_quantity",
         ),
         CheckConstraint(
             "pallet_count > 0 OR pallet_count IS NULL",

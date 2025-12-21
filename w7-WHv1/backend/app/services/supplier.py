@@ -146,4 +146,3 @@ async def delete_supplier(db: AsyncSession, supplier: Supplier) -> None:
 
 def calculate_pages(total: int, page_size: int) -> int:
     return _calculate_pages(total, page_size)
-

@@ -98,9 +98,7 @@ def require_roles(*allowed_roles: str):
 RequireAdmin = Annotated[User, Depends(require_roles("admin"))]
 RequireManager = Annotated[User, Depends(require_roles("admin", "manager"))]
 RequireWarehouse = Annotated[User, Depends(require_roles("admin", "manager", "warehouse"))]
-RequireViewer = Annotated[
-    User, Depends(require_roles("admin", "manager", "warehouse", "viewer"))
-]
+RequireViewer = Annotated[User, Depends(require_roles("admin", "manager", "warehouse", "viewer"))]
 
 # Type aliases for common dependencies
 CurrentUser = Annotated[User, Depends(get_current_user)]

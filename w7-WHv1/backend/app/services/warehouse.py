@@ -1,4 +1,5 @@
 """Warehouse service for CRUD operations."""
+
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -212,5 +213,3 @@ async def has_bins(db: AsyncSession, warehouse_id: UUID) -> bool:
 
 def calculate_pages(total: int, page_size: int) -> int:
     return _calculate_pages(total, page_size)
-
-

@@ -3,7 +3,8 @@
 import os
 import uuid
 from collections.abc import AsyncGenerator
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -13,6 +14,8 @@ from sqlalchemy.pool import StaticPool
 from app.core.security import create_access_token, get_password_hash
 from app.db.base import Base
 from app.db.models.bin import Bin
+from app.db.models.bin_content import BinContent
+from app.db.models.bin_movement import BinMovement
 from app.db.models.product import Product
 from app.db.models.supplier import Supplier
 from app.db.models.user import User
@@ -310,3 +313,177 @@ async def sample_bin(db_session: AsyncSession, sample_warehouse: Warehouse) -> B
     await db_session.flush()
     await db_session.refresh(bin_obj)
     return bin_obj
+
+
+@pytest.fixture
+async def second_bin(db_session: AsyncSession, sample_warehouse: Warehouse) -> Bin:
+    """Create a second bin for testing transfers."""
+    bin_obj = Bin(
+        id=uuid.uuid4(),
+        warehouse_id=sample_warehouse.id,
+        code="A-02",
+        structure_data={"aisle": "A", "level": "02"},
+        status="empty",
+        max_weight=1000.0,
+        max_height=180.0,
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_obj)
+    await db_session.flush()
+    await db_session.refresh(bin_obj)
+    return bin_obj
+
+
+@pytest.fixture
+async def inactive_bin(db_session: AsyncSession, sample_warehouse: Warehouse) -> Bin:
+    """Create an inactive bin for testing."""
+    bin_obj = Bin(
+        id=uuid.uuid4(),
+        warehouse_id=sample_warehouse.id,
+        code="A-03",
+        structure_data={"aisle": "A", "level": "03"},
+        status="empty",
+        max_weight=1000.0,
+        max_height=180.0,
+        is_active=False,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_obj)
+    await db_session.flush()
+    await db_session.refresh(bin_obj)
+    return bin_obj
+
+
+@pytest.fixture
+async def sample_bin_content(
+    db_session: AsyncSession,
+    sample_bin: Bin,
+    sample_product: Product,
+    sample_supplier: Supplier,
+) -> BinContent:
+    """Create sample bin content for inventory tests."""
+    bin_content = BinContent(
+        id=uuid.uuid4(),
+        bin_id=sample_bin.id,
+        product_id=sample_product.id,
+        supplier_id=sample_supplier.id,
+        batch_number="BATCH-TEST-001",
+        use_by_date=date.today() + timedelta(days=30),
+        quantity=Decimal("100.0"),
+        unit="kg",
+        status="available",
+        received_date=datetime.now(UTC),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_content)
+    # Update bin status to occupied
+    sample_bin.status = "occupied"
+    await db_session.flush()
+    await db_session.refresh(bin_content)
+    return bin_content
+
+
+@pytest.fixture
+async def sample_bin_content_expired(
+    db_session: AsyncSession,
+    second_bin: Bin,
+    sample_product: Product,
+    sample_supplier: Supplier,
+) -> BinContent:
+    """Create expired bin content for testing."""
+    bin_content = BinContent(
+        id=uuid.uuid4(),
+        bin_id=second_bin.id,
+        product_id=sample_product.id,
+        supplier_id=sample_supplier.id,
+        batch_number="BATCH-EXPIRED-001",
+        use_by_date=date.today() - timedelta(days=5),
+        quantity=Decimal("50.0"),
+        unit="kg",
+        status="available",
+        received_date=datetime.now(UTC) - timedelta(days=60),
+        created_at=datetime.now(UTC) - timedelta(days=60),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_content)
+    # Update bin status to occupied
+    second_bin.status = "occupied"
+    await db_session.flush()
+    await db_session.refresh(bin_content)
+    return bin_content
+
+
+@pytest.fixture
+async def sample_bin_content_critical_expiry(
+    db_session: AsyncSession,
+    sample_warehouse: Warehouse,
+    sample_product: Product,
+    sample_supplier: Supplier,
+) -> BinContent:
+    """Create bin content with critical expiry (< 7 days) for testing."""
+    # Create a new bin for this content
+    bin_obj = Bin(
+        id=uuid.uuid4(),
+        warehouse_id=sample_warehouse.id,
+        code="B-01",
+        structure_data={"aisle": "B", "level": "01"},
+        status="occupied",
+        max_weight=1000.0,
+        max_height=180.0,
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_obj)
+    await db_session.flush()
+
+    bin_content = BinContent(
+        id=uuid.uuid4(),
+        bin_id=bin_obj.id,
+        product_id=sample_product.id,
+        supplier_id=sample_supplier.id,
+        batch_number="BATCH-CRITICAL-001",
+        use_by_date=date.today() + timedelta(days=3),
+        quantity=Decimal("25.0"),
+        unit="kg",
+        status="available",
+        received_date=datetime.now(UTC) - timedelta(days=30),
+        created_at=datetime.now(UTC) - timedelta(days=30),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_content)
+    await db_session.flush()
+    await db_session.refresh(bin_content)
+    return bin_content
+
+
+@pytest.fixture
+async def sample_movement(
+    db_session: AsyncSession,
+    sample_bin_content: BinContent,
+    warehouse_user: User,
+) -> BinMovement:
+    """Create sample movement for testing."""
+    movement = BinMovement(
+        id=uuid.uuid4(),
+        bin_content_id=sample_bin_content.id,
+        movement_type="receipt",
+        quantity=Decimal("100.0"),
+        quantity_before=Decimal("0.0"),
+        quantity_after=Decimal("100.0"),
+        reason="supplier_delivery",
+        reference_number="REF-TEST-001",
+        fefo_compliant=True,
+        force_override=False,
+        notes="Test receipt",
+        created_by=warehouse_user.id,
+        created_at=datetime.now(UTC),
+    )
+    db_session.add(movement)
+    await db_session.flush()
+    await db_session.refresh(movement)
+    return movement

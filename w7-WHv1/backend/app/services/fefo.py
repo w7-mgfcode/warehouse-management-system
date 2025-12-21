@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
@@ -54,14 +55,17 @@ async def get_fefo_recommendation(
     if not product:
         raise ValueError(HU_MESSAGES["product_not_found"])
 
-    # Query all available stock for this product
+    # Query all available stock for this product (exclude expired and fully reserved items)
+    today = date.today()
     result = await db.execute(
         select(BinContent)
         .join(Bin, BinContent.bin_id == Bin.id)
+        .options(selectinload(BinContent.bin))
         .where(
             BinContent.product_id == product_id,
             BinContent.status == "available",
-            BinContent.quantity > 0,
+            BinContent.quantity > BinContent.reserved_quantity,  # Exclude fully reserved
+            BinContent.use_by_date >= today,  # Exclude expired items
         )
         .order_by(
             BinContent.use_by_date.asc(),
@@ -91,7 +95,9 @@ async def get_fefo_recommendation(
         if remaining_needed <= 0:
             break
 
-        suggested_qty = min(bin_content.quantity, remaining_needed)
+        # Calculate actual available quantity (excluding reserved)
+        available_qty = bin_content.quantity - bin_content.reserved_quantity
+        suggested_qty = min(available_qty, remaining_needed)
         days_until_expiry = calculate_days_until_expiry(bin_content.use_by_date)
 
         # Generate warning if expiry is close
@@ -109,7 +115,7 @@ async def get_fefo_recommendation(
                 batch_number=bin_content.batch_number,
                 use_by_date=bin_content.use_by_date,
                 days_until_expiry=days_until_expiry,
-                available_quantity=bin_content.quantity,
+                available_quantity=available_qty,  # Unreserved quantity only
                 suggested_quantity=suggested_qty,
                 is_fefo_compliant=True,  # All recommendations are in FEFO order
                 warning=warning,
@@ -118,7 +124,8 @@ async def get_fefo_recommendation(
 
         remaining_needed -= suggested_qty
 
-    total_available = sum(bc.quantity for bc in available_bins)
+    # Total available is sum of unreserved quantities
+    total_available = sum(bc.quantity - bc.reserved_quantity for bc in available_bins)
 
     # Check for critical expiry warnings
     if recommendations and recommendations[0].days_until_expiry < 7:
@@ -154,20 +161,18 @@ async def is_fefo_compliant(
         tuple: (is_compliant, oldest_bin_content if not compliant else None)
     """
     # Get the selected bin_content
-    selected_result = await db.execute(
-        select(BinContent).where(BinContent.id == bin_content_id)
-    )
+    selected_result = await db.execute(select(BinContent).where(BinContent.id == bin_content_id))
     selected_bin = selected_result.scalar_one_or_none()
     if not selected_bin:
         raise ValueError(HU_MESSAGES["bin_content_not_found"])
 
-    # Get the oldest available bin_content for this product
+    # Get the oldest available bin_content for this product (with unreserved stock)
     oldest_result = await db.execute(
         select(BinContent)
         .where(
             BinContent.product_id == product_id,
             BinContent.status == "available",
-            BinContent.quantity > 0,
+            BinContent.quantity > BinContent.reserved_quantity,  # Has unreserved stock
         )
         .order_by(
             BinContent.use_by_date.asc(),

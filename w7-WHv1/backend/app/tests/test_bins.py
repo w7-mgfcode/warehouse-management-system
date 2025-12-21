@@ -355,9 +355,7 @@ class TestBulkGeneration:
         )
         assert response.status_code == 422
         detail = response.json()["detail"]
-        assert any(
-            err.get("msg", "").endswith(HU_MESSAGES["bulk_invalid_range"]) for err in detail
-        )
+        assert any(err.get("msg", "").endswith(HU_MESSAGES["bulk_invalid_range"]) for err in detail)
 
     async def test_bulk_empty_generation_returns_localized_error(
         self,

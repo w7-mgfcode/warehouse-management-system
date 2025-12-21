@@ -371,4 +371,3 @@ async def create_bulk_bins(
     await db.flush()
 
     return len(bins_data)
-

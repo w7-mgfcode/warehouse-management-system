@@ -91,7 +91,9 @@ async def issue_inventory(
             bin_content_id=bin_content.id if bin_content else None,
             quantity_issued=abs(movement.quantity),
             remaining_quantity=movement.quantity_after,
-            use_by_date=bin_content.use_by_date if bin_content else movement.bin_content.use_by_date,
+            use_by_date=bin_content.use_by_date
+            if bin_content
+            else movement.bin_content.use_by_date,
             days_until_expiry=calculate_days_until_expiry(
                 bin_content.use_by_date if bin_content else movement.bin_content.use_by_date
             ),
@@ -102,7 +104,9 @@ async def issue_inventory(
     except ValueError as e:
         # FEFO violations and other errors
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT if "FEFO" in str(e) else status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT
+            if "FEFO" in str(e)
+            else status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         ) from e
 

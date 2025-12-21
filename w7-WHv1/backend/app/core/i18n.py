@@ -124,3 +124,48 @@ HU_REMOVAL_REASONS: dict[str, str] = {
     "moved": "Áthelyezve",
     "other": "Egyéb",
 }
+
+# Transfer messages (Phase 4)
+HU_TRANSFER_MESSAGES: dict[str, str] = {
+    "transfer_successful": "Átmozgatás sikeresen végrehajtva.",
+    "transfer_not_found": "Az átmozgatás nem található.",
+    "transfer_insufficient_quantity": "Nincs elegendő elérhető mennyiség az átmozgatáshoz.",
+    "transfer_same_bin": "A forrás és cél tárolóhely nem lehet ugyanaz.",
+    "transfer_different_warehouse": "A tárolóhelyek különböző raktárakban vannak.",
+    "transfer_target_occupied": "A cél tárolóhely más termékkel foglalt.",
+    "transfer_reserved_stock": "A lefoglalt készlet nem mozgatható.",
+    "transfer_cancelled": "Az átmozgatás visszavonva.",
+    "transfer_already_completed": "Az átmozgatás már befejezve.",
+    "transfer_already_cancelled": "Az átmozgatás már visszavonva.",
+    "transfer_pending": "Átmozgatás függőben.",
+    "transfer_in_transit": "Átmozgatás úton.",
+    "transfer_received": "Átmozgatás beérkezve.",
+    "cross_warehouse_created": "Raktárközi átmozgatás létrehozva.",
+    "cross_warehouse_dispatched": "Raktárközi átmozgatás elindítva.",
+    "cross_warehouse_confirmed": "Raktárközi átmozgatás visszaigazolva.",
+    "cross_warehouse_cancelled": "Raktárközi átmozgatás visszavonva.",
+}
+
+# Reservation messages (Phase 4)
+HU_RESERVATION_MESSAGES: dict[str, str] = {
+    "reservation_successful": "Foglalás sikeresen létrehozva.",
+    "reservation_not_found": "A foglalás nem található.",
+    "reservation_fulfilled": "Foglalás teljesítve.",
+    "reservation_cancelled": "Foglalás visszavonva.",
+    "reservation_expired": "Foglalás lejárt.",
+    "reservation_already_fulfilled": "A foglalás már teljesítve.",
+    "reservation_already_cancelled": "A foglalás már visszavonva.",
+    "reservation_partial": "Részleges foglalás - nem áll rendelkezésre elegendő készlet.",
+    "reservation_no_stock": "Nincs elérhető készlet a foglaláshoz.",
+    "reservation_invalid_quantity": "Érvénytelen mennyiség a foglaláshoz.",
+}
+
+# Job messages (Phase 4)
+HU_JOB_MESSAGES: dict[str, str] = {
+    "job_started": "Feladat elindítva.",
+    "job_completed": "Feladat sikeresen befejezve.",
+    "job_failed": "Feladat sikertelen.",
+    "job_not_found": "A feladat nem található.",
+    "job_already_running": "A feladat már fut.",
+    "job_trigger_success": "Feladat sikeresen elindítva.",
+}
