@@ -45,6 +45,12 @@ TestSessionLocal = async_sessionmaker(
 )
 
 
+@pytest.fixture(scope="session", autouse=True)
+async def _dispose_test_engine() -> AsyncGenerator[None]:
+    yield
+    await test_engine.dispose()
+
+
 @pytest.fixture(scope="function")
 async def db_session() -> AsyncGenerator[AsyncSession]:
     """
