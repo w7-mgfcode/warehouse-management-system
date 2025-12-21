@@ -4,27 +4,39 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 
 ## Features
 
-### Completed (Phase 1 & 2)
+### Completed (Phase 1, 2 & 3)
+
+**Phase 1 - Foundation**
 - ✅ JWT authentication with access/refresh tokens
 - ✅ Role-based access control (admin, manager, warehouse, viewer)
 - ✅ Warehouses CRUD with customizable bin structure templates
+- ✅ Hungarian localization for all user-facing messages
+
+**Phase 2 - Master Data & Storage**
 - ✅ Products CRUD with SKU validation and category filtering
 - ✅ Suppliers CRUD with Hungarian tax number validation
 - ✅ Bins CRUD with warehouse filtering and status management
-- ✅ Bulk bin generation from range specifications
-- ✅ Hungarian localization for all user-facing messages
-- ✅ Comprehensive test coverage (88 tests passing)
+- ✅ Bulk bin generation from range specifications (e.g., 3×10×5×4 = 600 bins)
 
-### Planned (Phase 3+)
-- 🔄 Phase 3: Inventory receipt/issue + FEFO logic (bin contents, stock movements, expiry warnings)
-- 🔄 Phase 4: Reports + scheduled jobs + Hungarian email templates
+**Phase 3 - Inventory Operations & FEFO**
+- ✅ Inventory receipt with batch tracking and expiry dates
+- ✅ Inventory issue with FEFO (First Expired, First Out) enforcement
+- ✅ FEFO algorithm with 3-level sort priority for food safety
+- ✅ Movement audit trail (immutable history of all transactions)
+- ✅ Expiry warnings with 4 urgency levels (critical < 7 days)
+- ✅ Stock reports (levels, locations, summaries)
+
+**Test Coverage**: 136 tests passing (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
+
+### Planned (Phase 4+)
+- 🔄 Phase 4: Bin transfers, stock reservations, scheduled jobs
 - 🔄 Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui)
 
 ## Technology Stack
 
 **Backend**: Python 3.13+, FastAPI 0.125.0, SQLAlchemy 2.0.45, PostgreSQL 17, Valkey 8.1
 **Frontend**: React 19, Tailwind CSS 4.0, shadcn/ui, TanStack Query 5.90+, Zustand 5.x
-**Testing**: pytest with 88 passing tests
+**Testing**: pytest with 136 passing tests (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
 **Code Quality**: ruff (linting + formatting), mypy (type checking)
 
 ## Quick Start
@@ -60,11 +72,31 @@ warehouse-management-system/
 
 ## Documentation
 
+### Getting Started
 - [Setup Guide](w7-WHv1/README.md) - Installation and configuration
+- [GitHub Workflow](Docs/GitHub_Workflow.md) - Development workflow and conventions
+
+### Phase 1 - Foundation
 - [Architecture](Docs/Phase1_Architecture.md) - System design and patterns
-- [API Reference](Docs/Phase1_API_Reference.md) - All endpoints with examples
-- [Database Schema](Docs/Phase1_Database_Schema.md) - Tables and relationships
+- [API Reference](Docs/Phase1_API_Reference.md) - Authentication, users, warehouses
+- [Database Schema](Docs/Phase1_Database_Schema.md) - Core tables and relationships
 - [Authentication](Docs/Phase1_Authentication.md) - JWT and RBAC details
+- [Development Guide](Docs/Phase1_Development_Guide.md) - Setup and workflow
+
+### Phase 2 - Master Data & Storage
+- [Overview](Docs/Phase2_Overview.md) - Phase 2 features and quick reference
+- [API Reference](Docs/Phase2_API_Reference.md) - Products, suppliers, bins endpoints
+- [Database Schema](Docs/Phase2_Database_Schema.md) - Master data tables
+- [Bulk Generation](Docs/Phase2_Bulk_Generation.md) - Cartesian product algorithm
+- [Testing Guide](Docs/Phase2_Testing_Guide.md) - Phase 2 test patterns
+
+### Phase 3 - Inventory Operations & FEFO
+- [Overview](Docs/Phase3_Overview.md) - Phase 3 features and quick reference
+- [API Reference](Docs/Phase3_API_Reference.md) - Inventory, movements, reports endpoints
+- [Database Schema](Docs/Phase3_Database_Schema.md) - Inventory and movement tables
+- [FEFO Compliance](Docs/Phase3_FEFO_Compliance.md) - Algorithm deep dive and food safety
+- [Movement Audit](Docs/Phase3_Movement_Audit.md) - Audit trail and traceability
+- [Testing Guide](Docs/Phase3_Testing_Guide.md) - Phase 3 test patterns
 
 ## Repo Governance (Agents + Workflow)
 
