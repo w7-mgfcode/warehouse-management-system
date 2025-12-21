@@ -94,4 +94,4 @@ Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/lab
 ## Discovered during work
 - Consider tightening CI later (make `mypy` blocking once the codebase is type-clean).
 - Confirm exact branch protection required-check name in GitHub UI and set it to `CI / backend (lint/type/test)`.
-- Phase 3 tests need to be written to verify FEFO algorithm and movement tracking.
+
