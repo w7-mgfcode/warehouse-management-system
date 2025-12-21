@@ -1040,6 +1040,487 @@ npm run dev
 
 ---
 
+## Playwright MCP for Frontend Development & Testing
+
+### Overview
+
+Playwright MCP (Model Context Protocol) provides browser automation capabilities for testing, debugging, and validating the frontend during development. This is especially valuable for this WMS project given the complexity of FEFO logic, Hungarian localization, and RBAC requirements.
+
+### Setup (Ubuntu Pro Server)
+
+```bash
+# Install Playwright browsers (headless mode for server)
+cd w7-WHv1/frontend
+npx playwright install chromium
+npx playwright install-deps  # Install system dependencies
+
+# Verify installation
+npx playwright --version
+```
+
+### Use Cases During Development
+
+#### 1. Authentication Flow Testing
+
+**Scenario**: Verify login/logout and token refresh work correctly
+
+```typescript
+// Test Case: Login with admin credentials
+// 1. Navigate to login page
+// 2. Fill credentials: admin / Admin123!
+// 3. Submit form
+// 4. Verify redirect to /dashboard
+// 5. Verify user info in header
+// 6. Click logout
+// 7. Verify redirect to /login
+
+// MCP Actions:
+- browser_navigate: http://localhost:5173/login
+- browser_snapshot: Capture accessibility tree
+- browser_fill_form: Fill username/password
+- browser_click: Submit button
+- browser_wait_for: Dashboard text appears
+- browser_take_screenshot: Success state
+```
+
+**Value**: Catches auth bugs early, verifies token storage and refresh logic
+
+---
+
+#### 2. Hungarian Localization Verification
+
+**Scenario**: Ensure all UI text is in Hungarian, no English leakage
+
+```typescript
+// Test Case: Scan all pages for Hungarian text
+// 1. Login as admin
+// 2. Navigate to each route
+// 3. Capture page snapshot
+// 4. Verify no English words (Create, Edit, Delete, etc.)
+// 5. Check form validation messages
+// 6. Check error messages
+
+// MCP Actions:
+- browser_navigate: Navigate to each route
+- browser_snapshot: Capture text content
+- browser_evaluate: Extract all text nodes
+- browser_console_messages: Check for untranslated logs
+```
+
+**Value**: Ensures Hungarian-only UI requirement is met (critical for this project)
+
+---
+
+#### 3. RBAC UI Enforcement Testing
+
+**Scenario**: Verify UI elements show/hide based on user roles
+
+```typescript
+// Test Case: Role-based UI visibility
+// Admin: Sees all features
+// Manager: Can't see user management
+// Warehouse: Can't see adjust/scrap buttons
+// Viewer: Can't see any create/edit/delete buttons
+
+// MCP Actions per role:
+- browser_navigate: /inventory/issue
+- browser_snapshot: Capture button availability
+- browser_evaluate: Check if force-issue button exists
+- browser_click: Try to access restricted page
+- browser_wait_for: Unauthorized message
+```
+
+**Value**: Prevents privilege escalation, ensures security requirements
+
+---
+
+#### 4. FEFO Visualization & Expiry Badge Testing
+
+**Scenario**: Verify expiry badges show correct colors and urgency
+
+```typescript
+// Test Case: Expiry urgency colors
+// < 7 days: Red (critical) with pulse animation
+// 7-14 days: Orange (high)
+// 15-30 days: Yellow (medium)
+// > 30 days: Green (low)
+// Expired: Red with "LEJÁRT" text
+
+// MCP Actions:
+- browser_navigate: /inventory/expiry
+- browser_take_screenshot: Full page with badges
+- browser_evaluate: Get computed styles of badges
+- browser_click: Sort by expiry date
+- browser_snapshot: Verify FEFO order
+```
+
+**Value**: FEFO compliance is critical for food safety - visual bugs could cause violations
+
+---
+
+#### 5. Form Validation & Hungarian Error Messages
+
+**Scenario**: Test all form validations show Hungarian messages
+
+```typescript
+// Test Case: Product form validation
+// 1. Navigate to /products/new
+// 2. Submit empty form
+// 3. Verify Hungarian error messages appear:
+//    - "Kötelező mező" (Required field)
+//    - "Minimum 2 karakter szükséges" (Min 2 chars)
+//    - "Érvénytelen mértékegység" (Invalid unit)
+
+// MCP Actions:
+- browser_navigate: /products/new
+- browser_click: Submit button without filling
+- browser_snapshot: Capture error messages
+- browser_fill_form: Fill with invalid data
+- browser_click: Submit
+- browser_wait_for: Specific error text
+```
+
+**Value**: Catches Zod schema issues, ensures Hungarian validation messages
+
+---
+
+#### 6. Responsive Design Testing
+
+**Scenario**: Verify layout adapts to mobile, tablet, desktop
+
+```typescript
+// Test Case: Responsive breakpoints
+// Desktop (1280px): Fixed sidebar, full layout
+// Tablet (768px): Collapsible sidebar
+// Mobile (375px): Bottom nav, hamburger menu
+
+// MCP Actions:
+- browser_resize: 1280x720 (desktop)
+- browser_take_screenshot: Desktop layout
+- browser_resize: 768x1024 (tablet)
+- browser_snapshot: Sidebar state
+- browser_resize: 375x667 (mobile)
+- browser_click: Hamburger menu
+- browser_take_screenshot: Mobile menu open
+```
+
+**Value**: Warehouse floor tablets/phones need proper mobile support
+
+---
+
+#### 7. Dark Mode Testing
+
+**Scenario**: Verify dark mode toggle and theme persistence
+
+```typescript
+// Test Case: Dark mode functionality
+// 1. Toggle dark mode on
+// 2. Verify CSS variables change
+// 3. Refresh page
+// 4. Verify dark mode persists
+// 5. Check all components in dark mode
+
+// MCP Actions:
+- browser_navigate: /dashboard
+- browser_click: Dark mode toggle
+- browser_evaluate: Check document.documentElement.classList
+- browser_take_screenshot: Dark mode screenshot
+- browser_navigate_back: Refresh
+- browser_evaluate: Verify persisted preference
+```
+
+**Value**: Ensures UI store persistence works, catches dark mode CSS bugs
+
+---
+
+#### 8. API Integration & Network Request Testing
+
+**Scenario**: Verify correct API calls with proper headers
+
+```typescript
+// Test Case: Authentication headers
+// 1. Login
+// 2. Navigate to /products
+// 3. Verify GET /api/v1/products has Authorization header
+// 4. Create new product
+// 5. Verify POST /api/v1/products succeeds
+
+// MCP Actions:
+- browser_navigate: /login
+- browser_fill_form: Login credentials
+- browser_click: Submit
+- browser_network_requests: Capture all requests
+- browser_evaluate: Check if requests have Bearer token
+- browser_console_messages: Check for network errors
+```
+
+**Value**: Catches axios interceptor issues, token refresh bugs
+
+---
+
+#### 9. Real-time Updates & TanStack Query Testing
+
+**Scenario**: Verify background refetching and cache invalidation
+
+```typescript
+// Test Case: Inventory updates after receipt
+// 1. Open /inventory overview in tab A
+// 2. Open /inventory/receipt in tab B
+// 3. Submit receipt in tab B
+// 4. Switch to tab A
+// 5. Verify stock levels updated automatically
+
+// MCP Actions:
+- browser_tabs: Create new tab
+- browser_navigate: /inventory
+- browser_snapshot: Note initial stock
+- browser_tabs: Switch to tab 2
+- browser_navigate: /inventory/receipt
+- browser_fill_form: Receipt data
+- browser_click: Submit
+- browser_wait_for: Success message
+- browser_tabs: Switch to tab 1
+- browser_wait_for: Updated stock value
+```
+
+**Value**: Ensures TanStack Query invalidation logic works correctly
+
+---
+
+#### 10. Optimistic Updates Testing
+
+**Scenario**: Verify useOptimistic provides instant feedback
+
+```typescript
+// Test Case: Product creation optimistic update
+// 1. Navigate to /products
+// 2. Click "Létrehozás" (Create)
+// 3. Fill form
+// 4. Submit
+// 5. Verify product appears immediately in list (optimistic)
+// 6. Verify product persists after API response
+
+// MCP Actions:
+- browser_navigate: /products
+- browser_take_screenshot: Before state
+- browser_click: Create button
+- browser_fill_form: Product data
+- browser_click: Submit
+- browser_snapshot: Immediate state (optimistic)
+- browser_wait_for: API completion
+- browser_snapshot: Final state
+```
+
+**Value**: Ensures React 19 useOptimistic hook works correctly
+
+---
+
+#### 11. Bulk Bin Generation Testing
+
+**Scenario**: Verify Cartesian product preview and creation
+
+```typescript
+// Test Case: Generate 600 bins (3×10×5×4)
+// 1. Navigate to /bins/bulk
+// 2. Fill ranges: Aisles (A-C), Racks (01-10), Levels (01-05), Positions (01-04)
+// 3. Click "Előnézet" (Preview)
+// 4. Verify 600 bins shown in preview table
+// 5. Click "Létrehozás" (Create)
+// 6. Wait for progress indicator
+// 7. Verify success message
+
+// MCP Actions:
+- browser_navigate: /bins/bulk
+- browser_fill_form: Range specifications
+- browser_click: Preview button
+- browser_wait_for: "600 tárolóhely" text
+- browser_take_screenshot: Preview table
+- browser_click: Create button
+- browser_wait_for: Progress bar completion
+- browser_snapshot: Success state
+```
+
+**Value**: Critical feature for warehouse setup - catches bulk operation bugs
+
+---
+
+#### 12. FEFO Recommendation Visualization
+
+**Scenario**: Verify FEFO picking list displays correctly
+
+```typescript
+// Test Case: FEFO recommendation order
+// 1. Navigate to /inventory/issue
+// 2. Select product with multiple batches
+// 3. Enter quantity
+// 4. Click "FEFO Javaslat" (FEFO Recommendation)
+// 5. Verify batches sorted by expiry date (oldest first)
+// 6. Verify expiry badges show urgency colors
+// 7. Check for FEFO warnings if needed
+
+// MCP Actions:
+- browser_navigate: /inventory/issue
+- browser_fill_form: Product selection + quantity
+- browser_click: FEFO recommendation button
+- browser_snapshot: Recommendation list
+- browser_evaluate: Extract batch order and dates
+- browser_take_screenshot: Visual verification
+```
+
+**Value**: Core FEFO compliance feature - bugs here could violate food safety regulations
+
+---
+
+#### 13. Cross-browser Compatibility Testing
+
+**Scenario**: Test in Chromium, Firefox, WebKit (Safari)
+
+```typescript
+// Test Case: Multi-browser compatibility
+// Run same test suite across all browsers
+// Focus areas:
+// - CSS Grid/Flexbox layouts
+// - Tailwind v4 features
+// - Date formatting (date-fns)
+// - Form validation
+// - Async/await API calls
+
+// MCP Actions:
+- Configure Playwright to test all browsers
+- browser_navigate: Same routes across browsers
+- browser_take_screenshot: Compare renders
+- browser_console_messages: Check browser-specific errors
+```
+
+**Value**: Ensures compatibility across warehouse devices (Chrome, Edge, Safari iPads)
+
+---
+
+#### 14. Accessibility Testing
+
+**Scenario**: Verify keyboard navigation and screen reader support
+
+```typescript
+// Test Case: Keyboard accessibility
+// 1. Navigate to /products/new
+// 2. Use Tab key to move through form
+// 3. Verify focus indicators visible
+// 4. Use Enter to submit
+// 5. Verify error messages announced to screen readers
+
+// MCP Actions:
+- browser_navigate: /products/new
+- browser_press_key: Tab (multiple times)
+- browser_snapshot: Check focus order
+- browser_evaluate: Check aria-labels
+- browser_press_key: Enter
+- browser_snapshot: Check error announcements
+```
+
+**Value**: Ensures WCAG compliance, usability for all users
+
+---
+
+#### 15. Performance & Console Error Monitoring
+
+**Scenario**: Monitor console for warnings/errors during development
+
+```typescript
+// Test Case: Clean console policy
+// 1. Navigate through all main routes
+// 2. Perform key user flows
+// 3. Verify no console errors
+// 4. Check for performance warnings
+
+// MCP Actions:
+- browser_navigate: Each route
+- browser_console_messages: Capture all levels
+- browser_evaluate: Performance.timing data
+- browser_network_requests: Check failed requests
+```
+
+**Value**: Catches React warnings, API errors, performance bottlenecks early
+
+---
+
+### Playwright MCP Command Reference for Frontend Dev
+
+```bash
+# Install browser (Ubuntu Pro server - headless)
+npx playwright install chromium --with-deps
+
+# Test specific scenario
+npm run test:e2e -- --grep "login flow"
+
+# Debug mode with headed browser (if X11 available)
+PWDEBUG=1 npm run test:e2e
+
+# Generate test code from actions
+npx playwright codegen http://localhost:5173
+
+# Run tests with video recording
+npm run test:e2e -- --video=on
+
+# Run tests with trace
+npm run test:e2e -- --trace=on
+```
+
+### Integration with CI/CD
+
+```yaml
+# .github/workflows/frontend.yml
+name: Frontend CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          cd w7-WHv1/frontend
+          npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend
+        run: |
+          cd w7-WHv1/backend
+          docker-compose up -d
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+```
+
+### Best Practices
+
+1. **Use browser_snapshot over browser_take_screenshot** for faster, text-based verification
+2. **Capture network requests** to debug API integration issues
+3. **Check console messages** for React warnings and errors
+4. **Test with real backend** running on localhost:8000
+5. **Use Hungarian text** in browser_wait_for to verify localization
+6. **Test RBAC** by logging in as different roles
+7. **Verify FEFO order** in issue operations (critical for compliance)
+8. **Test token refresh** by waiting 15 minutes or modifying token expiry
+9. **Check expiry badge colors** match urgency levels (food safety critical)
+10. **Test bulk operations** to ensure performance with large datasets
+
+---
+
 ## Confidence Score: 6/10
 
 **Strengths:**
