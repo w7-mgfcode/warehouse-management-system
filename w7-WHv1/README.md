@@ -116,7 +116,7 @@ cd w7-WHv1/backend
 pytest app/tests/ -v --cov=app --cov-report=term-missing
 ```
 
-**Current Status**: 88 tests passing (40 Phase 1 + 48 Phase 2)
+**Current Status**: 136 tests passing (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
 
 ## Linting and Type Checking
 
@@ -172,6 +172,41 @@ mypy .
 - `DELETE /api/v1/bins/{id}` - Delete bin (warehouse+)
 - `POST /api/v1/bins/bulk/preview` - Preview bulk generation (manager+)
 - `POST /api/v1/bins/bulk` - Bulk create bins (manager+)
+
+### Inventory Operations (Phase 3)
+- `POST /api/v1/inventory/receive` - Receive goods into bin (warehouse+)
+- `POST /api/v1/inventory/issue` - Issue goods from bin with FEFO (warehouse+)
+- `GET /api/v1/inventory/fefo-recommendation` - Get FEFO-compliant picking list
+- `GET /api/v1/inventory/stock-levels` - Get stock levels by product
+- `GET /api/v1/inventory/expiry-warnings` - Get products approaching expiry
+- `GET /api/v1/inventory/expired` - Get expired products
+- `POST /api/v1/inventory/adjust` - Adjust inventory (manager+)
+- `POST /api/v1/inventory/scrap` - Scrap inventory (manager+)
+
+### Movements (Phase 3)
+- `GET /api/v1/movements` - List movements with filters (by bin, product, date range)
+- `GET /api/v1/movements/{id}` - Get movement details
+
+### Reports (Phase 3)
+- `GET /api/v1/reports/inventory-summary` - Inventory summary by warehouse
+- `GET /api/v1/reports/product-locations` - Find all bins containing a product
+
+## Key Features
+
+### FEFO (First Expired, First Out) Compliance
+Phase 3 implements automated FEFO enforcement for food safety:
+- **3-level sort priority**: use_by_date → batch_number → received_date
+- **Multi-bin allocation**: Automatically recommends picking from multiple bins
+- **Manager override**: Managers can override FEFO with documented reason
+- **Expiry warnings**: 4 urgency levels (critical < 7 days, high 7-14 days, medium 15-30 days, low 31-60 days)
+
+### Immutable Audit Trail
+All inventory movements tracked in append-only log:
+- **Movement types**: receipt, issue, adjustment, scrap, transfer
+- **Quantity snapshots**: Before/after tracking
+- **FEFO compliance tracking**: Records violations and overrides
+- **User attribution**: Complete chain of custody
+- **No modifications**: Movements cannot be updated or deleted
 
 ## Environment Variables
 

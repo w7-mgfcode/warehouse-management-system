@@ -2,7 +2,7 @@
 
 from app.db.models.bin import Bin
 from app.db.models.bin_content import BinContent
-from app.db.models.bin_history import BinHistory
+from app.db.models.bin_movement import BinMovement
 from app.db.models.product import Product
 from app.db.models.supplier import Supplier
 from app.db.models.user import User
@@ -15,5 +15,5 @@ __all__ = [
     "Product",
     "Supplier",
     "BinContent",
-    "BinHistory",
+    "BinMovement",
 ]
