@@ -67,8 +67,7 @@ class Bin(Base):
 
     # Relationships
     warehouse: Mapped["Warehouse"] = relationship(back_populates="bins")
-    content: Mapped["BinContent | None"] = relationship(
+    contents: Mapped[list["BinContent"]] = relationship(
         back_populates="bin",
-        uselist=False,
         cascade="all, delete-orphan",
     )

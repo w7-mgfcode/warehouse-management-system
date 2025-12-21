@@ -39,11 +39,36 @@ HU_MESSAGES: dict[str, str] = {
     "supplier_name_required": "A cég neve kötelező.",
     "supplier_has_inventory": "A beszállító nem törölhető, mert van hozzá tartozó készlet.",
     "invalid_tax_number": "Érvénytelen adószám formátum.",
-    # Inventory
+    # Inventory (general)
     "invalid_dates": "A szavatossági dátum nem lehet korábbi, mint a minőségmegőrzési dátum.",
     "invalid_freeze_date": "A fagyasztás dátuma nem lehet a mai napnál későbbi.",
     "invalid_weight": "A súly pozitív szám kell legyen.",
     "invalid_pallet_count": "A raklap szám pozitív egész szám kell legyen.",
+    # Bin Contents (Phase 3)
+    "bin_content_not_found": "A tárolóhely tartalma nem található.",
+    "bin_already_occupied": "A tárolóhely már foglalt másik termékkel.",
+    "bin_not_empty_for_product": "A tárolóhely már tartalmazza ezt a terméket.",
+    "insufficient_quantity": "Nincs elegendő mennyiség a tárolóhelyen.",
+    "invalid_quantity": "Érvénytelen mennyiség.",
+    # Incoming/Outgoing (Phase 3)
+    "receipt_successful": "Termék sikeresen beérkeztetve.",
+    "issue_successful": "Termék sikeresen kiadva.",
+    "expiry_date_required": "A szavatossági dátum megadása kötelező.",
+    "expiry_date_past": "A szavatossági dátum nem lehet múltbeli.",
+    "freeze_date_future": "A fagyasztás dátuma nem lehet jövőbeli.",
+    # FEFO (Phase 3)
+    "fefo_violation": "FEFO szabály megsértése! Korábbi lejáratú tétel elérhető.",
+    "fefo_override_required": "FEFO felülíráshoz adminisztrátori jóváhagyás szükséges.",
+    "fefo_compliant": "FEFO szabály betartva.",
+    # Expiry (Phase 3)
+    "product_expired": "A termék lejárt.",
+    "expiry_warning": "Figyelem! Lejárat közel ({days} nap).",
+    "expiry_critical": "KRITIKUS! Lejárat közel ({days} nap).",
+    # Movements (Phase 3)
+    "movement_not_found": "A mozgás nem található.",
+    "movement_immutable": "A mozgás rekordok nem módosíthatók.",
+    "invalid_movement_type": "Érvénytelen mozgás típus.",
+    "reference_required": "A hivatkozási szám megadása kötelező.",
     # User
     "user_not_found": "A felhasználó nem található.",
     "username_exists": "Ez a felhasználónév már foglalt.",
