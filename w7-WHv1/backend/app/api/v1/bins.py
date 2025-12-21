@@ -1,5 +1,6 @@
 """Bin management API endpoints."""
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -112,7 +113,7 @@ async def bulk_create_bins(
     bulk_data: BulkBinCreate,
     db: DbSession,
     _current_user: RequireManager,
-) -> dict:
+) -> dict[str, Any]:
     """
     Bulk create bins (manager+ only).
 

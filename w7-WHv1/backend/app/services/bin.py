@@ -53,9 +53,9 @@ def expand_range(spec: Any) -> list[str]:
 
 
 def generate_bin_codes(
-    template: dict,
+    template: dict[str, Any],
     ranges: dict[str, Any],
-) -> list[tuple[str, dict]]:
+) -> list[tuple[str, dict[str, str]]]:
     """
     Generate bin codes and structure_data from ranges.
 
@@ -79,7 +79,7 @@ def generate_bin_codes(
     field_names = [f["name"] for f in sorted_fields]
 
     # Expand ranges for each field
-    field_values = []
+    field_values: list[list[str]] = []
     combination_count = 1
     for name in field_names:
         if name not in ranges:
@@ -98,12 +98,12 @@ def generate_bin_codes(
         field_values.append(expand_range(spec))
 
     # Generate cartesian product
-    results = []
+    results: list[tuple[str, dict[str, str]]] = []
     for combo in cartesian_product(*field_values):
-        structure_data = dict(zip(field_names, combo, strict=True))
+        structure_data: dict[str, str] = dict(zip(field_names, combo, strict=True))
 
         # Apply formatting
-        formatted = {}
+        formatted: dict[str, str] = {}
         for name, value in structure_data.items():
             if auto_uppercase and isinstance(value, str) and value.isalpha():
                 value = value.upper()
@@ -272,7 +272,7 @@ async def preview_bulk_bins(
     db: AsyncSession,
     warehouse_id: UUID,
     ranges: dict[str, Any],
-) -> dict:
+) -> dict[str, Any]:
     """
     Preview bulk bin generation - check conflicts without creating.
 
@@ -313,7 +313,7 @@ async def create_bulk_bins(
     db: AsyncSession,
     warehouse_id: UUID,
     ranges: dict[str, Any],
-    defaults: dict | None = None,
+    defaults: dict[str, Any] | None = None,
 ) -> int:
     """
     Create bins in bulk.
@@ -350,7 +350,7 @@ async def create_bulk_bins(
 
     # Prepare bulk insert data
     defaults = defaults or {}
-    bins_data = []
+    bins_data: list[dict[str, Any]] = []
     for code, structure_data in codes_and_data:
         bins_data.append(
             {

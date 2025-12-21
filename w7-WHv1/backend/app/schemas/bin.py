@@ -49,7 +49,7 @@ class BinResponse(BaseModel):
     warehouse_id: UUID
     code: str
     structure_data: dict[str, Any]
-    status: str
+    status: BinStatus
     max_weight: float | None
     max_height: float | None
     accessibility: str | None

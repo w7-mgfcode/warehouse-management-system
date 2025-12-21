@@ -12,6 +12,9 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token, get_password_hash
 from app.db.base import Base
+from app.db.models.bin import Bin
+from app.db.models.product import Product
+from app.db.models.supplier import Supplier
 from app.db.models.user import User
 from app.db.models.warehouse import Warehouse
 from app.db.session import get_async_session
@@ -242,10 +245,8 @@ def auth_header(token: str) -> dict[str, str]:
 
 
 @pytest.fixture
-async def sample_product(db_session: AsyncSession):
+async def sample_product(db_session: AsyncSession) -> Product:
     """Create a sample product for testing."""
-    from app.db.models.product import Product
-
     product = Product(
         id=uuid.uuid4(),
         name="Test Product",
@@ -264,10 +265,8 @@ async def sample_product(db_session: AsyncSession):
 
 
 @pytest.fixture
-async def sample_supplier(db_session: AsyncSession):
+async def sample_supplier(db_session: AsyncSession) -> Supplier:
     """Create a sample supplier for testing."""
-    from app.db.models.supplier import Supplier
-
     supplier = Supplier(
         id=uuid.uuid4(),
         company_name="Test Supplier Kft.",
@@ -287,10 +286,8 @@ async def sample_supplier(db_session: AsyncSession):
 
 
 @pytest.fixture
-async def sample_bin(db_session: AsyncSession, sample_warehouse: Warehouse):
+async def sample_bin(db_session: AsyncSession, sample_warehouse: Warehouse) -> Bin:
     """Create a sample bin for testing."""
-    from app.db.models.bin import Bin
-
     bin_obj = Bin(
         id=uuid.uuid4(),
         warehouse_id=sample_warehouse.id,

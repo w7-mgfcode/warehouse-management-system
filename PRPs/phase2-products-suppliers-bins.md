@@ -68,10 +68,10 @@ Implement complete CRUD operations for Products, Suppliers, and Bins entities, p
   why: "Test fixtures - user fixtures, sample_warehouse, auth_header"
 
 # External documentation
-- url: https://docs.sqlalchemy.org/en/20/orm/queryguide/dml.html
+- url: <https://docs.sqlalchemy.org/en/20/orm/queryguide/dml.html>
   why: "SQLAlchemy 2.0 bulk insert pattern using insert() statement"
 
-- url: https://github.com/zhanymkanov/fastapi-best-practices
+- url: <https://github.com/zhanymkanov/fastapi-best-practices>
   why: "FastAPI best practices - thin routes, fat services pattern"
 ```
 
