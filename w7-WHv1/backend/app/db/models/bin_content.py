@@ -84,7 +84,7 @@ class BinContent(Base):
             name="check_use_by_after_best_before",
         ),
         CheckConstraint(
-            "quantity > 0",
+            "quantity >= 0",
             name="check_positive_quantity",
         ),
         CheckConstraint(
