@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/
+    about: Check project docs under Docs/ and w7-WHv1/README.md

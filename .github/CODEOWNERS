@@ -1,0 +1,10 @@
+# Start light: set maintainers later.
+# Example:
+# * @w7-mgfcode/maintainers
+
+# Backend
+w7-WHv1/backend/ @w7-mgfcode
+
+# Docs/PRPs
+Docs/ @w7-mgfcode
+PRPs/ @w7-mgfcode
