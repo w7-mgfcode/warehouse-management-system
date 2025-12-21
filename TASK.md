@@ -3,11 +3,77 @@
 Last updated: 2025-12-21
 
 ## Active
+
+### Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui)
+**Branch**: `05-Frontend-Phase_5`
+**Specification**: `INITIAL5.md`
+**PRP**: `PRPs/phase5-frontend-react19-tailwind4.md`
+**Confidence Score**: 6/10 (large scope ~130 files, bleeding edge stack)
+
+#### Milestone 1: Foundation
+- [ ] Initialize Vite project with React 19 + TypeScript
+- [ ] Configure Tailwind CSS v4 with `@theme` directive
+- [ ] Initialize shadcn/ui (canary) components
+- [ ] Set up API client with axios interceptors
+- [ ] Create Zustand auth store with persistence
+- [ ] Implement protected routes
+- [ ] Build login page
+
+#### Milestone 2: Layout & Navigation
+- [ ] Create app layout with sidebar
+- [ ] Build navigation menu with Hungarian labels
+- [ ] Add breadcrumb component
+- [ ] Implement dark mode toggle
+- [ ] Make layout responsive
+
+#### Milestone 3: Dashboard
+- [ ] Build KPI cards component
+- [ ] Add occupancy chart (Recharts)
+- [ ] Add movement history chart
+- [ ] Create expiry warnings list
+- [ ] Implement quick actions
+
+#### Milestone 4: Master Data CRUD
+- [ ] Warehouses list/form pages
+- [ ] Products list/form pages
+- [ ] Suppliers list/form pages
+- [ ] Bins list/form pages
+- [ ] Bulk bin generation page
+
+#### Milestone 5: Inventory Operations
+- [ ] Receipt form with validation
+- [ ] Issue form with FEFO recommendation
+- [ ] Stock overview table
+- [ ] Expiry warnings page
+- [ ] Movement history page
+
+#### Milestone 6: Advanced Features
+- [ ] Same-warehouse transfer form
+- [ ] Cross-warehouse transfer form
+- [ ] Reservations list/form
+- [ ] Reservation fulfillment
+
+#### Milestone 7: Reports & Polish
+- [ ] Stock levels report
+- [ ] Expiry timeline report
+- [ ] Movements report
+- [ ] Export functionality (CSV/Excel)
+- [ ] User management (admin only)
+
+#### Milestone 8: Testing & Documentation
+- [ ] Unit tests (Vitest + Testing Library)
+- [ ] Integration tests with MSW
+- [ ] E2E tests (Playwright)
+- [ ] Frontend README documentation
+
+### Backlog
 - **Phase 3 Tests**: Implement 48 missing tests for inventory, FEFO, movements, and expiry endpoints (see INITIAL4.md for details)
 
 Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/labels/checks) are handled by Copilot per `AGENTS.md`.
 
 ## Completed
+- 2025-12-21 — Create Phase 5 PRP (`PRPs/phase5-frontend-react19-tailwind4.md`) with 8 implementation phases.
+- 2025-12-21 — Create INITIAL5.md Phase 5 frontend specification (React 19 + Tailwind v4 + shadcn/ui).
 - 2025-12-21 — Add lightweight GitHub governance (PR template, issue templates, CODEOWNERS, CI with Postgres).
 - 2025-12-21 — Add agent governance docs (`AGENTS.md`, `specs/*`, `.github/copilot-instructions.md`).
 - 2025-12-21 — Phase 2: Implement Products, Suppliers, Bins CRUD with bulk generation (88 tests passing).
