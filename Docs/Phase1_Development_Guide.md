@@ -81,9 +81,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ### 8. Access the Application
 
-- **API Documentation**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **Health Check**: http://localhost:8000/api/v1/health
+- **API Documentation**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>
+- **Health Check**: <http://localhost:8000/api/v1/health>
 
 ---
 
@@ -297,8 +297,8 @@ ruff check . --fix && ruff format . && pytest
 ### Interactive Documentation
 
 After starting the server, visit:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Swagger UI**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>
 
 ### Authentication Testing
 

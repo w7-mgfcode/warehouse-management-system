@@ -12,6 +12,9 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token, get_password_hash
 from app.db.base import Base
+from app.db.models.bin import Bin
+from app.db.models.product import Product
+from app.db.models.supplier import Supplier
 from app.db.models.user import User
 from app.db.models.warehouse import Warehouse
 from app.db.session import get_async_session
@@ -239,3 +242,65 @@ async def sample_warehouse(db_session: AsyncSession) -> Warehouse:
 def auth_header(token: str) -> dict[str, str]:
     """Create authorization header with token."""
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+async def sample_product(db_session: AsyncSession) -> Product:
+    """Create a sample product for testing."""
+    product = Product(
+        id=uuid.uuid4(),
+        name="Test Product",
+        sku="TEST-001",
+        category="Test Category",
+        default_unit="db",
+        description="Test description",
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(product)
+    await db_session.flush()
+    await db_session.refresh(product)
+    return product
+
+
+@pytest.fixture
+async def sample_supplier(db_session: AsyncSession) -> Supplier:
+    """Create a sample supplier for testing."""
+    supplier = Supplier(
+        id=uuid.uuid4(),
+        company_name="Test Supplier Kft.",
+        contact_person="Test Contact",
+        email="test@supplier.hu",
+        phone="+36 30 123 4567",
+        address="Budapest, Test utca 1.",
+        tax_number="12345678-2-42",
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(supplier)
+    await db_session.flush()
+    await db_session.refresh(supplier)
+    return supplier
+
+
+@pytest.fixture
+async def sample_bin(db_session: AsyncSession, sample_warehouse: Warehouse) -> Bin:
+    """Create a sample bin for testing."""
+    bin_obj = Bin(
+        id=uuid.uuid4(),
+        warehouse_id=sample_warehouse.id,
+        code="A-01",
+        structure_data={"aisle": "A", "level": "01"},
+        status="empty",
+        max_weight=1000.0,
+        max_height=180.0,
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db_session.add(bin_obj)
+    await db_session.flush()
+    await db_session.refresh(bin_obj)
+    return bin_obj

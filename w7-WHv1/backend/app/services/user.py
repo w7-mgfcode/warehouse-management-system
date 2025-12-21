@@ -1,6 +1,5 @@
 """User service for CRUD operations."""
 
-import math
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -9,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_password_hash
 from app.db.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
+from app.services.pagination import calculate_pages as _calculate_pages
 
 
 async def create_user(db: AsyncSession, user_data: UserCreate) -> User:
@@ -153,14 +153,7 @@ async def delete_user(db: AsyncSession, user: User) -> None:
 
 
 def calculate_pages(total: int, page_size: int) -> int:
-    """
-    Calculate total number of pages.
+    return _calculate_pages(total, page_size)
 
-    Args:
-        total: Total number of items.
-        page_size: Items per page.
 
-    Returns:
-        int: Total number of pages.
-    """
-    return math.ceil(total / page_size) if total > 0 else 1
+
