@@ -16,11 +16,9 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 - ✅ Comprehensive test coverage (88 tests passing)
 
 ### Planned (Phase 3+)
-- 🔄 Bin contents (inventory tracking)
-- 🔄 FEFO (First Expired, First Out) logic
-- 🔄 Stock movements and history
-- 🔄 Reporting and analytics
-- 🔄 Frontend (React 19 + Tailwind v4)
+- 🔄 Phase 3: Inventory receipt/issue + FEFO logic (bin contents, stock movements, expiry warnings)
+- 🔄 Phase 4: Reports + scheduled jobs + Hungarian email templates
+- 🔄 Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui)
 
 ## Technology Stack
 
@@ -67,6 +65,29 @@ warehouse-management-system/
 - [API Reference](Docs/Phase1_API_Reference.md) - All endpoints with examples
 - [Database Schema](Docs/Phase1_Database_Schema.md) - Tables and relationships
 - [Authentication](Docs/Phase1_Authentication.md) - JWT and RBAC details
+
+## Repo Governance (Agents + Workflow)
+
+This repo is designed to be worked on by both humans and AI assistants.
+
+- Agent roles and boundaries: [AGENTS.md](AGENTS.md)
+- Global rules / merge gates: [specs/global-rules.md](specs/global-rules.md)
+- Copilot (GitHub Ops) operating rules: [specs/copilot-instructions.md](specs/copilot-instructions.md)
+- GitHub workflow conventions: [Docs/GitHub_Workflow.md](Docs/GitHub_Workflow.md)
+
+## CI & Testing Notes
+
+- CI workflow definition: [.github/workflows/ci.yml](.github/workflows/ci.yml)
+- CI runs in the backend working directory and provisions Postgres 17.
+- Tests default to in-memory SQLite locally; CI forces Postgres by setting `TEST_DATABASE_URL`.
+
+Backend CI checks (run from `w7-WHv1/backend`):
+
+```bash
+ruff check .
+pytest
+mypy .  # advisory in CI for now
+```
 
 ## License
 
