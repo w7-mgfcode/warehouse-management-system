@@ -1,0 +1,36 @@
+venv
+venv_windows
+venv_linux
+.env
+
+# Editor / workspace settings
+.vscode/
+
+# Claude tooling
+CLAUDE.md
+.claude/
+
+# Project requirement packages / docs (folder)
+INITIAL.md
+PRPs/templates
+PRPs/EXAMPLE_multi_agent_prp.md
+
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+
+# Test / lint / typecheck caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Coverage outputs
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Build / packaging outputs
+build/
+dist/
+*.egg-info/
