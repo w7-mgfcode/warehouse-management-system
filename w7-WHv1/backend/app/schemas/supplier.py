@@ -15,7 +15,7 @@ TAX_NUMBER_PATTERN = re.compile(r"^\d{8}-\d-\d{2}$")
 class SupplierCreate(BaseModel):
     """Schema for creating a new supplier."""
 
-    company_name: str = Field(..., min_length=2, max_length=255)
+    company_name: str = Field(..., max_length=255)
     contact_person: str | None = Field(None, max_length=255)
     email: EmailStr | None = None
     phone: str | None = Field(None, max_length=50)
@@ -47,7 +47,7 @@ class SupplierCreate(BaseModel):
 class SupplierUpdate(BaseModel):
     """Schema for updating a supplier."""
 
-    company_name: str | None = Field(None, min_length=2, max_length=255)
+    company_name: str | None = Field(None, max_length=255)
     contact_person: str | None = Field(None, max_length=255)
     email: EmailStr | None = None
     phone: str | None = Field(None, max_length=50)
@@ -56,6 +56,16 @@ class SupplierUpdate(BaseModel):
     is_active: bool | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+    @field_validator("company_name")
+    @classmethod
+    def validate_company_name(cls, v: str | None) -> str | None:
+        """Validate company name when provided."""
+        if v is None:
+            return None
+        if len(v.strip()) < 2:
+            raise ValueError(HU_MESSAGES["supplier_name_required"])
+        return v.strip()
 
     @field_validator("tax_number")
     @classmethod

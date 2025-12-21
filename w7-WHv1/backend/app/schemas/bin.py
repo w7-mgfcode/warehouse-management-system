@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.core.i18n import HU_MESSAGES
+
 BinStatus = Literal["empty", "occupied", "reserved", "inactive"]
 
 
@@ -73,15 +75,14 @@ class BinListResponse(BaseModel):
 class RangeSpec(BaseModel):
     """Range specification for numeric ranges."""
 
-    start: int | None = None
-    end: int | None = None
+    start: int
+    end: int
 
     @model_validator(mode="after")
     def validate_range(self) -> "RangeSpec":
         """Validate that start <= end."""
-        if self.start is not None and self.end is not None:
-            if self.start > self.end:
-                raise ValueError("start must be <= end")
+        if self.start > self.end:
+            raise ValueError(HU_MESSAGES["bulk_invalid_range"])
         return self
 
 
@@ -97,7 +98,7 @@ class BulkBinCreate(BaseModel):
     """Request body for bulk bin creation."""
 
     warehouse_id: UUID
-    ranges: dict[str, Any]  # field_name -> list or {start, end}
+    ranges: dict[str, list[str | int] | RangeSpec]  # field_name -> list or {start, end}
     defaults: BulkBinDefaults | None = None
 
 

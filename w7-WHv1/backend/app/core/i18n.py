@@ -23,6 +23,10 @@ HU_MESSAGES: dict[str, str] = {
     "bin_occupied": "A tárolóhely foglalt.",
     "bin_invalid_structure": "A tárolóhely adatai nem felelnek meg a raktár sablonjának.",
     "bulk_generation_failed": "A tömeges létrehozás sikertelen.",
+    "bulk_invalid_range": "A tartomány kezdete nem lehet nagyobb, mint a vége.",
+    "bulk_generation_too_large": "A kért tömeges generálás túl nagy (max. {max}).",
+    "bulk_invalid_range_spec": "Érvénytelen tartomány specifikáció.",
+    "bulk_missing_range": "Hiányzó tartomány a mezőhöz: {field}",
     "bulk_conflicts_found": "Ütköző kódok találhatók: {codes}",
     "bulk_no_bins_generated": "Nem jött létre egyetlen tárolóhely sem.",
     # Product

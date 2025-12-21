@@ -4,6 +4,7 @@ import uuid
 
 from httpx import AsyncClient
 
+from app.core.i18n import HU_MESSAGES
 from app.db.models.supplier import Supplier
 from app.db.models.user import User
 from app.tests.conftest import auth_header
@@ -125,6 +126,8 @@ class TestCreateSupplier:
             },
         )
         assert response.status_code == 422
+        detail = response.json()["detail"]
+        assert any(err.get("msg", "").endswith(HU_MESSAGES["invalid_tax_number"]) for err in detail)
 
     async def test_create_supplier_short_name(
         self,
@@ -208,6 +211,23 @@ class TestUpdateSupplier:
             json={"company_name": "Unauthorized Update"},
         )
         assert response.status_code == 403
+
+    async def test_update_supplier_invalid_tax_number_returns_422(
+        self,
+        client: AsyncClient,
+        manager_user: User,
+        manager_token: str,
+        sample_supplier: Supplier,
+    ) -> None:
+        """Test updating supplier with invalid tax number returns localized 422."""
+        response = await client.put(
+            f"/api/v1/suppliers/{sample_supplier.id}",
+            headers=auth_header(manager_token),
+            json={"tax_number": "invalid"},
+        )
+        assert response.status_code == 422
+        detail = response.json()["detail"]
+        assert any(err.get("msg", "").endswith(HU_MESSAGES["invalid_tax_number"]) for err in detail)
 
 
 class TestDeleteSupplier:

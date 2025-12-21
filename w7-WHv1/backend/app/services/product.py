@@ -1,6 +1,5 @@
 """Product service for CRUD operations."""
 
-import math
 from uuid import UUID
 
 from sqlalchemy import func, or_, select
@@ -8,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models.product import Product
 from app.schemas.product import ProductCreate, ProductUpdate
+from app.services.pagination import calculate_pages as _calculate_pages
 
 
 async def create_product(
@@ -166,16 +166,5 @@ async def delete_product(db: AsyncSession, product: Product) -> None:
 
 
 def calculate_pages(total: int, page_size: int) -> int:
-    """
-    Calculate total number of pages.
+    return _calculate_pages(total, page_size)
 
-    Args:
-        total: Total number of items.
-        page_size: Items per page.
-
-    Returns:
-        int: Total number of pages.
-    """
-    if page_size <= 0:
-        return 1
-    return math.ceil(total / page_size) if total > 0 else 1

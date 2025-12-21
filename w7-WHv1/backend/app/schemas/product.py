@@ -11,7 +11,7 @@ from app.core.i18n import HU_MESSAGES
 class ProductCreate(BaseModel):
     """Schema for creating a new product."""
 
-    name: str = Field(..., min_length=2, max_length=255)
+    name: str = Field(..., max_length=255)
     sku: str | None = Field(None, min_length=3, max_length=100)
     category: str | None = Field(None, max_length=100)
     default_unit: str = Field(default="db", max_length=50)
@@ -32,7 +32,7 @@ class ProductCreate(BaseModel):
 class ProductUpdate(BaseModel):
     """Schema for updating a product."""
 
-    name: str | None = Field(None, min_length=2, max_length=255)
+    name: str | None = Field(None, max_length=255)
     sku: str | None = Field(None, min_length=3, max_length=100)
     category: str | None = Field(None, max_length=100)
     default_unit: str | None = Field(None, max_length=50)
@@ -40,6 +40,16 @@ class ProductUpdate(BaseModel):
     is_active: bool | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str | None) -> str | None:
+        """Validate product name when provided."""
+        if v is None:
+            return None
+        if len(v.strip()) < 2:
+            raise ValueError(HU_MESSAGES["product_name_required"])
+        return v.strip()
 
 
 class ProductResponse(BaseModel):

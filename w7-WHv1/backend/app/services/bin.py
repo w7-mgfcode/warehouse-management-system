@@ -1,17 +1,33 @@
 """Bin service for CRUD operations and bulk generation."""
 
-import math
-import uuid
 from itertools import product as cartesian_product
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
-from app.schemas.bin import BinCreate, BinUpdate
+from app.schemas.bin import BinCreate, BinUpdate, RangeSpec
+from app.services.pagination import calculate_pages as _calculate_pages
 from app.services.warehouse import get_warehouse_by_id
+
+MAX_BULK_BIN_COMBINATIONS = 10_000
+
+
+def calculate_pages(total: int, page_size: int) -> int:
+    return _calculate_pages(total, page_size)
+
+
+def _range_value_count(spec: Any) -> int:
+    if isinstance(spec, list):
+        return len(spec)
+    if isinstance(spec, RangeSpec):
+        return spec.end - spec.start + 1
+    if isinstance(spec, dict) and "start" in spec and "end" in spec:
+        return int(spec["end"]) - int(spec["start"]) + 1
+    raise ValueError(HU_MESSAGES["bulk_invalid_range_spec"])
 
 
 def expand_range(spec: Any) -> list[str]:
@@ -29,9 +45,11 @@ def expand_range(spec: Any) -> list[str]:
     """
     if isinstance(spec, list):
         return [str(v) for v in spec]
+    if isinstance(spec, RangeSpec):
+        return [str(i) for i in range(spec.start, spec.end + 1)]
     if isinstance(spec, dict) and "start" in spec and "end" in spec:
         return [str(i) for i in range(spec["start"], spec["end"] + 1)]
-    raise ValueError("Invalid range specification")
+    raise ValueError(HU_MESSAGES["bulk_invalid_range_spec"])
 
 
 def generate_bin_codes(
@@ -62,10 +80,22 @@ def generate_bin_codes(
 
     # Expand ranges for each field
     field_values = []
+    combination_count = 1
     for name in field_names:
         if name not in ranges:
-            raise ValueError(f"Missing range for field: {name}")
-        field_values.append(expand_range(ranges[name]))
+            raise ValueError(HU_MESSAGES["bulk_missing_range"].format(field=name))
+        spec = ranges[name]
+        value_count = _range_value_count(spec)
+        if value_count <= 0:
+            return []
+
+        combination_count *= value_count
+        if combination_count > MAX_BULK_BIN_COMBINATIONS:
+            raise ValueError(
+                HU_MESSAGES["bulk_generation_too_large"].format(max=MAX_BULK_BIN_COMBINATIONS)
+            )
+
+        field_values.append(expand_range(spec))
 
     # Generate cartesian product
     results = []
@@ -259,7 +289,7 @@ async def preview_bulk_bins(
     """
     warehouse = await get_warehouse_by_id(db, warehouse_id)
     if not warehouse:
-        raise ValueError("Warehouse not found")
+        raise ValueError(HU_MESSAGES["warehouse_not_found"])
 
     codes_and_data = generate_bin_codes(warehouse.bin_structure_template, ranges)
     codes = [c[0] for c in codes_and_data]
@@ -302,7 +332,7 @@ async def create_bulk_bins(
     """
     warehouse = await get_warehouse_by_id(db, warehouse_id)
     if not warehouse:
-        raise ValueError("Warehouse not found")
+        raise ValueError(HU_MESSAGES["warehouse_not_found"])
 
     codes_and_data = generate_bin_codes(warehouse.bin_structure_template, ranges)
 
@@ -314,9 +344,9 @@ async def create_bulk_bins(
 
         if conflicts:
             conflict_list = ", ".join(list(conflicts)[:5])
-            raise ValueError(f"Conflicting codes: {conflict_list}")
+            raise ValueError(HU_MESSAGES["bulk_conflicts_found"].format(codes=conflict_list))
     else:
-        raise ValueError("No bins to create")
+        raise ValueError(HU_MESSAGES["bulk_no_bins_generated"])
 
     # Prepare bulk insert data
     defaults = defaults or {}
@@ -324,7 +354,7 @@ async def create_bulk_bins(
     for code, structure_data in codes_and_data:
         bins_data.append(
             {
-                "id": uuid.uuid4(),
+                "id": uuid4(),
                 "warehouse_id": warehouse_id,
                 "code": code,
                 "structure_data": structure_data,
@@ -342,18 +372,3 @@ async def create_bulk_bins(
 
     return len(bins_data)
 
-
-def calculate_pages(total: int, page_size: int) -> int:
-    """
-    Calculate total number of pages.
-
-    Args:
-        total: Total number of items.
-        page_size: Items per page.
-
-    Returns:
-        int: Total number of pages.
-    """
-    if page_size <= 0:
-        return 1
-    return math.ceil(total / page_size) if total > 0 else 1

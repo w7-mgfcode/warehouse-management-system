@@ -4,6 +4,7 @@ import uuid
 
 from httpx import AsyncClient
 
+from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
 from app.db.models.user import User
 from app.db.models.warehouse import Warehouse
@@ -46,6 +47,8 @@ class TestListBins:
         assert response.status_code == 200
         data = response.json()
         assert data["total"] >= 1
+        for item in data["items"]:
+            assert item["warehouse_id"] == str(sample_warehouse.id)
 
     async def test_list_bins_search(
         self,
@@ -329,6 +332,54 @@ class TestBulkGeneration:
             },
         )
         assert response.status_code == 400
+        assert HU_MESSAGES["bulk_conflicts_found"].split("{codes}")[0] in response.json()["detail"]
+
+    async def test_bulk_invalid_range_start_gt_end(
+        self,
+        client: AsyncClient,
+        manager_user: User,
+        manager_token: str,
+        sample_warehouse: Warehouse,
+    ) -> None:
+        """Test invalid range (start > end) returns localized 422."""
+        response = await client.post(
+            "/api/v1/bins/bulk/preview",
+            headers=auth_header(manager_token),
+            json={
+                "warehouse_id": str(sample_warehouse.id),
+                "ranges": {
+                    "aisle": ["A"],
+                    "level": {"start": 3, "end": 1},
+                },
+            },
+        )
+        assert response.status_code == 422
+        detail = response.json()["detail"]
+        assert any(
+            err.get("msg", "").endswith(HU_MESSAGES["bulk_invalid_range"]) for err in detail
+        )
+
+    async def test_bulk_empty_generation_returns_localized_error(
+        self,
+        client: AsyncClient,
+        manager_user: User,
+        manager_token: str,
+        sample_warehouse: Warehouse,
+    ) -> None:
+        """Test empty generation returns a localized 400."""
+        response = await client.post(
+            "/api/v1/bins/bulk",
+            headers=auth_header(manager_token),
+            json={
+                "warehouse_id": str(sample_warehouse.id),
+                "ranges": {
+                    "aisle": [],
+                    "level": {"start": 1, "end": 1},
+                },
+            },
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == HU_MESSAGES["bulk_no_bins_generated"]
 
     async def test_bulk_warehouse_user_forbidden(
         self,

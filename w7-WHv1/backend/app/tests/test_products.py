@@ -4,6 +4,7 @@ import uuid
 
 from httpx import AsyncClient
 
+from app.core.i18n import HU_MESSAGES
 from app.db.models.product import Product
 from app.db.models.user import User
 from app.tests.conftest import auth_header
@@ -141,6 +142,10 @@ class TestCreateProduct:
             json={"name": "A"},  # Too short
         )
         assert response.status_code == 422
+        detail = response.json()["detail"]
+        assert any(
+            err.get("msg", "").endswith(HU_MESSAGES["product_name_required"]) for err in detail
+        )
 
 
 class TestGetProduct:
@@ -210,6 +215,34 @@ class TestUpdateProduct:
             json={"name": "Unauthorized Update"},
         )
         assert response.status_code == 403
+
+    async def test_update_product_duplicate_sku_returns_409(
+        self,
+        client: AsyncClient,
+        manager_user: User,
+        manager_token: str,
+        sample_product: Product,
+    ) -> None:
+        """Test updating product to a duplicate SKU returns 409."""
+        create_response = await client.post(
+            "/api/v1/products",
+            headers=auth_header(manager_token),
+            json={
+                "name": "Other Product",
+                "sku": "DUP-001",
+                "category": "Teszt",
+                "default_unit": "kg",
+            },
+        )
+        assert create_response.status_code == 201
+
+        response = await client.put(
+            f"/api/v1/products/{sample_product.id}",
+            headers=auth_header(manager_token),
+            json={"sku": "DUP-001"},
+        )
+        assert response.status_code == 409
+        assert response.json()["detail"] == HU_MESSAGES["product_sku_exists"]
 
 
 class TestDeleteProduct:
