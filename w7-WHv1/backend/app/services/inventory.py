@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
@@ -131,9 +132,18 @@ async def receive_goods(
     bin_obj.status = "occupied"
 
     await db.flush()
-    await db.refresh(bin_content)
 
-    return bin_content, movement
+    result = await db.execute(
+        select(BinContent)
+        .options(
+            selectinload(BinContent.bin),
+            selectinload(BinContent.product),
+        )
+        .where(BinContent.id == bin_content.id)
+    )
+    bin_content_with_relationships = result.scalar_one()
+
+    return bin_content_with_relationships, movement
 
 
 async def issue_goods(

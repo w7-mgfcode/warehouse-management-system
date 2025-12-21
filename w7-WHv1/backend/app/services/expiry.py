@@ -1,6 +1,6 @@
 """Expiry warning service for inventory management."""
 
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 from sqlalchemy import select
@@ -57,7 +57,7 @@ async def get_expiry_warnings(
         ExpiryWarningResponse: Warnings with summary.
     """
     today = date.today()
-    threshold_date = today + __import__("datetime").timedelta(days=days_threshold)
+    threshold_date = today + timedelta(days=days_threshold)
 
     query = (
         select(BinContent)
@@ -153,6 +153,7 @@ async def get_expired_products(
         .join(Warehouse, Bin.warehouse_id == Warehouse.id)
         .join(Product, BinContent.product_id == Product.id)
         .where(
+            BinContent.status == "available",
             BinContent.use_by_date < today,
             BinContent.quantity > 0,
         )
