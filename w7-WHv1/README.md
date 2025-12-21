@@ -116,6 +116,8 @@ cd w7-WHv1/backend
 pytest app/tests/ -v --cov=app --cov-report=term-missing
 ```
 
+**Current Status**: 88 tests passing (40 Phase 1 + 48 Phase 2)
+
 ## Linting and Type Checking
 
 ```bash
@@ -147,6 +149,29 @@ mypy .
 - `PUT /api/v1/warehouses/{id}` - Update warehouse (admin/manager)
 - `DELETE /api/v1/warehouses/{id}` - Delete warehouse (admin)
 - `GET /api/v1/warehouses/{id}/stats` - Get warehouse statistics
+
+### Products
+- `GET /api/v1/products` - List products (with filters: category, is_active, search)
+- `POST /api/v1/products` - Create product (admin/manager)
+- `GET /api/v1/products/{id}` - Get product
+- `PUT /api/v1/products/{id}` - Update product (admin/manager)
+- `DELETE /api/v1/products/{id}` - Delete product (admin/manager)
+
+### Suppliers
+- `GET /api/v1/suppliers` - List suppliers (with filters: is_active, search)
+- `POST /api/v1/suppliers` - Create supplier (admin/manager)
+- `GET /api/v1/suppliers/{id}` - Get supplier
+- `PUT /api/v1/suppliers/{id}` - Update supplier (admin/manager)
+- `DELETE /api/v1/suppliers/{id}` - Delete supplier (admin/manager)
+
+### Bins
+- `GET /api/v1/bins` - List bins (with filters: warehouse_id, status, search)
+- `POST /api/v1/bins` - Create bin (warehouse+)
+- `GET /api/v1/bins/{id}` - Get bin
+- `PUT /api/v1/bins/{id}` - Update bin (warehouse+)
+- `DELETE /api/v1/bins/{id}` - Delete bin (warehouse+)
+- `POST /api/v1/bins/bulk/preview` - Preview bulk generation (manager+)
+- `POST /api/v1/bins/bulk` - Bulk create bins (manager+)
 
 ## Environment Variables
 
