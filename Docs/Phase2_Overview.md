@@ -237,14 +237,31 @@ Phase 2 documentation is organized as follows:
 
 ## What's Next: Phase 3+
 
-Phase 2 provides the foundation for inventory operations. Planned for Phase 3:
+Phase 2 provides the foundation for inventory operations. The roadmap ahead:
 
-- **Bin Contents** - Track what products are in which bins
-- **FEFO Logic** - First Expired, First Out inventory management
-- **Stock Movements** - Incoming goods, outgoing shipments, transfers
-- **Batch/Lot Tracking** - Track product batches with expiry dates
-- **Reporting** - Inventory reports, movement history, FEFO warnings
-- **Frontend** - React 19 + Tailwind v4 web interface
+### Phase 3: Inventory Receipt/Issue + FEFO Logic
+- **Bin Contents** - Track what products are in which bins with batch/lot numbers
+- **Incoming Goods** - Receive products into bins with expiry date tracking
+- **Outgoing Goods** - Issue products from bins with FEFO enforcement
+- **FEFO Algorithm** - First Expired, First Out inventory management
+- **Stock Movements** - Movement history and audit trail
+- **Expiry Warnings** - Alert on products approaching expiration
+
+### Phase 4: Reports + Celery scheduled jobs + Hungarian email templates
+- **Inventory Reports** - Current stock levels, product locations, expiry reports
+- **Movement Reports** - Incoming/outgoing history, stock adjustments
+- **FEFO Reports** - Products by expiry date, expired stock alerts
+- **Celery Integration** - Scheduled jobs for daily reports and expiry checks
+- **Email Notifications** - Hungarian email templates for alerts and reports
+- **Background Tasks** - Async processing for large reports and exports
+
+### Phase 5: Frontend with React 19 + Tailwind v4 + shadcn/ui
+- **Modern UI Stack** - React 19, Tailwind CSS v4, shadcn/ui components
+- **Warehouse Dashboard** - Real-time inventory overview and alerts
+- **Product Management** - CRUD interfaces for products and suppliers
+- **Bin Management** - Visual bin layout, bulk generation UI
+- **Stock Operations** - Receive/issue products with FEFO guidance
+- **Reports Interface** - Interactive reports with filtering and export
 
 ---
 
