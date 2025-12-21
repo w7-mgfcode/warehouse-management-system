@@ -21,11 +21,20 @@ HU_MESSAGES: dict[str, str] = {
     "bin_not_empty": "A tárolóhely nem üres, nem törölhető.",
     "bin_inactive": "A tárolóhely inaktív.",
     "bin_occupied": "A tárolóhely foglalt.",
+    "bin_invalid_structure": "A tárolóhely adatai nem felelnek meg a raktár sablonjának.",
+    "bulk_generation_failed": "A tömeges létrehozás sikertelen.",
+    "bulk_conflicts_found": "Ütköző kódok találhatók: {codes}",
+    "bulk_no_bins_generated": "Nem jött létre egyetlen tárolóhely sem.",
     # Product
     "product_not_found": "A termék nem található.",
     "product_sku_exists": "Ilyen SKU-val már létezik termék.",
+    "product_name_required": "A termék neve kötelező.",
+    "product_has_inventory": "A termék nem törölhető, mert van belőle készlet.",
     # Supplier
     "supplier_not_found": "A beszállító nem található.",
+    "supplier_name_required": "A cég neve kötelező.",
+    "supplier_has_inventory": "A beszállító nem törölhető, mert van hozzá tartozó készlet.",
+    "invalid_tax_number": "Érvénytelen adószám formátum.",
     # Inventory
     "invalid_dates": "A szavatossági dátum nem lehet korábbi, mint a minőségmegőrzési dátum.",
     "invalid_freeze_date": "A fagyasztás dátuma nem lehet a mai napnál későbbi.",
