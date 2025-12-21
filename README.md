@@ -26,7 +26,7 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 - ✅ Expiry warnings with 4 urgency levels (critical < 7 days)
 - ✅ Stock reports (levels, locations, summaries)
 
-**Test Coverage**: 136 tests passing (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
+**Test Coverage**: 92 tests passing (Phase 1 + Phase 2); Phase 3 tests pending
 
 ### Planned (Phase 4+)
 - 🔄 Phase 4: Bin transfers, stock reservations, scheduled jobs
@@ -36,7 +36,7 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 
 **Backend**: Python 3.13+, FastAPI 0.125.0, SQLAlchemy 2.0.45, PostgreSQL 17, Valkey 8.1
 **Frontend**: React 19, Tailwind CSS 4.0, shadcn/ui, TanStack Query 5.90+, Zustand 5.x
-**Testing**: pytest with 136 passing tests (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
+**Testing**: pytest with 92 passing tests (Phase 1 + Phase 2)
 **Code Quality**: ruff (linting + formatting), mypy (type checking)
 
 ## Quick Start

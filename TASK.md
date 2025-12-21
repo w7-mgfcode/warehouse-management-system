@@ -3,7 +3,7 @@
 Last updated: 2025-12-21
 
 ## Active
-- (none)
+- **Phase 3 Tests**: Implement 48 missing tests for inventory, FEFO, movements, and expiry endpoints (see INITIAL4.md for details)
 
 Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/labels/checks) are handled by Copilot per `AGENTS.md`.
 
@@ -74,7 +74,8 @@ Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/lab
 - Migration: `20251221_074407_fb475d91443e_phase3_inventory_movements.py`
 
 ### Testing
-- ✅ 48 new tests added (136 total passing)
+- ⚠️ API endpoints implemented but tests NOT created
+- **TODO**: Create test_inventory.py, test_fefo.py, test_movements.py, test_expiry.py (~48 tests)
 - Test coverage: Inventory operations, FEFO algorithm, movement audit, expiry warnings
 - All tests documented in `Docs/Phase3_Testing_Guide.md`
 
