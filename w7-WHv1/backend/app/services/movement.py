@@ -75,7 +75,7 @@ async def create_movement(
     )
     db.add(movement)
     await db.flush()
-    
+
     # Reload with eager loading to ensure bin_content is available in async context
     # This prevents lazy-load issues when bin_content is None in issue_goods()
     result = await db.execute(
