@@ -14,6 +14,8 @@ Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/lab
 - 2025-12-21 — Create comprehensive Phase 2 documentation (5 files, ~4,261 lines covering API, database, algorithms, testing).
 - 2025-12-21 — Phase 3: Implement Inventory Receipt/Issue with FEFO enforcement, Movement audit trail, and Expiry warnings (core implementation complete).
 - 2025-12-21 — Create comprehensive Phase 3 documentation (6 files, ~5,400 lines covering API, database, FEFO compliance, movement audit, and testing).
+- 2025-12-21 — Phase 4: Implement transfers, reservations, jobs, and email services (18 endpoints, 4 new tables).
+- 2025-12-21 — Create comprehensive Phase 4 documentation (4 files, ~2,840 lines covering API, database, testing).
 
 ## Phase 3 Implementation Details
 **Completed**: 2025-12-21
@@ -91,6 +93,46 @@ Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/lab
 ### Next Steps (Phase 4+)
 - Apply migration to production database
 - Stock reservations, bin transfers, barcode integration
+
+## Phase 4 Implementation Details
+**Completed**: 2025-12-21
+**Branch**: 04-Phase_4
+
+### Database Layer
+- Created `StockReservation` model: FEFO-ordered reservations with status workflow
+- Created `ReservationItem` model: Links reservations to bin_contents
+- Created `WarehouseTransfer` model: Cross-warehouse transfer tracking
+- Created `JobExecution` model: Background job execution logging
+- Modified `BinContent` model: Added `reserved_quantity` column
+- Generated Alembic migration for Phase 4 tables
+
+### Schemas Layer (Pydantic v2)
+- `app/schemas/transfer.py`: Transfer requests, cross-warehouse, dispatch/confirm
+- `app/schemas/reservation.py`: Reservation create/fulfill, FEFO allocation
+- `app/schemas/jobs.py`: Job trigger, status, execution history
+
+### Service Layer
+- `app/services/transfer.py`: Same-warehouse and cross-warehouse transfer logic
+- `app/services/reservation.py`: FEFO allocation, fulfill, cancel operations
+- `app/services/email.py`: Hungarian email templates for expiry alerts
+
+### API Layer (FastAPI) - 18 new endpoints
+- `app/api/v1/transfers.py`: 8 endpoints (same-warehouse, cross-warehouse, dispatch, confirm, cancel)
+- `app/api/v1/reservations.py`: 6 endpoints (create, list, fulfill, cancel, expiring)
+- `app/api/v1/jobs.py`: 4 endpoints (trigger, status, executions)
+
+### Background Jobs (Celery)
+- `app/tasks/jobs.py`: Scheduled tasks for reservation cleanup and expiry alerts
+
+### Localization
+- Added 32 Hungarian messages to `app/core/i18n.py` (transfers, reservations, jobs)
+
+### Documentation
+- ✅ 4 comprehensive documentation files created (~2,840 lines total)
+- `Phase4_Overview.md`: Business context and quick reference
+- `Phase4_API_Reference.md`: All 18 endpoints with examples
+- `Phase4_Database_Schema.md`: Database design and migrations
+- `Phase4_Testing_Guide.md`: Test patterns and fixtures
 
 ## Discovered during work
 - Consider tightening CI later (make `mypy` blocking once the codebase is type-clean).

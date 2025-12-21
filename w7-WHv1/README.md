@@ -116,7 +116,7 @@ cd w7-WHv1/backend
 pytest app/tests/ -v --cov=app --cov-report=term-missing
 ```
 
-**Current Status**: 136 tests passing (40 Phase 1 + 48 Phase 2 + 48 Phase 3)
+**Current Status**: 140 tests passing (40 Phase 1 + 48 Phase 2 + 48 Phase 3 + 4 Phase 4)
 
 ## Linting and Type Checking
 
@@ -191,6 +191,30 @@ mypy .
 - `GET /api/v1/reports/inventory-summary` - Inventory summary by warehouse
 - `GET /api/v1/reports/product-locations` - Find all bins containing a product
 
+### Transfers (Phase 4)
+- `POST /api/v1/transfers` - Same-warehouse transfer (warehouse+)
+- `POST /api/v1/transfers/cross-warehouse` - Cross-warehouse transfer (manager+)
+- `GET /api/v1/transfers` - List transfers
+- `GET /api/v1/transfers/pending` - Pending transfers
+- `GET /api/v1/transfers/{id}` - Get transfer details
+- `POST /api/v1/transfers/{id}/dispatch` - Mark as dispatched (warehouse+)
+- `POST /api/v1/transfers/{id}/confirm` - Confirm receipt (warehouse+)
+- `POST /api/v1/transfers/{id}/cancel` - Cancel transfer (manager+)
+
+### Reservations (Phase 4)
+- `POST /api/v1/reservations` - Create FEFO-ordered reservation (warehouse+)
+- `GET /api/v1/reservations` - List reservations
+- `GET /api/v1/reservations/expiring` - Expiring reservations
+- `GET /api/v1/reservations/{id}` - Get reservation details
+- `POST /api/v1/reservations/{id}/fulfill` - Fulfill reservation (warehouse+)
+- `DELETE /api/v1/reservations/{id}` - Cancel reservation (manager+)
+
+### Jobs (Phase 4)
+- `POST /api/v1/jobs/trigger` - Manually trigger job (admin only)
+- `GET /api/v1/jobs/status/{task_id}` - Check job status (manager+)
+- `GET /api/v1/jobs/executions` - List job history (manager+)
+- `GET /api/v1/jobs/executions/{id}` - Get execution details (manager+)
+
 ## Key Features
 
 ### FEFO (First Expired, First Out) Compliance
@@ -208,6 +232,23 @@ All inventory movements tracked in append-only log:
 - **User attribution**: Complete chain of custody
 - **No modifications**: Movements cannot be updated or deleted
 
+### Stock Reservations (Phase 4)
+- **FEFO allocation**: Automatically reserves from oldest expiry dates first
+- **Partial reservations**: Reserves available amount if insufficient stock
+- **Expiry tracking**: Auto-expire after `reserved_until` datetime
+- **Fulfillment**: Convert reservation to actual issue with movement records
+
+### Warehouse Transfers (Phase 4)
+- **Same-warehouse**: Immediate execution between bins
+- **Cross-warehouse**: Dispatch/confirm workflow with transport tracking
+- **Status workflow**: pending → in_transit → received/cancelled
+- **Audit trail**: All transfers logged as paired movements
+
+### Background Jobs (Phase 4)
+- **Celery integration**: Scheduled tasks with Redis/Valkey broker
+- **Cleanup jobs**: Automatic release of expired reservations
+- **Expiry alerts**: Hungarian email notifications for products approaching expiry
+
 ## Environment Variables
 
 | Variable | Description | Default |
@@ -220,6 +261,13 @@ All inventory movements tracked in append-only log:
 | `TIMEZONE` | Application timezone | `Europe/Budapest` |
 | `LANGUAGE` | Default language | `hu` |
 | `DEBUG` | Debug mode | `true` |
+| `CELERY_BROKER_URL` | Celery broker URL | `redis://localhost:6379/0` |
+| `CELERY_RESULT_BACKEND` | Celery result backend | `redis://localhost:6379/0` |
+| `SMTP_HOST` | SMTP server host | `localhost` |
+| `SMTP_PORT` | SMTP server port | `587` |
+| `EMAIL_ENABLED` | Enable email alerts | `false` |
+| `EXPIRY_WARNING_DAYS` | Days before expiry warning | `14` |
+| `EXPIRY_CRITICAL_DAYS` | Days for critical warning | `7` |
 
 ## Default Admin User
 
