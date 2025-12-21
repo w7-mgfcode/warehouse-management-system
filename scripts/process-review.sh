@@ -87,7 +87,7 @@ Addresses feedback from @$AUTHOR
 Run this to reply:
 \`\`\`bash
 COMMIT_SHA=\$(git rev-parse HEAD)
-gh api -X POST repos/$OWNER/$REPO/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \\
+gh api -X POST repos/$OWNER/$REPO/pulls/comments/$COMMENT_ID/replies \\
   -f body="✅ Fixed in commit \$COMMIT_SHA
 
 {Explanation of fix}"

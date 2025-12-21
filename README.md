@@ -43,7 +43,7 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 
 **Backend**: Python 3.13+, FastAPI 0.125.0, SQLAlchemy 2.0.45, PostgreSQL 17, Valkey 8.1
 **Frontend**: React 19, Tailwind CSS 4.0, shadcn/ui, TanStack Query 5.90+, Zustand 5.x
-**Testing**: pytest with 92 passing tests (Phase 1 + Phase 2)
+**Testing**: pytest with 140 tests passing (Phase 1 + 2 + 3 + 4)
 **Code Quality**: ruff (linting + formatting), mypy (type checking)
 
 ## Quick Start
