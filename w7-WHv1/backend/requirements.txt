@@ -23,7 +23,7 @@ httpx>=0.28.0
 
 # Task Queue
 celery>=5.4.0
-valkey>=6.0.0
+valkey>=6.0.0  # Note: Use redis:// URI in config (Celery doesn't support valkey:// yet)
 
 # Email
 aiosmtplib>=3.0.0

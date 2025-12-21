@@ -386,6 +386,8 @@ async def confirm_cross_warehouse_transfer(
         raise ValueError(HU_TRANSFER_MESSAGES["transfer_already_completed"])
     if transfer.status == "cancelled":
         raise ValueError(HU_TRANSFER_MESSAGES["transfer_already_cancelled"])
+    if transfer.status == "pending":
+        raise ValueError("A transzfert először ki kell küldeni (dispatch) mielőtt megerősítené.")
 
     # 2. Validate target bin
     target_bin_result = await db.execute(

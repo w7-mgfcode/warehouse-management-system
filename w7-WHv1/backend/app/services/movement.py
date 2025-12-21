@@ -75,7 +75,8 @@ async def create_movement(
     )
     db.add(movement)
     await db.flush()
-    await db.refresh(movement)
+    # Eager load bin_content relationship for API responses
+    await db.refresh(movement, ["bin_content"])
     return movement
 
 
