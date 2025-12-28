@@ -166,7 +166,7 @@ jobs:
 
       - name: Run E2E tests
         working-directory: w7-WHv1/frontend
-        run: npx playwright test --project=chromium
+        run: npx playwright test --project=setup --project=chromium
 
       - name: Upload Playwright report
         if: always()
