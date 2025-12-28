@@ -1,12 +1,17 @@
 import { test as setup } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 /**
  * Authentication setup for Playwright tests
  * Creates storage states for different user roles
  * These files are reused across tests to avoid repeated logins
  */
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const authFile = {
   admin: path.join(__dirname, '../../playwright/.auth/admin.json'),
