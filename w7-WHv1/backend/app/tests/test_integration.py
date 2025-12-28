@@ -67,7 +67,7 @@ class TestInventoryWorkflow:
         )
         assert response.status_code == 201
         receipt_result = response.json()
-        bin_content_id = receipt_result["bin_content"]["id"]
+        bin_content_id = receipt_result["bin_content_id"]
 
         # Verify bin status updated to occupied
         result = await db_session.execute(select(Bin).where(Bin.id == sample_bin.id))
