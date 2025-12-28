@@ -241,6 +241,7 @@ async def fulfill_reservation_endpoint(
             reservation_id=reservation.id,
             movement_ids=movement_ids,
             total_fulfilled=reservation.total_quantity,
+            status=reservation.status,
             message=HU_RESERVATION_MESSAGES["reservation_fulfilled"],
         )
     except ValueError as e:

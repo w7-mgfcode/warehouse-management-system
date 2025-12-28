@@ -68,6 +68,7 @@ class ReservationFulfillResponse(BaseModel):
     reservation_id: UUID
     movement_ids: list[UUID]
     total_fulfilled: Decimal
+    status: str
     message: str
 
     model_config = ConfigDict(from_attributes=True)

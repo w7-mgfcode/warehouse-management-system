@@ -90,15 +90,15 @@ class TestInventoryWorkflow:
         )
         assert response.status_code == 200
         fefo_result = response.json()
-        assert len(fefo_result["items"]) == 1
-        assert fefo_result["items"][0]["bin_content_id"] == bin_content_id
-        assert fefo_result["is_fefo_compliant"] is True
+        assert len(fefo_result["recommendations"]) == 1
+        assert fefo_result["recommendations"][0]["bin_content_id"] == bin_content_id
+        assert fefo_result["recommendations"][0]["is_fefo_compliant"] is True
 
         # Step 3: Issue goods
         issue_data = {
-            "warehouse_id": str(sample_warehouse.id),
-            "product_id": str(sample_product.id),
+            "bin_content_id": bin_content_id,
             "quantity": 50.0,
+            "reason": "customer_order",
             "reference_number": "REF-INT-ISSUE-001",
             "notes": "Integration test issue",
         }
@@ -110,8 +110,8 @@ class TestInventoryWorkflow:
         )
         assert response.status_code == 200
         issue_result = response.json()
-        assert issue_result["issued_quantity"] == 50.0
-        assert issue_result["is_fefo_compliant"] is True
+        assert float(issue_result["quantity_issued"]) == 50.0
+        assert issue_result["fefo_compliant"] is True
 
         # Verify remaining stock
         result = await db_session.execute(
@@ -131,7 +131,7 @@ class TestInventoryWorkflow:
         assert movements[0].movement_type == "receipt"
         assert movements[0].quantity == Decimal("100.0")
         assert movements[1].movement_type == "issue"
-        assert movements[1].quantity == Decimal("50.0")
+        assert movements[1].quantity == Decimal("-50.0")  # Negative for issue
         assert movements[1].quantity_after == Decimal("50.0")
 
 
@@ -150,55 +150,37 @@ class TestTransferWorkflow:
     ):
         """
         Test same-warehouse transfer:
-        1. Create transfer
-        2. Dispatch transfer
-        3. Confirm receipt
-        4. Verify stock moved
+        1. Create transfer (executes immediately)
+        2. Verify stock moved
+        3. Verify movements created
         """
-        # Step 1: Create transfer
+        # Step 1: Create transfer (executes immediately for same-warehouse)
         transfer_data = {
-            "from_bin_id": str(sample_bin_content.bin_id),
-            "to_bin_id": str(second_bin.id),
+            "source_bin_content_id": str(sample_bin_content.id),
+            "target_bin_id": str(second_bin.id),
             "quantity": 50.0,
             "notes": "Integration test transfer",
         }
 
         response = await client.post(
-            "/api/v1/transfers",
+            "/api/v1/transfers/",
             json=transfer_data,
             headers=auth_header(warehouse_token),
         )
         assert response.status_code == 201
         transfer_result = response.json()
-        transfer_id = transfer_result["id"]
-        assert transfer_result["status"] == "pending"
+        assert float(transfer_result["quantity_transferred"]) == 50.0
+        assert transfer_result["source_bin_code"] == sample_bin_content.bin.code
+        assert transfer_result["target_bin_code"] == second_bin.code
 
-        # Step 2: Dispatch transfer
-        response = await client.post(
-            f"/api/v1/transfers/{transfer_id}/dispatch",
-            headers=auth_header(warehouse_token),
-        )
-        assert response.status_code == 200
-        dispatch_result = response.json()
-        assert dispatch_result["status"] == "dispatched"
-
-        # Verify source bin content reduced
+        # Step 2: Verify source bin content reduced
         result = await db_session.execute(
             select(BinContent).where(BinContent.id == sample_bin_content.id)
         )
         source_content = result.scalar_one()
         assert source_content.quantity == Decimal("50.0")  # 100 - 50
 
-        # Step 3: Confirm receipt
-        response = await client.post(
-            f"/api/v1/transfers/{transfer_id}/confirm",
-            headers=auth_header(warehouse_token),
-        )
-        assert response.status_code == 200
-        confirm_result = response.json()
-        assert confirm_result["status"] == "confirmed"
-
-        # Step 4: Verify destination bin content created
+        # Step 3: Verify destination bin content created
         result = await db_session.execute(
             select(BinContent).where(BinContent.bin_id == second_bin.id)
         )
@@ -236,48 +218,38 @@ class TestReservationWorkflow:
         """
         # Step 1: Create reservation
         reservation_data = {
+            "product_id": str(sample_product.id),
+            "quantity": 30.0,
+            "order_reference": "TEST-ORDER-001",
             "customer_name": "Test Customer",
-            "warehouse_id": str(sample_warehouse.id),
-            "items": [
-                {
-                    "product_id": str(sample_product.id),
-                    "quantity": 30.0,
-                }
-            ],
-            "expiry_date": str(date.today() + timedelta(days=7)),
+            "reserved_until": (datetime.now(UTC) + timedelta(days=7)).isoformat(),
             "notes": "Integration test reservation",
         }
 
         response = await client.post(
-            "/api/v1/reservations",
+            "/api/v1/reservations/",
             json=reservation_data,
             headers=auth_header(warehouse_token),
         )
         assert response.status_code == 201
         reservation_result = response.json()
-        reservation_id = reservation_result["id"]
-        assert reservation_result["status"] == "pending"
+        reservation_id = reservation_result["reservation_id"]
+        assert reservation_result["status"] == "active"
         assert len(reservation_result["items"]) == 1
+        assert float(reservation_result["total_quantity"]) == 30.0
 
-        # Step 2: Verify items reserved in database
-        result = await db_session.execute(
-            select(StockReservation).where(StockReservation.id == uuid.UUID(reservation_id))
-        )
-        reservation = result.scalar_one()
-        assert len(reservation.items) == 1
-        assert reservation.items[0].quantity == Decimal("30.0")
-        assert reservation.items[0].bin_content_id == sample_bin_content.id
-
-        # Verify bin content status updated
+        # Step 2: Verify bin content has reserved quantity
         result = await db_session.execute(
             select(BinContent).where(BinContent.id == sample_bin_content.id)
         )
         content = result.scalar_one()
-        assert content.status == "reserved"
+        assert content.reserved_quantity == Decimal("30.0")
 
         # Step 3: Fulfill reservation
+        fulfill_data = {"notes": "Fulfilled integration test reservation"}
         response = await client.post(
             f"/api/v1/reservations/{reservation_id}/fulfill",
+            json=fulfill_data,
             headers=auth_header(warehouse_token),
         )
         assert response.status_code == 200
@@ -336,7 +308,7 @@ class TestExpiryWarningSystem:
 
         # Should have at least 1 expired item
         assert len(expired_result["items"]) >= 1
-        assert expired_result["items"][0]["id"] == str(sample_bin_content_expired.id)
+        assert expired_result["items"][0]["bin_content_id"] == str(sample_bin_content_expired.id)
 
 
 @pytest.mark.asyncio
@@ -348,6 +320,7 @@ class TestCrossWarehouseTransfer:
         client: AsyncClient,
         db_session: AsyncSession,
         warehouse_token: str,
+        manager_token: str,
         warehouse_user: User,
         sample_warehouse: Warehouse,
         sample_bin_content: BinContent,
@@ -378,7 +351,7 @@ class TestCrossWarehouseTransfer:
         response = await client.post(
             "/api/v1/warehouses",
             json=warehouse2_data,
-            headers=auth_header(warehouse_token),
+            headers=auth_header(manager_token),
         )
         assert response.status_code == 201
         warehouse2 = response.json()
@@ -403,10 +376,9 @@ class TestCrossWarehouseTransfer:
 
         # Step 2: Create cross-warehouse transfer
         transfer_data = {
-            "from_warehouse_id": str(sample_warehouse.id),
-            "to_warehouse_id": warehouse2_id,
-            "from_bin_id": str(sample_bin_content.bin_id),
-            "to_bin_id": bin2_id,
+            "source_bin_content_id": str(sample_bin_content.id),
+            "target_warehouse_id": warehouse2_id,
+            "target_bin_id": bin2_id,
             "quantity": 40.0,
             "notes": "Cross-warehouse integration test",
         }
@@ -414,11 +386,11 @@ class TestCrossWarehouseTransfer:
         response = await client.post(
             "/api/v1/transfers/cross-warehouse",
             json=transfer_data,
-            headers=auth_header(warehouse_token),
+            headers=auth_header(manager_token),
         )
         assert response.status_code == 201
         transfer_result = response.json()
-        transfer_id = transfer_result["id"]
+        transfer_id = transfer_result["transfer_id"]
         assert transfer_result["status"] == "pending"
 
         # Step 3: Dispatch from source
@@ -436,8 +408,15 @@ class TestCrossWarehouseTransfer:
         assert source_content.quantity == Decimal("60.0")  # 100 - 40
 
         # Step 4: Confirm at destination
+        confirm_data = {
+            "target_bin_id": bin2_id,
+            "received_quantity": 40.0,
+            "condition_on_receipt": "good",
+            "notes": "Received in good condition",
+        }
         response = await client.post(
             f"/api/v1/transfers/{transfer_id}/confirm",
+            json=confirm_data,
             headers=auth_header(warehouse_token),
         )
         assert response.status_code == 200
@@ -515,11 +494,11 @@ class TestStockLevelAggregation:
         assert response.status_code == 200
         stock_result = response.json()
 
-        # Step 3: Verify aggregation
-        assert len(stock_result["items"]) >= 1
+        # Step 3: Verify aggregation - stock_result is a direct list
+        assert len(stock_result) >= 1
         product_stock = next(
-            (item for item in stock_result["items"] if item["product_id"] == str(sample_product.id)),
+            (item for item in stock_result if item["product_id"] == str(sample_product.id)),
             None,
         )
         assert product_stock is not None
-        assert product_stock["total_quantity"] == 250.0  # 100 + 150
+        assert float(product_stock["total_quantity"]) == 250.0  # 100 + 150

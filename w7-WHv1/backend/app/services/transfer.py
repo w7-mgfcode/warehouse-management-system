@@ -375,6 +375,7 @@ async def confirm_cross_warehouse_transfer(
         select(WarehouseTransfer)
         .options(
             selectinload(WarehouseTransfer.source_bin_content).selectinload(BinContent.product),
+            selectinload(WarehouseTransfer.target_bin),
         )
         .where(WarehouseTransfer.id == transfer_id)
     )
