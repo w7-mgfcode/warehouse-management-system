@@ -44,7 +44,7 @@ export function ProductList({
   if (products.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs megjeleníthető termék
+        {HU.empty.products}
       </div>
     );
   }

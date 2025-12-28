@@ -39,7 +39,7 @@ export function TransferList({ transfers, isLoading }: TransferListProps) {
   if (transfers.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs áthelyezés
+        {HU.empty.transfers}
       </div>
     );
   }

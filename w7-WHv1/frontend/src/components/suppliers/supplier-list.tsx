@@ -31,7 +31,7 @@ export function SupplierList({ suppliers, isLoading, onDelete, isDeleting }: Sup
   if (suppliers.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs megjeleníthető beszállító
+        {HU.empty.suppliers}
       </div>
     );
   }

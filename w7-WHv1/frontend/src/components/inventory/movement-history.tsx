@@ -27,7 +27,7 @@ export function MovementHistory({ filters = {} }: MovementHistoryProps) {
   if (!data || data.items.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs mozgási előzmény
+        {HU.empty.movements}
       </div>
     );
   }

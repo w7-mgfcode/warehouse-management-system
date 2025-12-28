@@ -32,7 +32,7 @@ export function WarehouseList({ warehouses, isLoading, onDelete, isDeleting }: W
   if (warehouses.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs megjeleníthető raktár
+        {HU.empty.warehouses}
       </div>
     );
   }

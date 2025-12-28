@@ -32,7 +32,7 @@ export function BinList({ bins, isLoading, onDelete, isDeleting }: BinListProps)
   if (bins.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs megjeleníthető tárolóhely
+        {HU.empty.bins}
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { binsQueryOptions } from "@/queries/bins";
 import { BinStatusBadge } from "./bin-status-badge";
+import { HU } from "@/lib/i18n";
 import type { BinStatus } from "@/types";
 
 interface BinSelectProps {
@@ -48,7 +49,7 @@ function BinSelectContent({
         ))}
         {data.items.length === 0 && (
           <div className="p-4 text-center text-sm text-muted-foreground">
-            Nincs elérhető tárolóhely
+            {HU.empty.binsAvailable}
           </div>
         )}
       </SelectContent>

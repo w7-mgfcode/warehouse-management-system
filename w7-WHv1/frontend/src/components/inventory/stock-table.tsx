@@ -28,7 +28,7 @@ export function StockTable({ filters = {} }: StockTableProps) {
   if (!data || data.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs készlet a megadott szűrőkkel
+        {HU.empty.stock}
       </div>
     );
   }

@@ -39,7 +39,7 @@ export function ReservationList({ reservations, isLoading }: ReservationListProp
   if (reservations.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Nincs foglalás
+        {HU.empty.reservations}
       </div>
     );
   }

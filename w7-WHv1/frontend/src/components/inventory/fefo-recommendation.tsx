@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fefoRecommendationQueryOptions } from "@/queries/inventory";
 import { ExpiryBadge } from "./expiry-badge";
 import { formatNumber } from "@/lib/number";
+import { HU, interpolate } from "@/lib/i18n";
 
 interface FEFORecommendationProps {
   productId: string;
@@ -53,7 +54,7 @@ function FEFOContent({ productId, requestedQuantity, warehouseId }: FEFORecommen
         <div className="space-y-3">
           {data.recommendations.length === 0 ? (
             <p className="text-center py-4 text-muted-foreground">
-              Nincs elérhető készlet ehhez a termékhez
+              {HU.empty.stockAvailable}
             </p>
           ) : (
             data.recommendations.map((rec, index) => (
@@ -100,8 +101,10 @@ function FEFOContent({ productId, requestedQuantity, warehouseId }: FEFORecommen
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Nincs elegendő készlet. Elérhető: {formatNumber(data.total_available)} kg,
-              Kért: {formatNumber(requestedQuantity)} kg
+              {interpolate(HU.fefo.insufficientStock, {
+                available: formatNumber(data.total_available),
+                requested: formatNumber(requestedQuantity),
+              })}
             </AlertDescription>
           </Alert>
         )}

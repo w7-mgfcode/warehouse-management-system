@@ -155,6 +155,26 @@ export const HU = {
     low: "Alacsony",
     expired: "Lejárt",
   },
+
+  // Empty state messages
+  empty: {
+    warehouses: "Nincs megjeleníthető raktár",
+    products: "Nincs megjeleníthető termék",
+    suppliers: "Nincs megjeleníthető beszállító",
+    bins: "Nincs megjeleníthető tárolóhely",
+    binsAvailable: "Nincs elérhető tárolóhely",
+    transfers: "Nincs áthelyezés",
+    reservations: "Nincs foglalás",
+    movements: "Nincs mozgási előzmény",
+    stock: "Nincs készlet a megadott szűrőkkel",
+    expiryWarnings: "Nincs lejárati figyelmeztetés",
+    stockAvailable: "Nincs elérhető készlet ehhez a termékhez",
+  },
+
+  // FEFO messages
+  fefo: {
+    insufficientStock: "Nincs elegendő készlet. Elérhető: {available} kg, Kért: {requested} kg",
+  },
 } as const;
 
 // Helper function for message interpolation

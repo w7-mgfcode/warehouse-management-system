@@ -8,6 +8,7 @@ import { expiryWarningsQueryOptions } from "@/queries/dashboard";
 import { formatDate, getExpiryUrgency, formatExpiryWarning, getDaysUntilExpiry } from "@/lib/date";
 import { formatWeight } from "@/lib/number";
 import { cn } from "@/lib/utils";
+import { HU } from "@/lib/i18n";
 
 function ExpiryWarningsContent() {
   const { data: warnings } = useSuspenseQuery(expiryWarningsQueryOptions(10));
@@ -16,7 +17,7 @@ function ExpiryWarningsContent() {
     return (
       <CardContent>
         <p className="text-sm text-muted-foreground text-center py-4">
-          Nincs lejárati figyelmeztetés
+          {HU.empty.expiryWarnings}
         </p>
       </CardContent>
     );
