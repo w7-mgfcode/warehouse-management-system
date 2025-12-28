@@ -7,6 +7,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 import { productsQueryOptions } from "@/queries/products";
 
 interface ProductSelectProps {
@@ -24,9 +26,14 @@ export function ProductSelect({
   required = false,
   disabled = false,
 }: ProductSelectProps) {
+  // CONSTRAINT: Hard limit of 1000 active products for dropdown performance.
+  // If more than 1000 products exist, results will be truncated and a warning displayed.
+  // TODO: Consider implementing Combobox with search for better UX with large datasets.
   const { data } = useSuspenseQuery(
     productsQueryOptions({ is_active: true, page_size: 1000 })
   );
+
+  const isTruncated = data.total > 1000;
 
   return (
     <div className="space-y-2">
@@ -48,6 +55,15 @@ export function ProductSelect({
           ))}
         </SelectContent>
       </Select>
+      {isTruncated && (
+        <Alert variant="destructive" className="py-2">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="text-sm">
+            Figyelem! {data.total} termékből csak az első 1000 jelenik meg.
+            Használja a termékek listát részletesebb kereséséhez.
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }
