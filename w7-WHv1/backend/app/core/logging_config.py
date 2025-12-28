@@ -7,9 +7,9 @@ ingested by log aggregation systems (ELK, Loki, etc.).
 
 import logging
 import sys
+from datetime import UTC, datetime
+
 from pythonjsonlogger import jsonlogger
-from datetime import timezone, datetime
-from typing import Optional
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
@@ -35,7 +35,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         super().add_fields(log_record, record, message_dict)
 
         # Add timestamp in ISO 8601 format with UTC timezone
-        log_record["timestamp"] = datetime.now(timezone.utc).isoformat()
+        log_record["timestamp"] = datetime.now(UTC).isoformat()
 
         # Add application context
         log_record["app"] = "wms"
@@ -66,7 +66,7 @@ def setup_logging(
     log_level: str = "INFO",
     log_format: str = "json",
     enable_file_logging: bool = False,
-    log_file_path: Optional[str] = None,
+    log_file_path: str | None = None,
 ) -> None:
     """
     Configure application logging.
@@ -210,8 +210,8 @@ def log_request(
     path: str,
     status_code: int,
     duration_ms: float,
-    user_id: Optional[str] = None,
-    request_id: Optional[str] = None,
+    user_id: str | None = None,
+    request_id: str | None = None,
 ) -> None:
     """
     Log HTTP request with structured data.

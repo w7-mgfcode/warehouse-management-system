@@ -22,7 +22,6 @@ from app.db.models.stock_reservation import StockReservation
 from app.db.models.supplier import Supplier
 from app.db.models.user import User
 from app.db.models.warehouse import Warehouse
-from app.db.models.warehouse_transfer import WarehouseTransfer
 from app.tests.conftest import auth_header
 
 

@@ -5,13 +5,14 @@ Protects against abuse and ensures fair resource usage.
 Default: 100 requests per minute per IP address.
 """
 
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from fastapi import Request, HTTPException, status
-from fastapi.responses import JSONResponse
-from typing import Callable
 import logging
+from collections.abc import Callable
+
+from fastapi import HTTPException, Request, status
+from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 logger = logging.getLogger(__name__)
 
@@ -140,10 +141,10 @@ def rate_limit(limit: str = "100/minute") -> Callable:
         try:
             # This will be replaced by SlowAPI middleware check
             pass
-        except RateLimitExceeded as exc:
+        except RateLimitExceeded:
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="Túl sok kérés. Kérjük, próbálja újra később.",
-            )
+            ) from None
 
     return dependency

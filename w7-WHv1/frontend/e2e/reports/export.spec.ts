@@ -9,7 +9,7 @@ import * as path from 'path';
 test.describe('Reports - CSV Export', () => {
   test.use({ storageState: 'playwright/.auth/warehouse.json' });
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     // Clean up any existing downloads
     const downloadsPath = path.join(process.cwd(), 'downloads');
     if (fs.existsSync(downloadsPath)) {
@@ -91,7 +91,7 @@ test.describe('Reports - CSV Export', () => {
 
         // Clean up
         fs.unlinkSync(filePath);
-      } catch (error) {
+      } catch (_error) {
         // Download may not trigger if no data
         console.log('Download not triggered (possibly no data)');
       }
@@ -128,7 +128,7 @@ test.describe('Reports - CSV Export', () => {
 
         // Clean up
         fs.unlinkSync(filePath);
-      } catch (error) {
+      } catch (_error) {
         console.log('Export test skipped (no data or download blocked)');
       }
     }

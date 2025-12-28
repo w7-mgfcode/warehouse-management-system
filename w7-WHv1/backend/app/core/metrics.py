@@ -7,8 +7,8 @@ Tracks:
 - System health metrics (DB connections, task queue)
 """
 
-from prometheus_client import Counter, Histogram, Gauge, Info
-from typing import Optional
+
+from prometheus_client import Counter, Gauge, Histogram, Info
 
 # Application info
 app_info = Info("wms_app", "WMS application information")
@@ -186,7 +186,7 @@ def update_expiry_warnings(urgency: str, count: int) -> None:
     inventory_expiry_warnings_total.labels(urgency=urgency).set(count)
 
 
-def track_transfer(status: str, from_warehouse: Optional[str] = None, to_warehouse: Optional[str] = None, duration: Optional[float] = None) -> None:
+def track_transfer(status: str, from_warehouse: str | None = None, to_warehouse: str | None = None, duration: float | None = None) -> None:
     """
     Track warehouse transfer metrics.
 
@@ -204,7 +204,7 @@ def track_transfer(status: str, from_warehouse: Optional[str] = None, to_warehou
         ).observe(duration)
 
 
-def track_reservation(status: str, warehouse_id: Optional[str] = None) -> None:
+def track_reservation(status: str, warehouse_id: str | None = None) -> None:
     """
     Track reservation metrics.
 
@@ -226,7 +226,7 @@ def update_active_reservations(warehouse_id: str, count: int) -> None:
     reservations_active.labels(warehouse_id=warehouse_id).set(count)
 
 
-def track_celery_task(task_name: str, status: str, duration: Optional[float] = None) -> None:
+def track_celery_task(task_name: str, status: str, duration: float | None = None) -> None:
     """
     Track Celery task metrics.
 
