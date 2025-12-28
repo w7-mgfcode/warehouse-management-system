@@ -75,7 +75,7 @@ function FEFOContent({ productId, requestedQuantity, warehouseId }: FEFORecommen
                     Sarzs: {rec.batch_number}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Elérhető: {formatNumber(rec.available_quantity)} {data.sku ? "" : "kg"}
+                    Elérhető: {formatNumber(rec.available_quantity)} kg
                   </div>
                 </div>
                 <div className="text-right space-y-2">
