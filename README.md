@@ -139,6 +139,7 @@ warehouse-management-system/
 ### Phase 6 - Testing, QA & DevOps ✅ COMPLETE
 - [Specification](INITIAL6.md) - Phase 6 requirements
 - [PRP](PRPs/phase6-testing-devops.md) - Implementation blueprint
+- [Comprehensive Guide](Docs/Phase6_Testing_DevOps.md) - Complete Phase 6 documentation (11,000 words, 22 sections, LLM-optimized)
 - [Production Deployment Guide](Docs/Production_Deployment.md) - Prerequisites, installation, configuration, deployment, updates, rollback
 - [Operations Runbook](Docs/Operations_Runbook.md) - Daily operations, monitoring, incident response, maintenance, performance tuning
 - [Security Hardening Guide](Docs/Security_Hardening.md) - Server security, HTTPS, secrets management, access control, monitoring
