@@ -44,8 +44,16 @@ export function DeleteDialog({
     // Don't close immediately - let useEffect handle it after async operation completes
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    // Prevent closing dialog while deletion is in progress
+    if (!newOpen && isDeleting) {
+      return; // Block close attempts during deletion
+    }
+    setOpen(newOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="ghost" size="icon" className="text-error hover:text-error">
