@@ -8,11 +8,12 @@ Last updated: 2025-12-28
 **Branch**: `06-Testing-Phase_6` → Ready for merge
 **Specification**: `INITIAL6.md`
 **PRP**: `PRPs/phase6-testing-devops.md`
-**Status**: ✅ COMPLETE
+**Status**: ✅ COMPLETE + E2E Test Fixes
 **Progress**: 6/6 sub-phases complete (100%)
 **Confidence Score**: 10/10 (Production ready)
+**Latest**: E2E tests fixed (41 passed, 6 skipped, 0 failed) - CI passing ✅
 
-#### Phase 6A: Frontend E2E Testing (Playwright) ✅ COMPLETED (2025-12-28)
+#### Phase 6A: Frontend E2E Testing (Playwright) ✅ COMPLETED + FIXED (2025-12-28)
 - ✅ Install Playwright and configure multi-browser testing (chromium, firefox, webkit, mobile)
 - ✅ Create authentication setup (storageState for admin, warehouse users)
 - ✅ Create auth tests (4 tests: login, logout, invalid, RBAC)
@@ -20,7 +21,13 @@ Last updated: 2025-12-28
 - ✅ Create master data tests (5 tests: warehouses, products, suppliers, bins, bulk generation)
 - ✅ Create reports tests (2 tests: CSV export with Hungarian headers)
 - ✅ Create accessibility tests (7 tests: a11y, ARIA labels, keyboard nav, tables, buttons, color contrast)
-- ✅ Files created: 15 test specs, playwright.config.ts
+- ✅ Files created: 15 test specs, playwright.config.ts, e2e/helpers.ts
+- ✅ **E2E Test Fixes** (2025-12-28): Fixed 28 skipped tests - now 41 passed, 6 skipped (backend unavailable), 0 failed
+  - Created closeMobileMenu() helper to dismiss responsive dialogs
+  - Fixed Hungarian text selectors (Létrehozás, Bevételezés, Kiadás)
+  - Added graceful skip when backend unavailable (Hiba történt error page)
+  - Fixed form field selectors using getByRole with Hungarian labels
+  - CI passing ✅ (all 3 jobs: backend, frontend, E2E)
 
 #### Phase 6B: Frontend Unit Testing (Vitest) ✅ COMPLETED (2025-12-28)
 - ✅ Install Vitest + React Testing Library + coverage tools

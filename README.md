@@ -34,7 +34,7 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 - ✅ Hungarian email alerts for expiring products
 - ✅ Job monitoring and manual trigger capabilities
 
-**Test Coverage**: 154 backend + 35+ frontend = **189+ total tests** (100% Phase 1-6 coverage)
+**Test Coverage**: 154 backend + 47 frontend (41 E2E passed + 6 skipped) = **201 total tests** (100% Phase 1-6 coverage)
 
 ### Completed (Phase 5)
 - ✅ **Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui)** - 100% Complete!
@@ -60,7 +60,8 @@ A comprehensive web-based warehouse management system designed for pallet rackin
 
 **Backend**: Python 3.13+, FastAPI 0.125.0, SQLAlchemy 2.0.45, PostgreSQL 17, Valkey 8.1
 **Frontend**: React 19, Tailwind CSS 4.0, shadcn/ui, TanStack Query 5.90+, Zustand 5.x
-**Testing**: pytest (154 backend), Playwright (20+ E2E), Vitest (15+ unit) = **189+ total tests**
+**Testing**: pytest (154 backend), Playwright (47 E2E: 41 passed + 6 skipped), Vitest (15+ unit) = **201 total tests**
+**E2E Status**: CI passing ✅ (chromium), graceful skip when backend unavailable
 **DevOps**: Docker Compose, GitHub Actions CI/CD, Prometheus metrics, structured logging
 **Code Quality**: ruff (linting + formatting), mypy (type checking)
 

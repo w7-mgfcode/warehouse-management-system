@@ -17,9 +17,10 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
 | Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
-| Phase 6 | ✅ Complete | `06-Testing-Phase_6` → Ready for merge | Testing, QA & DevOps (100% complete: A-F done + comprehensive documentation) |
+| Phase 6 | ✅ Complete | `06-Testing-Phase_6` → Ready for merge | Testing, QA & DevOps (100% complete: A-F done + comprehensive documentation + E2E fixes) |
 
-**Test Coverage**: 154 backend + 35+ frontend tests (E2E + unit + integration) - Phase 1-6: 100%
+**Test Coverage**: 154 backend + 47 frontend tests (41 E2E passed + 6 skipped) - Phase 1-6: 100%
+**E2E Status**: CI passing ✅ (chromium), 47 total specs (41 pass, 6 skip when backend unavailable)
 **Documentation**: Phase 6 comprehensive guide created (`Docs/Phase6_Testing_DevOps.md` - 11,000 words, 22 sections)
 
 ## Key constraints
