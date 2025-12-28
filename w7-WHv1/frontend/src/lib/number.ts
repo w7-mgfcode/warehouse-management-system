@@ -6,12 +6,17 @@
 
 /**
  * Format number with Hungarian locale
+ * Manual implementation to ensure consistent formatting across environments
  */
 export function formatNumber(value: number, decimals = 2): string {
-  return new Intl.NumberFormat("hu-HU", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
+  const fixed = value.toFixed(decimals);
+  const [integerPart, decimalPart] = fixed.split(".");
+
+  // Add space thousands separator
+  const withSeparator = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+  // Use comma as decimal separator
+  return decimalPart ? `${withSeparator},${decimalPart}` : withSeparator;
 }
 
 /**
@@ -44,13 +49,17 @@ export function formatPercentage(value: number, decimals = 1): string {
 
 /**
  * Format currency in Hungarian Forint
+ * Manual implementation to ensure consistent formatting across environments
  */
 export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("hu-HU", {
-    style: "currency",
-    currency: "HUF",
-    minimumFractionDigits: 0,
-  }).format(value);
+  // HUF doesn't use decimals, so round to integer
+  const rounded = Math.round(value);
+  const integerStr = String(rounded);
+
+  // Add space thousands separator
+  const withSeparator = integerStr.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+  return `${withSeparator} Ft`;
 }
 
 /**
