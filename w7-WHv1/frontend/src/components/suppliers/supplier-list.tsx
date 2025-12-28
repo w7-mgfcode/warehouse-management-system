@@ -57,7 +57,7 @@ export function SupplierList({ suppliers, isLoading, onDelete, isDeleting }: Sup
               className="cursor-pointer hover:bg-secondary/50"
               onClick={() => navigate(`/suppliers/${supplier.id}`)}
             >
-              <TableCell className="font-medium">{supplier.name}</TableCell>
+              <TableCell className="font-medium">{supplier.company_name}</TableCell>
               <TableCell className="text-muted-foreground">
                 {supplier.tax_number || "—"}
               </TableCell>
@@ -94,7 +94,7 @@ export function SupplierList({ suppliers, isLoading, onDelete, isDeleting }: Sup
                     <Edit className="h-4 w-4" />
                   </Button>
                   <DeleteDialog
-                    entityName={supplier.name}
+                    entityName={supplier.company_name}
                     onConfirm={() => onDelete(supplier.id)}
                     isDeleting={isDeleting}
                   />

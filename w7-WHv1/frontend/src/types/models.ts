@@ -42,7 +42,7 @@ export interface Product {
 // Supplier types
 export interface Supplier {
   id: string;
-  name: string;
+  company_name: string;
   tax_number: string | null;
   contact_name: string | null;
   email: string | null;

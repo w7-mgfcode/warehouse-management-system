@@ -1,6 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { ProductSelect } from "@/components/products/product-select";
 import { SupplierSelect } from "@/components/suppliers/supplier-select";
 import { BinSelect } from "@/components/bins/bin-select";
 import { HU } from "@/lib/i18n";
+import type { APIError } from "@/types/api";
 
 interface ReceiptFormProps {
   onSuccess?: () => void;
@@ -46,13 +48,15 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
     const submitData = data as ReceiptFormData;
 
     receiveMutation.mutate(submitData, {
-      onSuccess: (response: any) => {
-        toast.success(response.message || HU.success.received);
+      onSuccess: (response) => {
+        toast.success((response as { message?: string }).message || HU.success.received);
         form.reset();
         onSuccess?.();
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.detail || HU.errors.generic);
+      onError: (error) => {
+        const axiosError = error as AxiosError<APIError>;
+        const message = axiosError.response?.data?.detail;
+        toast.error(typeof message === "string" ? message : HU.errors.generic);
       },
     });
   });

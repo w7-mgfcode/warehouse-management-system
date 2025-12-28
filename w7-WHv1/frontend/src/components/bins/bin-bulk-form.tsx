@@ -2,6 +2,7 @@ import { useState, Suspense } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { warehousesQueryOptions } from "@/queries/warehouses";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { HU } from "@/lib/i18n";
 import { formatNumber } from "@/lib/number";
+import type { APIError } from "@/types/api";
 
 interface BinPreview {
   code: string;
@@ -119,13 +121,15 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
       aisles: parseAisles(formData.aisles as unknown as string),
     };
 
-    bulkMutation.mutate(submitData as any, {
-      onSuccess: (result: any) => {
-        toast.success(`${result.created || preview.length} tárolóhely sikeresen létrehozva`);
+    bulkMutation.mutate(submitData, {
+      onSuccess: (result) => {
+        toast.success(`${(result as { created?: number }).created || preview.length} tárolóhely sikeresen létrehozva`);
         onSuccess?.();
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.detail || HU.errors.generic);
+      onError: (error) => {
+        const axiosError = error as AxiosError<APIError>;
+        const message = axiosError.response?.data?.detail;
+        toast.error(typeof message === "string" ? message : HU.errors.generic);
       },
     });
   });

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ import { ProductSelect } from "@/components/products/product-select";
 import { FEFORecommendation } from "./fefo-recommendation";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { HU } from "@/lib/i18n";
+import type { APIError } from "@/types/api";
 
 interface IssueFormProps {
   onSuccess?: () => void;
@@ -50,16 +52,18 @@ export function IssueForm({ onSuccess }: IssueFormProps) {
     const submitData = data as IssueFormData;
 
     issueMutation.mutate(submitData, {
-      onSuccess: (response: any) => {
-        toast.success(response.message || HU.success.issued);
+      onSuccess: (response) => {
+        toast.success((response as { message?: string }).message || HU.success.issued);
         form.reset();
         setShowFEFO(false);
         setSelectedProduct("");
         setRequestedQuantity(0);
         onSuccess?.();
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.detail || HU.errors.generic);
+      onError: (error) => {
+        const axiosError = error as AxiosError<APIError>;
+        const message = axiosError.response?.data?.detail;
+        toast.error(typeof message === "string" ? message : HU.errors.generic);
       },
     });
   });

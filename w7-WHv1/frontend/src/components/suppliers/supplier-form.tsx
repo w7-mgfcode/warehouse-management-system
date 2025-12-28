@@ -22,7 +22,7 @@ export function SupplierForm({ supplier, onSuccess }: SupplierFormProps) {
   const form = useForm({
     resolver: zodResolver(supplierSchema),
     defaultValues: {
-      company_name: supplier?.name || "",
+      company_name: supplier?.company_name || "",
       contact_person: supplier?.contact_name || "",
       email: supplier?.email || "",
       phone: supplier?.phone || "",

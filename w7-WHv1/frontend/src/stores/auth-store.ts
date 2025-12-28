@@ -35,7 +35,9 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         refreshToken: state.refreshToken,
-        // CRITICAL: Do NOT persist accessToken or user (security)
+        // SECURITY: accessToken intentionally NOT persisted (short-lived, memory only)
+        // On reload, first API call triggers 401 -> token refresh flow restores accessToken
+        // user: null on reload, will be restored after token refresh
       }),
     }
   )

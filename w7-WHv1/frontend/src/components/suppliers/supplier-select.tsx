@@ -36,7 +36,7 @@ export function SupplierSelect({
         <SelectContent>
           {data.items.map((supplier) => (
             <SelectItem key={supplier.id} value={supplier.id}>
-              {supplier.name}
+              {supplier.company_name}
               {supplier.tax_number && ` (${supplier.tax_number})`}
             </SelectItem>
           ))}
