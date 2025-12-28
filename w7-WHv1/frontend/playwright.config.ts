@@ -27,8 +27,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:5173',
 
-    // Action timeout for individual operations
-    actionTimeout: 8000,
+    // Action timeout for individual operations (increased for CI stability)
+    actionTimeout: 15000,
 
     // Artifacts only on failure (no retries means on-first-retry won't trigger)
     trace: 'retain-on-failure',

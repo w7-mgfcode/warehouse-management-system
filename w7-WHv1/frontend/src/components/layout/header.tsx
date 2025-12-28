@@ -80,7 +80,11 @@ export function Header() {
         {/* User dropdown menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Button
+              variant="ghost"
+              className="relative h-10 w-10 rounded-full"
+              aria-label={`Felhasználói menü: ${user?.username || 'user'}`}
+            >
               <Avatar>
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   {getInitials()}

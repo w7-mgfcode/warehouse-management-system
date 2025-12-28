@@ -11,10 +11,12 @@ export function ProtectedRoute({
   children,
   allowedRoles,
 }: ProtectedRouteProps) {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, refreshToken } = useAuthStore();
   const location = useLocation();
 
-  if (!isAuthenticated) {
+  // Allow access if authenticated OR if we have a refresh token (will be refreshed on first API call)
+  // This fixes the issue where page reload loses isAuthenticated but keeps refreshToken
+  if (!isAuthenticated && !refreshToken) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -11,11 +11,17 @@ test.describe('Authentication - Logout', () => {
   test('user can logout successfully', async ({ page }) => {
     await page.goto('/dashboard');
 
-    // Verify logged in
-    await expect(page.getByRole('heading', { name: 'Irányítópult' })).toBeVisible();
+    // Close any dialog/mobile menu if open
+    const closeButton = page.getByRole('button', { name: 'Close' });
+    if (await closeButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await closeButton.click();
+    }
 
-    // Open user menu
-    await page.getByRole('button', { name: 'admin' }).click();
+    // Verify logged in - use h1 directly
+    await expect(page.locator('h1')).toContainText('Irányítópult', { timeout: 10000 });
+
+    // Open user menu (uses aria-label from header.tsx)
+    await page.getByRole('button', { name: /Felhasználói menü/i }).click();
 
     // Click logout (Hungarian: Kijelentkezés)
     await page.getByRole('menuitem', { name: 'Kijelentkezés' }).click();
@@ -31,12 +37,29 @@ test.describe('Authentication - Logout', () => {
   test('logout clears authentication state', async ({ page }) => {
     await page.goto('/dashboard');
 
-    // Logout
-    await page.getByRole('button', { name: 'admin' }).click();
+    // Close any dialog/mobile menu if open
+    const closeButton = page.getByRole('button', { name: 'Close' });
+    if (await closeButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await closeButton.click();
+    }
+
+    // Wait for dashboard to load
+    await expect(page.locator('h1')).toContainText('Irányítópult', { timeout: 10000 });
+
+    // Logout (open user menu using aria-label)
+    await page.getByRole('button', { name: /Felhasználói menü/i }).click();
     await page.getByRole('menuitem', { name: 'Kijelentkezés' }).click();
 
-    // Verify no auth token in local storage
-    const authStore = await page.evaluate(() => localStorage.getItem('auth-storage'));
-    expect(authStore).toBeNull();
+    // Wait for logout redirect
+    await expect(page).toHaveURL('/login');
+
+    // Verify auth store is cleared (key is 'wms-auth' from auth-store.ts)
+    const authStore = await page.evaluate(() => localStorage.getItem('wms-auth'));
+    if (authStore) {
+      const parsed = JSON.parse(authStore);
+      // After logout, state should have null values
+      expect(parsed.state.refreshToken).toBeNull();
+      expect(parsed.state.isAuthenticated).toBeFalsy();
+    }
   });
 });
