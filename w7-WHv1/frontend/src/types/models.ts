@@ -44,7 +44,7 @@ export interface Supplier {
   id: string;
   company_name: string;
   tax_number: string | null;
-  contact_name: string | null;
+  contact_person: string | null;
   email: string | null;
   phone: string | null;
   address: string | null;

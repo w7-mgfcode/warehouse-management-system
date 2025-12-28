@@ -61,7 +61,7 @@ export function SupplierList({ suppliers, isLoading, onDelete, isDeleting }: Sup
               <TableCell className="text-muted-foreground">
                 {supplier.tax_number || "—"}
               </TableCell>
-              <TableCell>{supplier.contact_name || "—"}</TableCell>
+              <TableCell>{supplier.contact_person || "—"}</TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {supplier.email || "—"}
               </TableCell>
