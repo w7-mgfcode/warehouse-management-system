@@ -33,7 +33,7 @@ test.describe('Inventory - Receipt', () => {
     }
 
     // Wait for form dropdowns to load
-    const hasCombobox = await page.waitForSelector('button[role="combobox"]', { timeout: 10000 }).catch(() => null);
+    await page.waitForSelector('button[role="combobox"]', { timeout: 10000 }).catch(() => null);
 
     // Select bin (first combobox)
     const comboboxes = page.locator('button[role="combobox"]');
