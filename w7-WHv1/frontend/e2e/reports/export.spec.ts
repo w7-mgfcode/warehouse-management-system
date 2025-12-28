@@ -91,7 +91,7 @@ test.describe('Reports - CSV Export', () => {
 
         // Clean up
         fs.unlinkSync(filePath);
-      } catch (_error) {
+      } catch {
         // Download may not trigger if no data
         console.log('Download not triggered (possibly no data)');
       }
@@ -128,7 +128,7 @@ test.describe('Reports - CSV Export', () => {
 
         // Clean up
         fs.unlinkSync(filePath);
-      } catch (_error) {
+      } catch {
         console.log('Export test skipped (no data or download blocked)');
       }
     }

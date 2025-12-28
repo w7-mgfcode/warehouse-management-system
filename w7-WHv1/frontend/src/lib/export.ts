@@ -2,7 +2,7 @@
  * CSV export utility for reports
  */
 
-export function exportToCSV<T extends Record<string, any>>(
+export function exportToCSV<T extends Record<string, unknown>>(
   data: T[],
   filename: string,
   headers?: Partial<Record<keyof T, string>>

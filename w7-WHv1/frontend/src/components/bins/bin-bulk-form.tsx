@@ -107,7 +107,7 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
       setPreview(previewData);
       setShowPreview(true);
       toast.info(`${previewData.length} tárolóhely lesz létrehozva`);
-    } catch (_error) {
+    } catch {
       toast.error("Hiba az előnézet generálásakor");
     }
   };

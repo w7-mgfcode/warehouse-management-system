@@ -1,12 +1,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supplierSchema, type SupplierFormData } from "@/schemas/supplier";
 import { useCreateSupplier, useUpdateSupplier } from "@/queries/suppliers";
 import type { Supplier } from "@/types";
+import type { APIError } from "@/types/api";
 import { HU, interpolate } from "@/lib/i18n";
 
 interface SupplierFormProps {
@@ -43,8 +45,10 @@ export function SupplierForm({ supplier, onSuccess }: SupplierFormProps) {
           toast.success(interpolate(HU.success.updated, { entity: "Beszállító" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     } else {
@@ -53,8 +57,10 @@ export function SupplierForm({ supplier, onSuccess }: SupplierFormProps) {
           toast.success(interpolate(HU.success.created, { entity: "Beszállító" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     }
