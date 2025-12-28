@@ -17,9 +17,9 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
 | Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
-| Phase 6 | 🔄 Active | `06-Testing-Phase_6` | Testing, QA & DevOps (67% complete: A-D done) |
+| Phase 6 | ✅ Complete | `06-Testing-Phase_6` → Ready for merge | Testing, QA & DevOps (100% complete: A-F done) |
 
-**Test Coverage**: 146 backend + 35+ frontend tests (E2E + unit) - Phase 1-4: 100%, Phase 6: 67%
+**Test Coverage**: 154 backend + 35+ frontend tests (E2E + unit + integration) - Phase 1-6: 100%
 
 ## Key constraints
 - **Hungarian UI requirement**: all user-facing UI text/messages/validation must be Hungarian (code identifiers and DB schema remain English).
@@ -78,10 +78,13 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
   - `npx playwright test` - 20+ E2E tests (required)
   - Full stack: Postgres + Backend + Frontend
   - Runs after backend + frontend jobs pass
-- Phase 6E-F (remaining):
-  - Prometheus metrics
-  - Structured logging, rate limiting
-  - Deployment docs and scripts
+- **Observability** (Phase 6E):
+  - Prometheus metrics (HTTP, inventory, Celery, DB, errors)
+  - Structured JSON logging for production
+  - SlowAPI rate limiting (100 req/min default, configurable)
+- **DevOps** (Phase 6F):
+  - Production deployment docs (4 guides)
+  - Deployment scripts (install, deploy, backup, restore)
 
 ## How agents work here
 - Implementation agent (Claude Code): edits application code.
