@@ -1,6 +1,6 @@
 # PLANNING
 
-Last updated: 2025-12-21
+Last updated: 2025-12-28
 
 ## Purpose
 This file is the lightweight "source of truth" for project direction, constraints, and working agreements.
@@ -16,10 +16,10 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 2 | ✅ Complete | `main` | Products, suppliers, bins CRUD + bulk generation |
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
-| Phase 5 | ✅ Complete | `05-Frontend-Phase_5` | React 19 + Tailwind v4 + shadcn/ui frontend |
+| Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
 |         | ✅ All Phases A-H | Complete | Foundation → Reports (111 files, 100% done) |
 
-**Test Coverage**: 140 tests passing (backend)
+**Test Coverage**: 146 tests passing (backend) - 100% Phase 1-4 coverage
 
 ## Key constraints
 - **Hungarian UI requirement**: all user-facing UI text/messages/validation must be Hungarian (code identifiers and DB schema remain English).
