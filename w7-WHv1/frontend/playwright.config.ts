@@ -1,48 +1,50 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright configuration for E2E testing
- * Tests Hungarian UI in multiple browsers
+ * Playwright CI Configuration - Optimized for Fast Feedback
+ *
+ * Single browser (chromium), no retries, parallel workers.
+ * For full cross-browser testing, use: npm run test:e2e:full
+ *
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+
+  // Fail fast - no retries for quick CI feedback
+  retries: 0,
+
+  // Parallel workers in CI for speed
+  workers: process.env.CI ? 2 : undefined,
+
   reporter: [['html'], ['list']],
-  timeout: 30000,
+
+  // Reduced timeout for faster failure detection
+  timeout: 20000,
 
   use: {
     baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
+
+    // Action timeout for individual operations
+    actionTimeout: 8000,
+
+    // Artifacts only on failure (no retries means on-first-retry won't trigger)
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'on-first-retry',
+    video: 'retain-on-failure',
   },
 
   projects: [
     // Setup project for authentication
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
+    // CI: Only chromium for fast feedback
+    // For full browser testing, use playwright.config.full.ts
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'mobile',
-      use: { ...devices['iPhone 13'] },
       dependencies: ['setup'],
     },
   ],
@@ -51,13 +53,14 @@ export default defineConfig({
     {
       command: 'cd ../backend && uvicorn app.main:app --host 0.0.0.0 --port 8000',
       url: 'http://localhost:8000/health',
-      reuseExistingServer: true,
-      timeout: 120 * 1000,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60 * 1000,
     },
     {
       command: 'npm run dev',
       url: 'http://localhost:5173',
-      reuseExistingServer: true,
+      reuseExistingServer: !process.env.CI,
+      timeout: 30 * 1000,
     },
   ],
 });
