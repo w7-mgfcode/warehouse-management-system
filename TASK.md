@@ -4,7 +4,59 @@ Last updated: 2025-12-28
 
 ## Active
 
-### Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui)
+### Phase 6: Testing, Quality Assurance & DevOps
+**Branch**: `06-Testing-Phase_6`
+**Specification**: `INITIAL6.md`
+**PRP**: `PRPs/phase6-testing-devops.md`
+**Status**: 🔄 IN PROGRESS
+**Progress**: 0/6 sub-phases complete
+**Confidence Score**: 8/10
+
+#### Phase 6A: Frontend E2E Testing (Playwright) - PENDING
+- [ ] Install Playwright and configure multi-browser testing
+- [ ] Create authentication setup (storageState for reusable sessions)
+- [ ] Create auth tests (4 tests: login, logout, invalid, RBAC)
+- [ ] Create inventory tests (6 tests: receipt, issue, FEFO)
+- [ ] Create master data tests (5 tests: warehouses, products, suppliers, bins, bulk)
+- [ ] Create reports tests (2 tests: CSV export)
+- [ ] Create accessibility tests (3 tests: a11y, keyboard nav)
+
+#### Phase 6B: Frontend Unit Testing (Vitest) - PENDING
+- [ ] Install Vitest + React Testing Library
+- [ ] Create test setup and utilities
+- [ ] Create utility tests (15 tests: date, number, export)
+- [ ] Create component tests (20 tests: expiry-badge, FEFO, search)
+- [ ] Create hook tests (10 tests: debounce)
+
+#### Phase 6C: Production Docker Setup - PENDING
+- [ ] Create backend Dockerfile.prod (multi-stage, non-root, health check)
+- [ ] Create frontend Dockerfile.prod (multi-stage with nginx)
+- [ ] Create nginx.conf (SPA routing, security headers, gzip)
+- [ ] Create docker-compose.prod.yml (all services)
+- [ ] Add health endpoint to backend
+
+#### Phase 6D: CI/CD Pipeline - PENDING
+- [ ] Enhance .github/workflows/ci.yml (frontend tests, E2E)
+- [ ] Create .github/workflows/deploy-prod.yml
+- [ ] Create deployment scripts (install, deploy, backup)
+
+#### Phase 6E: Backend Enhancements - PENDING
+- [ ] Add Prometheus metrics
+- [ ] Add structured JSON logging
+- [ ] Add rate limiting (SlowAPI)
+- [ ] Create integration tests
+
+#### Phase 6F: Documentation & Scripts - PENDING
+- [ ] Create Production_Deployment.md
+- [ ] Create Operations_Runbook.md
+- [ ] Create Security_Hardening.md
+- [ ] Create Backup_Recovery.md
+- [ ] Create install-production.sh
+- [ ] Create deploy.sh, backup/restore scripts
+
+---
+
+### Phase 5: Frontend (React 19 + Tailwind v4 + shadcn/ui) ✅ COMPLETE
 **Branch**: `05-Frontend-Phase_5`
 **Specification**: `INITIAL5.md`
 **PRP**: `PRPs/phase5-frontend-react19-tailwind4.md`
@@ -101,13 +153,12 @@ Last updated: 2025-12-28
 - ✅ Build: 1,086 KB (327 KB gzipped), TypeScript strict mode: 0 errors
 
 ### Backlog
-- **Frontend E2E Tests**: Add Playwright tests for critical user flows (login, FEFO, inventory operations)
-- **Bundle Optimization**: Implement code splitting to reduce main bundle from 1,085 KB
-- **Accessibility Audit**: Add comprehensive ARIA labels and keyboard navigation
+- **Bundle Optimization**: Implement code splitting to reduce main bundle from 1,085 KB (post-Phase 6)
 
 Note: Implementation work items belong here; GitHub ops (branches/PR hygiene/labels/checks) are handled by Copilot per `AGENTS.md`.
 
 ## Completed
+- 2025-12-28 — **Phase 6 PRP Created**: `PRPs/phase6-testing-devops.md` (8/10 confidence, 6 sub-phases).
 - 2025-12-28 — **Phase 5 Code Review**: Fixed 9 CodeRabbit issues (14 commits, production-ready).
 - 2025-12-28 — **Phase 3 Tests COMPLETE**: Implemented 6 missing tests (146 total tests, 100% Phase 3 coverage).
 - 2025-12-21 — **Phase 5 COMPLETE (A-H)**: Full frontend implementation (111 files, 100% done).

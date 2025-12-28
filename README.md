@@ -47,6 +47,15 @@ A comprehensive web-based warehouse management system designed for pallet rackin
   - ✅ Phase G: Transfers & Reservations (same-warehouse, cross-warehouse, FEFO allocation)
   - ✅ Phase H: Reports (Stock levels, Expiry, Movements) with CSV export + README
 
+### In Progress (Phase 6)
+- 🔄 **Phase 6: Testing, Quality Assurance & DevOps**
+  - [ ] Phase 6A: Frontend E2E Testing (Playwright - 20+ tests)
+  - [ ] Phase 6B: Frontend Unit Testing (Vitest - 50+ tests)
+  - [ ] Phase 6C: Production Docker Setup (multi-stage builds, nginx)
+  - [ ] Phase 6D: CI/CD Pipeline (GitHub Actions)
+  - [ ] Phase 6E: Backend Enhancements (metrics, logging, rate limiting)
+  - [ ] Phase 6F: Documentation & Scripts (deployment guide, runbook)
+
 ## Technology Stack
 
 **Backend**: Python 3.13+, FastAPI 0.125.0, SQLAlchemy 2.0.45, PostgreSQL 17, Valkey 8.1
@@ -124,6 +133,14 @@ warehouse-management-system/
 - [Live Implementation C & D](Docs/Phase5_Live-CD.md) - Layout and Dashboard
 - [Live Implementation E](Docs/Phase5_Live-E.md) - Master Data CRUD
 - [Live Implementation F-G-H](Docs/Phase5_Live-FGH.md) - Inventory, Transfers, Reports (completed)
+
+### Phase 6 - Testing, QA & DevOps 🔄 IN PROGRESS
+- [Specification](INITIAL6.md) - Phase 6 requirements
+- [PRP](PRPs/phase6-testing-devops.md) - Implementation blueprint
+- Production_Deployment.md (planned)
+- Operations_Runbook.md (planned)
+- Security_Hardening.md (planned)
+- Backup_Recovery.md (planned)
 
 ## Repo Governance (Agents + Workflow)
 

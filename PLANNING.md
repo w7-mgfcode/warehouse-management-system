@@ -17,7 +17,7 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
 | Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
-|         | ✅ All Phases A-H | Complete | Foundation → Reports (111 files, 100% done) |
+| Phase 6 | 🔄 Active | `06-Testing-Phase_6` | Testing, QA & DevOps |
 
 **Test Coverage**: 146 tests passing (backend) - 100% Phase 1-4 coverage
 
@@ -34,7 +34,8 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 - DB migrations: `w7-WHv1/backend/alembic/`.
 - Specifications: `INITIAL.md` through `INITIAL5.md`.
 - PRPs (Planning & Requirements Prompts):
-  - `PRPs/phase5-frontend-react19-tailwind4.md` - Frontend implementation (active)
+  - `PRPs/phase6-testing-devops.md` - Testing, QA & DevOps (active)
+  - `PRPs/phase5-frontend-react19-tailwind4.md` - Frontend implementation
   - `PRPs/phase4-transfers-reservations-jobs.md` - Phase 4
   - `PRPs/phase3-inventory-fefo.md` - Phase 3
   - `PRPs/phase2-products-suppliers-bins.md` - Phase 2
@@ -70,9 +71,11 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
   - `pytest` (runs against Postgres in CI via `TEST_DATABASE_URL`)
 - Advisory:
   - `mypy .`
-- Future (Phase 5):
+- Phase 6 (planned):
   - `npm run lint` (frontend)
-  - `npm run test` (frontend)
+  - `npm run test` (Vitest unit tests)
+  - `npm run test:e2e` (Playwright E2E tests)
+  - Docker build verification
 
 ## How agents work here
 - Implementation agent (Claude Code): edits application code.
