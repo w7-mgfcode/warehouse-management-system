@@ -201,7 +201,7 @@ class TestFEFOSorting:
         await db_session.flush()
 
         # Create bin_contents with same expiry, same batch, different received_dates
-        for i, (bin_obj, rcv_date) in enumerate(zip(bins, received_dates, strict=True)):
+        for bin_obj, rcv_date in zip(bins, received_dates, strict=True):
             content = BinContent(
                 id=uuid.uuid4(),
                 bin_id=bin_obj.id,
