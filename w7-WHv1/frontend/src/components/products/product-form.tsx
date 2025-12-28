@@ -1,6 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ import {
 import { productSchema, UNIT_OPTIONS, type ProductFormData } from "@/schemas/product";
 import { useCreateProduct, useUpdateProduct } from "@/queries/products";
 import type { Product } from "@/types";
+import type { APIError } from "@/types/api";
 import { HU, interpolate } from "@/lib/i18n";
 
 interface ProductFormProps {
@@ -49,8 +51,10 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           toast.success(interpolate(HU.success.updated, { entity: "Termék" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     } else {
@@ -59,8 +63,10 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           toast.success(interpolate(HU.success.created, { entity: "Termék" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     }
