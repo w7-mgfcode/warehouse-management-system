@@ -136,13 +136,14 @@ warehouse-management-system/
 - [Live Implementation E](Docs/Phase5_Live-E.md) - Master Data CRUD
 - [Live Implementation F-G-H](Docs/Phase5_Live-FGH.md) - Inventory, Transfers, Reports (completed)
 
-### Phase 6 - Testing, QA & DevOps 🔄 IN PROGRESS
+### Phase 6 - Testing, QA & DevOps ✅ COMPLETE
 - [Specification](INITIAL6.md) - Phase 6 requirements
 - [PRP](PRPs/phase6-testing-devops.md) - Implementation blueprint
-- Production_Deployment.md (planned)
-- Operations_Runbook.md (planned)
-- Security_Hardening.md (planned)
-- Backup_Recovery.md (planned)
+- [Production Deployment Guide](Docs/Production_Deployment.md) - Prerequisites, installation, configuration, deployment, updates, rollback
+- [Operations Runbook](Docs/Operations_Runbook.md) - Daily operations, monitoring, incident response, maintenance, performance tuning
+- [Security Hardening Guide](Docs/Security_Hardening.md) - Server security, HTTPS, secrets management, access control, monitoring
+- [Backup & Recovery Guide](Docs/Backup_Recovery.md) - Backup strategy (3-2-1 rule), automated backups, disaster recovery, testing
+- [Deployment Scripts](scripts/) - install-production.sh, deploy.sh, backup-database.sh, restore-database.sh
 
 ## Repo Governance (Agents + Workflow)
 
