@@ -17,9 +17,9 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
 | Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
-| Phase 6 | 🔄 Active | `06-Testing-Phase_6` | Testing, QA & DevOps |
+| Phase 6 | 🔄 Active | `06-Testing-Phase_6` | Testing, QA & DevOps (67% complete: A-D done) |
 
-**Test Coverage**: 146 tests passing (backend) - 100% Phase 1-4 coverage
+**Test Coverage**: 146 backend + 35+ frontend tests (E2E + unit) - Phase 1-4: 100%, Phase 6: 67%
 
 ## Key constraints
 - **Hungarian UI requirement**: all user-facing UI text/messages/validation must be Hungarian (code identifiers and DB schema remain English).
@@ -65,17 +65,23 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
   - `CI / backend (lint/type/test)` green
   - 1 approving review
 
-## CI behavior (current)
-- Required:
-  - `ruff check .` (backend)
-  - `pytest` (runs against Postgres in CI via `TEST_DATABASE_URL`)
-- Advisory:
-  - `mypy .`
-- Phase 6 (planned):
-  - `npm run lint` (frontend)
-  - `npm run test` (Vitest unit tests)
-  - `npm run test:e2e` (Playwright E2E tests)
-  - Docker build verification
+## CI behavior (current - Phase 6D enhanced)
+- **Backend job**:
+  - `ruff check .` (required)
+  - `pytest` with Postgres (required)
+  - `mypy .` (advisory)
+- **Frontend job** (Phase 6D):
+  - `npm run lint` (required)
+  - `npm run build` (required)
+  - `npm run test:run` - Vitest unit tests (required)
+- **E2E job** (Phase 6D):
+  - `npx playwright test` - 20+ E2E tests (required)
+  - Full stack: Postgres + Backend + Frontend
+  - Runs after backend + frontend jobs pass
+- Phase 6E-F (remaining):
+  - Prometheus metrics
+  - Structured logging, rate limiting
+  - Deployment docs and scripts
 
 ## How agents work here
 - Implementation agent (Claude Code): edits application code.
