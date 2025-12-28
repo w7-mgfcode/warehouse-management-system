@@ -1,6 +1,7 @@
 # Core
 fastapi>=0.125.0
 uvicorn[standard]>=0.34.0
+gunicorn>=23.0.0
 
 # Database
 sqlalchemy[asyncio]>=2.0.45
