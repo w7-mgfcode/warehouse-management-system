@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,20 +18,27 @@ export function SearchInput({
   debounce = 300,
 }: SearchInputProps) {
   const [localValue, setLocalValue] = useState(value);
+  const onChangeRef = useRef(onChange);
+
+  // Keep ref updated with latest onChange callback
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     setLocalValue(value);
   }, [value]);
 
+  // Debounce effect - use ref to avoid onChange dependency
   useEffect(() => {
     const timer = setTimeout(() => {
       if (localValue !== value) {
-        onChange(localValue);
+        onChangeRef.current(localValue);
       }
     }, debounce);
 
     return () => clearTimeout(timer);
-  }, [localValue, onChange, value, debounce]);
+  }, [localValue, value, debounce]);
 
   return (
     <div className="relative flex-1 max-w-sm">
