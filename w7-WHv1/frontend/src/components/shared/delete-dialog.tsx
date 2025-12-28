@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Trash2 } from "lucide-react";
 import {
   Dialog,
@@ -26,10 +26,22 @@ export function DeleteDialog({
   trigger,
 }: DeleteDialogProps) {
   const [open, setOpen] = useState(false);
+  const wasDeleting = useRef(false);
+
+  // Close dialog after successful deletion (when isDeleting changes from true to false)
+  useEffect(() => {
+    if (wasDeleting.current && !isDeleting) {
+      // Deletion completed (either success or error)
+      // Close dialog after a brief delay to show the loading state transition
+      const timer = setTimeout(() => setOpen(false), 100);
+      return () => clearTimeout(timer);
+    }
+    wasDeleting.current = isDeleting;
+  }, [isDeleting]);
 
   const handleConfirm = () => {
     onConfirm();
-    setOpen(false);
+    // Don't close immediately - let useEffect handle it after async operation completes
   };
 
   return (
