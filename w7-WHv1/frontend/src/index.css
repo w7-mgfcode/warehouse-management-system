@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  /* Primary colors - Hungarian blue theme */
+  --color-primary: hsl(210, 100%, 40%);
+  --color-primary-foreground: hsl(0, 0%, 100%);
+  --color-secondary: hsl(210, 15%, 95%);
+  --color-secondary-foreground: hsl(210, 50%, 20%);
+
+  /* Semantic colors */
+  --color-success: hsl(142, 76%, 36%);
+  --color-warning: hsl(38, 92%, 50%);
+  --color-error: hsl(0, 84%, 60%);
+  --color-info: hsl(199, 89%, 48%);
+
+  /* Expiry urgency colors */
+  --color-expiry-critical: hsl(0, 84%, 60%);
+  --color-expiry-high: hsl(25, 95%, 53%);
+  --color-expiry-medium: hsl(45, 93%, 47%);
+  --color-expiry-low: hsl(142, 71%, 45%);
+
+  /* Bin status colors */
+  --color-bin-empty: hsl(142, 76%, 36%);
+  --color-bin-occupied: hsl(210, 100%, 40%);
+  --color-bin-reserved: hsl(280, 87%, 40%);
+  --color-bin-inactive: hsl(0, 0%, 60%);
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Spacing */
+  --spacing-page: 1.5rem;
+  --spacing-card: 1rem;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+/* Dark mode theme overrides */
+.dark {
+  --color-primary: hsl(210, 100%, 60%);
+  --color-secondary: hsl(210, 15%, 15%);
+  --color-secondary-foreground: hsl(210, 15%, 90%);
+}

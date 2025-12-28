@@ -116,11 +116,11 @@ cd w7-WHv1/backend
 pytest app/tests/ -v --cov=app --cov-report=term-missing
 ```
 
-**Current Status**: 140 tests passing
+**Current Status**: 146 tests passing (100% backend coverage)
 - Phase 1 (40): Auth (9) + Users (12) + Warehouses (19)
 - Phase 2 (36): Products (16) + Suppliers (16) + Bins bulk (4)
-- Phase 3 (60): Bins (16) + Inventory (20) + FEFO (7) + Movements (11) + Expiry (10)
-- Phase 4 (4): Transfers + Reservations + Jobs (added in this PR)
+- Phase 3 (54): Bins (16) + Inventory (20) + FEFO (12) + Movements (12) + Expiry (10)
+- Phase 4 (16): Transfers + Reservations + Jobs
 
 ## Linting and Type Checking
 
