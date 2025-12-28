@@ -55,7 +55,7 @@ export function TransferList({ transfers, isLoading }: TransferListProps) {
             <TableHead>Forrás raktár</TableHead>
             <TableHead>Cél raktár</TableHead>
             <TableHead>Státusz</TableHead>
-            <TableHead>Létrehozó</TableHead>
+            <TableHead>Tárolóhelyek</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -64,16 +64,21 @@ export function TransferList({ transfers, isLoading }: TransferListProps) {
               <TableCell className="text-sm">
                 {formatDateTime(transfer.created_at)}
               </TableCell>
-              <TableCell className="font-medium">{transfer.product_id}</TableCell>
-              <TableCell>{formatNumber(transfer.quantity, 0)} kg</TableCell>
-              <TableCell>{transfer.from_warehouse_id}</TableCell>
-              <TableCell>{transfer.to_warehouse_id}</TableCell>
+              <TableCell className="font-medium">{transfer.product_name}</TableCell>
+              <TableCell>
+                {formatNumber(transfer.quantity_sent, 0)} {transfer.unit}
+              </TableCell>
+              <TableCell>{transfer.source_warehouse_name}</TableCell>
+              <TableCell>{transfer.target_warehouse_name}</TableCell>
               <TableCell>
                 <Badge variant="outline" className={statusColors[transfer.status]}>
                   {statusLabels[transfer.status] || transfer.status}
                 </Badge>
               </TableCell>
-              <TableCell className="text-sm">{transfer.created_by}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {transfer.source_bin_code}
+                {transfer.target_bin_code && ` → ${transfer.target_bin_code}`}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

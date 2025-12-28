@@ -163,14 +163,14 @@ export type TransferStatus = "pending" | "dispatched" | "completed" | "cancelled
 
 export interface WarehouseTransfer {
   id: string;
-  from_warehouse_id: string;
-  to_warehouse_id: string;
-  product_id: string;
-  quantity: number;
+  source_warehouse_name: string;
+  target_warehouse_name: string;
+  source_bin_code: string;
+  target_bin_code: string | null;
+  product_name: string;
+  quantity_sent: number;
+  unit: string;
   status: TransferStatus;
-  dispatched_at: string | null;
-  received_at: string | null;
-  created_by: string;
+  transport_reference: string | null;
   created_at: string;
-  updated_at: string;
 }
