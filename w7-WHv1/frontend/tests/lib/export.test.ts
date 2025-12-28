@@ -2,12 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { exportToCSV } from '@/lib/export';
 
 describe('CSV Export', () => {
-  let createElementSpy: any;
-  let appendChildSpy: any;
-  let removeChildSpy: any;
-  let clickSpy: any;
-  let createObjectURLSpy: any;
-  let revokeObjectURLSpy: any;
+  let createElementSpy: ReturnType<typeof vi.spyOn>;
+  let appendChildSpy: ReturnType<typeof vi.spyOn>;
+  let removeChildSpy: ReturnType<typeof vi.spyOn>;
+  let clickSpy: ReturnType<typeof vi.fn>;
+  let createObjectURLSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     // Mock DOM APIs
@@ -16,14 +15,14 @@ describe('CSV Export', () => {
     removeChildSpy = vi.spyOn(document.body, 'removeChild');
     clickSpy = vi.fn();
     createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url');
-    revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
     // Mock link element
     const mockLink = {
       setAttribute: vi.fn(),
       click: clickSpy,
       style: {},
-    } as any;
+    } as Partial<HTMLAnchorElement>;
 
     createElementSpy.mockReturnValue(mockLink);
     appendChildSpy.mockImplementation(() => mockLink);
@@ -121,7 +120,7 @@ describe('CSV Export', () => {
     const setAttributeCalls = mockLink.setAttribute.mock.calls;
 
     const downloadCall = setAttributeCalls.find(
-      (call: any[]) => call[0] === 'download'
+      (call: unknown[]) => Array.isArray(call) && call[0] === 'download'
     );
 
     expect(downloadCall).toBeTruthy();
