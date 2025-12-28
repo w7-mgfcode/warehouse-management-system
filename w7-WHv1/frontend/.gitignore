@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright auth storage state (contains tokens)
+playwright/.auth/

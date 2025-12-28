@@ -1,5 +1,6 @@
 import { test as setup } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 
 /**
  * Authentication setup for Playwright tests
@@ -13,6 +14,12 @@ const authFile = {
   warehouse: path.join(__dirname, '../../playwright/.auth/warehouse.json'),
   viewer: path.join(__dirname, '../../playwright/.auth/viewer.json'),
 };
+
+// Ensure auth directory exists
+const authDir = path.dirname(authFile.admin);
+if (!fs.existsSync(authDir)) {
+  fs.mkdirSync(authDir, { recursive: true });
+}
 
 /**
  * Setup admin user authentication

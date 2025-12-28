@@ -43,6 +43,38 @@ async def create_admin_user(db: AsyncSession) -> User | None:
     return admin
 
 
+async def create_warehouse_user(db: AsyncSession) -> User | None:
+    """
+    Create warehouse user if not exists.
+
+    Args:
+        db: Async database session.
+
+    Returns:
+        User | None: Created user or None if already exists.
+    """
+    result = await db.execute(select(User).where(User.username == "warehouse"))
+    existing = result.scalar_one_or_none()
+
+    if existing:
+        print("Warehouse user already exists, skipping...")
+        return None
+
+    warehouse = User(
+        username="warehouse",
+        email="warehouse@wms.local",
+        password_hash=get_password_hash("Warehouse123!"),
+        full_name="Warehouse Operator",
+        role="warehouse",
+        is_active=True,
+    )
+    db.add(warehouse)
+    await db.flush()
+    await db.refresh(warehouse)
+    print(f"Created warehouse user: {warehouse.username}")
+    return warehouse
+
+
 async def create_sample_warehouse(db: AsyncSession) -> Warehouse | None:
     """
     Create sample warehouse if not exists.
@@ -92,6 +124,7 @@ async def seed_database() -> None:
     async with async_session_maker() as db:
         try:
             await create_admin_user(db)
+            await create_warehouse_user(db)
             await create_sample_warehouse(db)
             await db.commit()
             print("Database seed completed successfully!")
