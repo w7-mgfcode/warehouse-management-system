@@ -30,7 +30,7 @@ import {
   parseAisles,
   type BulkBinFormData,
 } from "@/schemas/bin";
-import { useBulkCreateBins } from "@/queries/bins";
+import { useBulkCreateBins, binsQueryOptions } from "@/queries/bins";
 import {
   warehousesQueryOptions,
   warehouseQueryOptions,
@@ -87,6 +87,85 @@ function isNumericField(fieldName: string): boolean {
   const numericPatterns =
     /^(rack|level|position|bay|shelf|slot|tier|column|row_number|\d+)$/i;
   return numericPatterns.test(fieldName);
+}
+
+/**
+ * Analyze existing bins to provide smart suggestions.
+ */
+function analyzeBins(
+  bins: any[],
+  template: BinStructureTemplate
+): {
+  fieldValues: Record<string, Set<string>>;
+  suggestions: Record<string, string>;
+  totalBins: number;
+  existingCodes: Set<string>;
+} {
+  const fieldValues: Record<string, Set<string>> = {};
+  const existingCodes = new Set<string>();
+
+  // Initialize field value sets
+  template.fields.forEach((field) => {
+    fieldValues[field.name] = new Set();
+  });
+
+  // Collect existing values
+  bins.forEach((bin) => {
+    existingCodes.add(bin.code);
+    if (bin.structure_data) {
+      template.fields.forEach((field) => {
+        const value = bin.structure_data[field.name];
+        if (value) {
+          fieldValues[field.name].add(String(value));
+        }
+      });
+    }
+  });
+
+  // Generate suggestions for next values
+  const suggestions: Record<string, string> = {};
+
+  template.fields.forEach((field) => {
+    const values = Array.from(fieldValues[field.name]).sort();
+
+    if (values.length === 0) {
+      // No existing values, suggest defaults
+      if (isNumericField(field.name)) {
+        suggestions[field.name] = "1-10";
+      } else {
+        suggestions[field.name] = "A";
+      }
+    } else if (isNumericField(field.name)) {
+      // For numeric fields, suggest next range
+      const numericValues = values
+        .map((v) => parseInt(v))
+        .filter((n) => !isNaN(n))
+        .sort((a, b) => a - b);
+
+      if (numericValues.length > 0) {
+        const max = Math.max(...numericValues);
+        const min = Math.min(...numericValues);
+        const range = max - min + 1;
+        suggestions[field.name] = `${max + 1}-${max + range}`;
+      }
+    } else {
+      // For text fields, suggest next letter or value
+      const lastValue = values[values.length - 1];
+      if (/^[A-Z]$/.test(lastValue)) {
+        const nextChar = String.fromCharCode(lastValue.charCodeAt(0) + 1);
+        if (nextChar <= "Z") {
+          suggestions[field.name] = nextChar;
+        }
+      }
+    }
+  });
+
+  return {
+    fieldValues,
+    suggestions,
+    totalBins: bins.length,
+    existingCodes,
+  };
 }
 
 /**
@@ -243,7 +322,19 @@ export function BinBulkForm({
     enabled: !!warehouseId,
   });
 
+  // Fetch existing bins for smart suggestions
+  const { data: existingBinsData } = useQuery({
+    ...binsQueryOptions({ warehouse_id: warehouseId, page_size: 1000 }),
+    enabled: !!warehouseId,
+  });
+
   const template = warehouse?.bin_structure_template;
+
+  // Analyze existing bins for suggestions
+  const binAnalysis =
+    template && existingBinsData
+      ? analyzeBins(existingBinsData.items || [], template)
+      : null;
 
   // Detect active preset for display
   const activePreset = template
@@ -283,6 +374,26 @@ export function BinBulkForm({
       if (previewData.length === 0) {
         toast.error("Nincs létrehozható tárolóhely a megadott tartományokkal");
         return;
+      }
+
+      // Check for duplicates with existing bins
+      if (binAnalysis) {
+        const duplicates = previewData.filter((bin) =>
+          binAnalysis.existingCodes.has(bin.code)
+        );
+
+        if (duplicates.length > 0) {
+          const duplicateCodes = duplicates
+            .slice(0, 5)
+            .map((b) => b.code)
+            .join(", ");
+          const more =
+            duplicates.length > 5 ? ` és még ${duplicates.length - 5}` : "";
+          toast.error(
+            `${duplicates.length} tárolóhely már létezik: ${duplicateCodes}${more}`
+          );
+          return;
+        }
       }
 
       setPreview(previewData);
@@ -435,6 +546,114 @@ export function BinBulkForm({
               <AlertCircle className="h-5 w-5" />
               <p className="text-sm">Raktár adatok betöltése...</p>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Smart Suggestions Card */}
+      {binAnalysis && template && (
+        <Card className="bg-green-50 dark:bg-green-950">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              💡 Javaslatok
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {/* Existing bins count */}
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Létező tárolóhelyek
+              </p>
+              <p className="font-medium">{binAnalysis.totalBins} db</p>
+            </div>
+
+            {/* Used values per field */}
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                Használt értékek mező szerint
+              </p>
+              <div className="space-y-2">
+                {template.fields.map((field) => {
+                  const values = Array.from(
+                    binAnalysis.fieldValues[field.name] || []
+                  ).sort();
+
+                  if (values.length === 0) return null;
+
+                  return (
+                    <div
+                      key={field.name}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <span className="font-medium">{field.label}:</span>
+                      <code className="text-xs bg-background px-2 py-0.5 rounded">
+                        {values.length > 10
+                          ? `${values.slice(0, 10).join(", ")}... (+${
+                              values.length - 10
+                            })`
+                          : values.join(", ")}
+                      </code>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Suggested next ranges */}
+            {Object.keys(binAnalysis.suggestions).length > 0 && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Javasolt következő tartományok
+                </p>
+                <div className="space-y-2">
+                  {template.fields.map((field) => {
+                    const suggestion = binAnalysis.suggestions[field.name];
+                    if (!suggestion) return null;
+
+                    return (
+                      <div
+                        key={field.name}
+                        className="flex items-center justify-between gap-2 text-sm bg-background p-2 rounded"
+                      >
+                        <span className="font-medium">{field.label}:</span>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs font-mono">
+                            {suggestion}
+                          </code>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 text-xs"
+                            onClick={() => {
+                              if (isNumericField(field.name)) {
+                                const [start, end] = suggestion
+                                  .split("-")
+                                  .map(Number);
+                                setFieldRanges((prev) => ({
+                                  ...prev,
+                                  [field.name]: { start, end },
+                                }));
+                              } else {
+                                setFieldRanges((prev) => ({
+                                  ...prev,
+                                  [field.name]: { text: suggestion },
+                                }));
+                              }
+                              toast.success(
+                                `${field.label} kitöltve: ${suggestion}`
+                              );
+                            }}
+                          >
+                            Alkalmaz
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
