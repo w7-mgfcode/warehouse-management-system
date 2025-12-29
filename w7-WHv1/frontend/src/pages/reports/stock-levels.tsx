@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Download, ArrowLeft, X, Search, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,64 @@ import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/shared/search-input";
 import { StockTable } from "@/components/inventory/stock-table";
 import { StockSummaryStats } from "@/components/inventory/stock-summary-stats";
+import { StockAdvancedFilters, type AdvancedFilters } from "@/components/inventory/stock-advanced-filters";
+import { StockBulkActions } from "@/components/inventory/stock-bulk-actions";
 import { useStockLevels } from "@/queries/inventory";
+import { useSuppliers } from "@/queries/suppliers";
+import { getExpiryUrgency } from "@/lib/date";
 import { exportToCSV } from "@/lib/export";
 import { toast } from "sonner";
 
 export default function StockLevelsReportPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<AdvancedFilters>({});
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-  // Fetch data with search filter - used by both summary and table
-  const { data, isLoading } = useStockLevels({ search });
+  // Fetch data
+  const { data: rawData, isLoading } = useStockLevels({ search });
+  const { data: suppliersData } = useSuppliers({ page_size: 200 });
+
+  // Apply client-side filters
+  const data = useMemo(() => {
+    if (!rawData) return [];
+
+    let filtered = [...rawData];
+
+    // Status filter
+    if (filters.status) {
+      filtered = filtered.filter((item) => item.status === filters.status);
+    }
+
+    // Expiry range filter
+    if (filters.expiryRange) {
+      filtered = filtered.filter((item) => {
+        const urgency = getExpiryUrgency(item.use_by_date);
+        switch (filters.expiryRange) {
+          case "expired":
+            return urgency === "expired";
+          case "critical":
+            return urgency === "critical";
+          case "high":
+            return urgency === "high";
+          case "medium":
+            return urgency === "medium";
+          case "low":
+            return urgency === "low";
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Supplier filter (need to add supplier_id to backend response)
+    // For now, this is a placeholder
+    if (filters.supplierId) {
+      // filtered = filtered.filter((item) => item.supplier_id === filters.supplierId);
+    }
+
+    return filtered;
+  }, [rawData, filters]);
 
   const handleExport = () => {
     if (!data || data.length === 0) {
@@ -49,8 +97,53 @@ export default function StockLevelsReportPage() {
     setSearch("");
   };
 
+  // Bulk action handlers
+  const handleReserveBulk = () => {
+    toast.info(`Tömeges foglalás funkció hamarosan elérhető (${selectedItems.size} tétel)`);
+    // TODO: Implement bulk reserve
+  };
+
+  const handleTransferBulk = () => {
+    toast.info(`Tömeges áthelyezés funkció hamarosan elérhető (${selectedItems.size} tétel)`);
+    // TODO: Implement bulk transfer
+  };
+
+  const handleExportBulk = () => {
+    const selectedData = data.filter((item) => selectedItems.has(item.bin_content_id));
+    if (selectedData.length === 0) {
+      toast.error("Nincs kiválasztott tétel");
+      return;
+    }
+
+    exportToCSV(
+      selectedData,
+      "keszletszint_kivalasztott",
+      {
+        product_name: "Termék",
+        warehouse_name: "Raktár",
+        bin_code: "Tárolóhely",
+        batch_number: "Sarzs",
+        quantity: "Mennyiség",
+        unit: "Egység",
+        weight_kg: "Súly (kg)",
+        use_by_date: "Lejárat",
+        days_until_expiry: "Napok lejáratig",
+      }
+    );
+
+    toast.success(`${selectedData.length} tétel exportálva`);
+    setSelectedItems(new Set());
+  };
+
+  const handleClearSelection = () => {
+    setSelectedItems(new Set());
+  };
+
   // Helper: Check if search is active
   const hasActiveSearch = search.trim().length > 0;
+
+  // Helper: Check if filters are active
+  const hasActiveFilters = Object.values(filters).some((v) => v !== undefined);
 
   // Helper: Get result count message
   const getResultMessage = () => {
@@ -59,6 +152,9 @@ export default function StockLevelsReportPage() {
     if (!data || data.length === 0) return "Nincs találat";
     return `${data.length} találat`;
   };
+
+  // Prepare suppliers list for filter
+  const suppliersList = suppliersData?.items || [];
 
   return (
     <div className="space-y-6">
@@ -133,7 +229,7 @@ export default function StockLevelsReportPage() {
             )}
 
             {/* Search Help Info */}
-            {!hasActiveSearch && (
+            {!hasActiveSearch && !hasActiveFilters && (
               <Alert className="bg-muted/50">
                 <Info className="h-4 w-4" />
                 <AlertDescription className="text-sm">
@@ -143,6 +239,17 @@ export default function StockLevelsReportPage() {
               </Alert>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Advanced Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <StockAdvancedFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            suppliers={suppliersList.map((s: any) => ({ id: s.id, name: s.name }))}
+          />
         </CardContent>
       </Card>
 
@@ -170,8 +277,22 @@ export default function StockLevelsReportPage() {
         </CardContent>
       </Card>
 
-      {/* Stock Table with all Phase 1 features */}
-      <StockTable data={data} isLoading={isLoading} />
+      {/* Stock Table with Phase 1 & 2 features + bulk selection */}
+      <StockTable
+        data={data}
+        isLoading={isLoading}
+        selectedItems={selectedItems}
+        onSelectionChange={setSelectedItems}
+      />
+
+      {/* Bulk Actions Toolbar (floating) */}
+      <StockBulkActions
+        selectedItems={data.filter((item) => selectedItems.has(item.bin_content_id))}
+        onReserveBulk={handleReserveBulk}
+        onTransferBulk={handleTransferBulk}
+        onExportBulk={handleExportBulk}
+        onClearSelection={handleClearSelection}
+      />
     </div>
   );
 }

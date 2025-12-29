@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ExpiryBadge } from "./expiry-badge";
 import { BinStatusBadge } from "@/components/bins/bin-status-badge";
 import { StockRowActions } from "./stock-row-actions";
@@ -25,6 +26,8 @@ import { toast } from "sonner";
 interface StockTableProps {
   data?: StockLevel[];
   isLoading?: boolean;
+  selectedItems?: Set<string>;
+  onSelectionChange?: (selected: Set<string>) => void;
 }
 
 type SortField = keyof StockLevel | "none";
@@ -52,7 +55,12 @@ const DEFAULT_COLUMNS: ColumnVisibility = {
   status: true,
 };
 
-export function StockTable({ data, isLoading = false }: StockTableProps) {
+export function StockTable({
+  data,
+  isLoading = false,
+  selectedItems = new Set(),
+  onSelectionChange,
+}: StockTableProps) {
   const [sortField, setSortField] = useState<SortField>("none");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
@@ -179,6 +187,33 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
     // TODO: Open movement history dialog
   };
 
+  // Selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (!onSelectionChange || !data) return;
+
+    if (checked) {
+      const allIds = new Set(sortedData.map((item) => item.bin_content_id));
+      onSelectionChange(allIds);
+    } else {
+      onSelectionChange(new Set());
+    }
+  };
+
+  const handleSelectItem = (itemId: string, checked: boolean) => {
+    if (!onSelectionChange) return;
+
+    const newSelection = new Set(selectedItems);
+    if (checked) {
+      newSelection.add(itemId);
+    } else {
+      newSelection.delete(itemId);
+    }
+    onSelectionChange(newSelection);
+  };
+
+  const isAllSelected = data && data.length > 0 && selectedItems.size === sortedData.length;
+  const isSomeSelected = selectedItems.size > 0 && selectedItems.size < sortedData.length;
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -266,6 +301,15 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              {onSelectionChange && (
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={isAllSelected || (isSomeSelected ? "indeterminate" : false)}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Összes kijelölése"
+                  />
+                </TableHead>
+              )}
               {columnVisibility.product && (
                 <SortableHeader field="product_name">{HU.table.product}</SortableHeader>
               )}
@@ -296,6 +340,17 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
           <TableBody>
             {sortedData.map((stock) => (
               <TableRow key={stock.bin_content_id} className={cn(getRowClassName(stock))}>
+                {onSelectionChange && (
+                  <TableCell className="w-[50px]">
+                    <Checkbox
+                      checked={selectedItems.has(stock.bin_content_id)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleSelectItem(stock.bin_content_id, checked)
+                      }
+                      aria-label={`Kijelölés: ${stock.product_name}`}
+                    />
+                  </TableCell>
+                )}
                 {columnVisibility.product && (
                   <TableCell className="font-medium">
                     {stock.product_name}
