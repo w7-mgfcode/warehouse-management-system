@@ -23,7 +23,7 @@ async def list_movements(
     db: DbSession,
     _current_user: RequireViewer,
     page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=200),
+    page_size: int = Query(50, ge=1, le=500),
     product_id: UUID | None = Query(None, description="Filter by product"),
     bin_id: UUID | None = Query(None, description="Filter by bin"),
     movement_type: MovementType | None = Query(None, description="Filter by type"),
