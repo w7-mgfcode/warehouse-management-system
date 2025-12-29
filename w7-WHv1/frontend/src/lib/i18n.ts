@@ -39,6 +39,7 @@ export const HU = {
     previous: "Előző",
     confirm: "Megerősítés",
     close: "Bezárás",
+    actions: "Műveletek",
   },
 
   // Status labels
@@ -100,8 +101,7 @@ export const HU = {
     serverError: "Szerverhiba. Kérjük, próbálja újra később.",
     binNotEmpty: "A tárolóhely nem üres, nem törölhető.",
     binOccupied: "A tárolóhely már foglalt.",
-    fefoViolation:
-      "FEFO szabály megsértése! Korábbi lejáratú tétel elérhető.",
+    fefoViolation: "FEFO szabály megsértése! Korábbi lejáratú tétel elérhető.",
     productHasInventory: "A termék nem törölhető, mert van belőle készlet.",
     supplierHasInventory:
       "A beszállító nem törölhető, mert van hozzá tartozó készlet.",
@@ -173,7 +173,8 @@ export const HU = {
 
   // FEFO messages
   fefo: {
-    insufficientStock: "Nincs elegendő készlet. Elérhető: {available} kg, Kért: {requested} kg",
+    insufficientStock:
+      "Nincs elegendő készlet. Elérhető: {available} kg, Kért: {requested} kg",
   },
 
   // Template editor
@@ -356,9 +357,52 @@ export const HU = {
     expiryBreakdown: "Lejárati megoszlás",
     viewDetails: "Részletek megtekintése",
   },
+
+  // Users management
+  users: {
+    pageDescription: "Felhasználók kezelése és jogosultságok beállítása",
+    username: "Felhasználónév",
+    email: "Email cím",
+    fullName: "Teljes név",
+    role: "Szerepkör",
+    status: "Státusz",
+    password: "Jelszó",
+    createdAt: "Létrehozva",
+    activeStatus: "Aktív felhasználó",
+    activeStatusDescription: "A felhasználó be tud-e jelentkezni a rendszerbe",
+    noUsers: "Nincs megjeleníthető felhasználó",
+    createUser: "Új felhasználó",
+    editUser: "Felhasználó szerkesztése",
+    deleteUser: "Felhasználó törlése",
+    createUserDescription: "Új felhasználó hozzáadása a rendszerhez",
+    editUserDescription: "Felhasználó adatainak módosítása",
+    deleteUserConfirm:
+      "Biztosan törölni szeretné ezt a felhasználót? Ez a művelet nem vonható vissza.",
+    userCreated: "Felhasználó sikeresen létrehozva",
+    userUpdated: "Felhasználó sikeresen módosítva",
+    userDeleted: "Felhasználó sikeresen törölve",
+    selectRole: "Válasszon szerepkört",
+    leaveBlankToKeep: "hagyja üresen a jelszó megtartásához",
+    totalUsers: "Összes felhasználó",
+    activeUsers: "Aktív felhasználók",
+    inactiveUsers: "Inaktív felhasználók",
+    adminUsers: "Adminisztrátorok",
+    validation: {
+      usernameMin: "A felhasználónév legalább 3 karakter hosszú kell legyen",
+      passwordMin: "A jelszó legalább 8 karakter hosszú kell legyen",
+      passwordWeak:
+        "A jelszónak tartalmaznia kell kis- és nagybetűt, valamint számot",
+    },
+  },
+
+  // Common UI
+  loading: "Betöltés...",
 } as const;
 
 // Helper function for message interpolation
-export function interpolate(template: string, values: Record<string, string>): string {
+export function interpolate(
+  template: string,
+  values: Record<string, string>
+): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => values[key] || `{${key}}`);
 }

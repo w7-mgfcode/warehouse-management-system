@@ -50,6 +50,9 @@ import ExpiryReportPage from "@/pages/reports/expiry";
 import MovementsReportPage from "@/pages/reports/movements";
 import FEFOReportPage from "@/pages/reports/fefo";
 
+// Users
+import UsersIndexPage from "@/pages/users/index";
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -92,7 +95,10 @@ export default function App() {
 
             {/* Inventory */}
             <Route path="/inventory" element={<InventoryIndexPage />} />
-            <Route path="/inventory/receipt" element={<InventoryReceiptPage />} />
+            <Route
+              path="/inventory/receipt"
+              element={<InventoryReceiptPage />}
+            />
             <Route path="/inventory/issue" element={<InventoryIssuePage />} />
             <Route path="/inventory/expiry" element={<InventoryExpiryPage />} />
 
@@ -105,9 +111,18 @@ export default function App() {
             {/* Reports */}
             <Route path="/reports" element={<ReportsIndexPage />} />
             <Route path="/reports/fefo" element={<FEFOReportPage />} />
-            <Route path="/reports/stock-levels" element={<StockLevelsReportPage />} />
+            <Route
+              path="/reports/stock-levels"
+              element={<StockLevelsReportPage />}
+            />
             <Route path="/reports/expiry" element={<ExpiryReportPage />} />
-            <Route path="/reports/movements" element={<MovementsReportPage />} />
+            <Route
+              path="/reports/movements"
+              element={<MovementsReportPage />}
+            />
+
+            {/* Users (Admin Only) */}
+            <Route path="/users" element={<UsersIndexPage />} />
           </Route>
 
           {/* Root redirect */}
