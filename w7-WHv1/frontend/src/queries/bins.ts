@@ -44,15 +44,32 @@ export const binKeys = {
   detail: (id: string) => [...binKeys.details(), id] as const,
 };
 
+// Helper to transform backend bin to frontend format
+function transformBin(backendBin: any): Bin {
+  return {
+    ...backendBin,
+    aisle: backendBin.structure_data?.aisle || "",
+    rack: backendBin.structure_data?.rack || "",
+    level: backendBin.structure_data?.level || "",
+    position: backendBin.structure_data?.position || "",
+    capacity_kg: backendBin.max_weight || 0,
+    current_product_id: null, // Not provided by backend
+  };
+}
+
 // Query options
 export const binsQueryOptions = (filters: BinFilters = {}) =>
   queryOptions({
     queryKey: binKeys.list(filters),
     queryFn: async () => {
-      const { data } = await apiClient.get<PaginatedResponse<Bin>>("/bins", {
+      const { data } = await apiClient.get<any>("/bins", {
         params: filters,
       });
-      return data;
+      // Transform backend response to frontend format
+      return {
+        ...data,
+        items: data.items.map(transformBin),
+      };
     },
   });
 
@@ -60,8 +77,8 @@ export const binQueryOptions = (id: string) =>
   queryOptions({
     queryKey: binKeys.detail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<Bin>(`/bins/${id}`);
-      return data;
+      const { data } = await apiClient.get<any>(`/bins/${id}`);
+      return transformBin(data);
     },
     enabled: !!id,
   });
@@ -85,8 +102,8 @@ export function useCreateBin() {
         max_weight: bin.capacity_kg || null,
         is_active: bin.is_active ?? true,
       };
-      const { data } = await apiClient.post<Bin>("/bins", backendData);
-      return data;
+      const { data } = await apiClient.post<any>("/bins", backendData);
+      return transformBin(data);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: binKeys.all });
@@ -119,8 +136,8 @@ export function useUpdateBin(id: string) {
         backendData.max_weight = bin.capacity_kg || null;
       }
 
-      const { data } = await apiClient.put<Bin>(`/bins/${id}`, backendData);
-      return data;
+      const { data } = await apiClient.put<any>(`/bins/${id}`, backendData);
+      return transformBin(data);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: binKeys.all });
@@ -148,8 +165,8 @@ export function useBulkCreateBins() {
       const { data } = await apiClient.post("/bins/bulk", bulkData);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: binKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: binKeys.all });
     },
   });
 }
