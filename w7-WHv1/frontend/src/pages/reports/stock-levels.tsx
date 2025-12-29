@@ -59,10 +59,9 @@ export default function StockLevelsReportPage() {
       });
     }
 
-    // Supplier filter (need to add supplier_id to backend response)
-    // For now, this is a placeholder
+    // Supplier filter
     if (filters.supplierId) {
-      // filtered = filtered.filter((item) => item.supplier_id === filters.supplierId);
+      filtered = filtered.filter((item) => item.supplier_id === filters.supplierId);
     }
 
     return filtered;

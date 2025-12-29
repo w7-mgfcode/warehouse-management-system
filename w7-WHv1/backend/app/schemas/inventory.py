@@ -191,6 +191,9 @@ class StockLevel(BaseModel):
     use_by_date: date | None
     days_until_expiry: int
     status: str
+    # Supplier info
+    supplier_id: UUID | None = None
+    supplier_name: str | None = None
     # FEFO compliance info
     is_fefo_compliant: bool = True
     oldest_bin_code: str | None = None

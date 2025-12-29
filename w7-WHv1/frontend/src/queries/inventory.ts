@@ -63,6 +63,9 @@ export interface StockLevel {
   use_by_date: string;
   days_until_expiry: number;
   status: string;
+  // Supplier info
+  supplier_id?: string;
+  supplier_name?: string;
   // FEFO compliance info
   is_fefo_compliant: boolean;
   oldest_bin_code?: string;
