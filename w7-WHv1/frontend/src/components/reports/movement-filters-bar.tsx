@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,20 @@ export function MovementFiltersBar({
   const [datePreset, setDatePreset] = useState<DatePreset>("custom");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Auto-apply filters when dates change (with debounce)
+  useEffect(() => {
+    if (datePreset === "custom" && (startDate || endDate)) {
+      const timer = setTimeout(() => {
+        applyFilters({
+          movement_type: movementType === "all" ? undefined : movementType,
+          start_date: startDate || undefined,
+          end_date: endDate || undefined,
+        });
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [startDate, endDate]);
 
   const getDateRange = (preset: DatePreset): { start: string; end: string } => {
     const today = new Date();
@@ -91,14 +105,6 @@ export function MovementFiltersBar({
     onFiltersChange(filters);
   };
 
-  const handleApplyFilters = () => {
-    applyFilters({
-      movement_type: movementType === "all" ? undefined : movementType,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
-    });
-  };
-
   const handleClearFilters = () => {
     setMovementType("all");
     setDatePreset("custom");
@@ -119,9 +125,16 @@ export function MovementFiltersBar({
             <Label htmlFor="movement_type">Mozgástípus</Label>
             <Select
               value={movementType}
-              onValueChange={(value) =>
-                setMovementType(value as MovementType | "all")
-              }
+              onValueChange={(value) => {
+                const newType = value as MovementType | "all";
+                setMovementType(newType);
+                // Auto-apply filters when movement type changes
+                applyFilters({
+                  movement_type: newType === "all" ? undefined : newType,
+                  start_date: startDate || undefined,
+                  end_date: endDate || undefined,
+                });
+              }}
             >
               <SelectTrigger id="movement_type">
                 <SelectValue placeholder="Összes" />
@@ -229,18 +242,17 @@ export function MovementFiltersBar({
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button onClick={handleApplyFilters} className="flex-1">
-              Szűrők alkalmazása
+          {/* Clear Filters Button */}
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              onClick={handleClearFilters}
+              className="w-full"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Szűrők törlése
             </Button>
-            {hasActiveFilters && (
-              <Button variant="outline" onClick={handleClearFilters}>
-                <X className="h-4 w-4 mr-2" />
-                Törlés
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>
