@@ -130,7 +130,79 @@ export function MovementHistory({
 
   return (
     <>
-      <div className="rounded-md border">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {sortedMovements.map((movement) => {
+          const isExpiringSoon =
+            movement.use_by_date &&
+            new Date(movement.use_by_date).getTime() - Date.now() <
+              24 * 60 * 60 * 1000;
+
+          return (
+            <div
+              key={movement.id}
+              className="border rounded-lg p-3 space-y-2 active:bg-muted/50 cursor-pointer"
+              onClick={() => handleRowClick(movement)}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate text-foreground">
+                    {movement.product_name}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatDateTime(movement.created_at)}
+                  </div>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={`${
+                    movementTypeColors[movement.movement_type]
+                  } shrink-0 text-[10px] px-2 py-0.5`}
+                >
+                  {HU.movementTypes[movement.movement_type]}
+                </Badge>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-muted-foreground">
+                    {movement.bin_code}
+                  </span>
+                  {isExpiringSoon && (
+                    <AlertCircle className="h-3 w-3 text-warning" />
+                  )}
+                </div>
+                <span
+                  className={`font-semibold ${
+                    movement.quantity >= 0 ? "text-success" : "text-destructive"
+                  }`}
+                >
+                  {movement.quantity >= 0 ? "+" : ""}
+                  {formatNumber(movement.quantity, 2)} {movement.unit}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span className="truncate max-w-[60%]">
+                  {movement.batch_number}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  {movement.fefo_compliant !== undefined &&
+                    (movement.fefo_compliant ? (
+                      <CheckCircle className="h-3 w-3 text-success" />
+                    ) : (
+                      <AlertCircle className="h-3 w-3 text-warning" />
+                    ))}
+                  <span>{movement.created_by}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
