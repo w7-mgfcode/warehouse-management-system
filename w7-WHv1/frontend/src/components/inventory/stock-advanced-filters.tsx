@@ -14,23 +14,27 @@ export interface AdvancedFilters {
   status?: string;
   expiryRange?: string;
   supplierId?: string;
+  productId?: string;
 }
 
 interface StockAdvancedFiltersProps {
   filters: AdvancedFilters;
   onFiltersChange: (filters: AdvancedFilters) => void;
   suppliers?: Array<{ id: string; name: string }>;
+  products?: Array<{ id: string; name: string }>;
 }
 
 export function StockAdvancedFilters({
   filters,
   onFiltersChange,
   suppliers = [],
+  products = [],
 }: StockAdvancedFiltersProps) {
   const activeFilterCount = [
     filters.status,
     filters.expiryRange,
     filters.supplierId,
+    filters.productId,
   ].filter(Boolean).length;
 
   const handleStatusChange = (value: string) => {
@@ -51,6 +55,13 @@ export function StockAdvancedFilters({
     onFiltersChange({
       ...filters,
       supplierId: value === "all" ? undefined : value,
+    });
+  };
+
+  const handleProductChange = (value: string) => {
+    onFiltersChange({
+      ...filters,
+      productId: value === "all" ? undefined : value,
     });
   };
 
@@ -83,7 +94,7 @@ export function StockAdvancedFilters({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Status Filter */}
         <div className="space-y-2">
           <Label htmlFor="status-filter" className="text-xs text-muted-foreground">
@@ -145,6 +156,29 @@ export function StockAdvancedFilters({
               {suppliers.map((supplier) => (
                 <SelectItem key={supplier.id} value={supplier.id}>
                   {supplier.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Product Filter */}
+        <div className="space-y-2">
+          <Label htmlFor="product-filter" className="text-xs text-muted-foreground">
+            Termék
+          </Label>
+          <Select
+            value={filters.productId || "all"}
+            onValueChange={handleProductChange}
+          >
+            <SelectTrigger id="product-filter" className="h-9">
+              <SelectValue placeholder="Összes termék" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Összes termék</SelectItem>
+              {products.map((product) => (
+                <SelectItem key={product.id} value={product.id}>
+                  {product.name}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -13,6 +13,7 @@ import { StockAdvancedFilters, type AdvancedFilters } from "@/components/invento
 import { StockBulkActions } from "@/components/inventory/stock-bulk-actions";
 import { useStockLevels } from "@/queries/inventory";
 import { useSuppliers } from "@/queries/suppliers";
+import { useProducts } from "@/queries/products";
 import { getExpiryUrgency } from "@/lib/date";
 import { exportToCSV } from "@/lib/export";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ export default function StockLevelsReportPage() {
   // Fetch data
   const { data: rawData, isLoading } = useStockLevels({ search });
   const { data: suppliersData } = useSuppliers({ page_size: 200 });
+  const { data: productsData } = useProducts({ page_size: 200 });
 
   // Apply client-side filters
   const data = useMemo(() => {
@@ -62,6 +64,11 @@ export default function StockLevelsReportPage() {
     // Supplier filter
     if (filters.supplierId) {
       filtered = filtered.filter((item) => item.supplier_id === filters.supplierId);
+    }
+
+    // Product filter
+    if (filters.productId) {
+      filtered = filtered.filter((item) => item.product_id === filters.productId);
     }
 
     return filtered;
@@ -152,8 +159,9 @@ export default function StockLevelsReportPage() {
     return `${data.length} találat`;
   };
 
-  // Prepare suppliers list for filter
+  // Prepare suppliers and products lists for filters
   const suppliersList = suppliersData?.items || [];
+  const productsList = productsData?.items || [];
 
   return (
     <div className="space-y-6">
@@ -171,8 +179,8 @@ export default function StockLevelsReportPage() {
 
       {/* Summary Statistics */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-28" />
           ))}
         </div>
@@ -248,6 +256,7 @@ export default function StockLevelsReportPage() {
             filters={filters}
             onFiltersChange={setFilters}
             suppliers={suppliersList.map((s: any) => ({ id: s.id, name: s.company_name }))}
+            products={productsList.map((p: any) => ({ id: p.id, name: p.name }))}
           />
         </CardContent>
       </Card>

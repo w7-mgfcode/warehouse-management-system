@@ -44,6 +44,7 @@ export function StockSummaryStats({ data }: StockSummaryStatsProps) {
   const stats = useMemo(() => {
     const totalItems = data.length;
     const totalWeight = data.reduce((sum, item) => sum + Number(item.weight_kg || 0), 0);
+    const totalQuantity = data.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
     const uniqueProducts = new Set(data.map(item => item.product_id)).size;
 
     // Count items by expiry urgency
@@ -60,6 +61,7 @@ export function StockSummaryStats({ data }: StockSummaryStatsProps) {
     return {
       totalItems,
       totalWeight,
+      totalQuantity,
       uniqueProducts,
       criticalCount,
       warningCount,
@@ -67,10 +69,15 @@ export function StockSummaryStats({ data }: StockSummaryStatsProps) {
   }, [data]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       <StatCard
         label="Összes tétel"
         value={formatNumber(stats.totalItems, 0)}
+        icon={<Package className="h-5 w-5" />}
+      />
+      <StatCard
+        label="Összes mennyiség"
+        value={formatNumber(stats.totalQuantity, 0)}
         icon={<Package className="h-5 w-5" />}
       />
       <StatCard
