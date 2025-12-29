@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Package, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,12 +9,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { WarehouseForm } from "@/components/warehouses/warehouse-form";
 import { WarehouseMap } from "@/components/warehouses/warehouse-map";
 import { warehouseQueryOptions } from "@/queries/warehouses";
+import { binsQueryOptions } from "@/queries/bins";
 
 function WarehouseDetailContent() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: warehouse } = useSuspenseQuery(warehouseQueryOptions(id!));
+
+  // Get bin count for this warehouse
+  const { data: binsData } = useQuery(
+    binsQueryOptions({ warehouse_id: id, page_size: 1 })
+  );
+  const binCount = binsData?.total || 0;
 
   const activeTab = searchParams.get("tab") || "details";
 
@@ -24,23 +31,60 @@ function WarehouseDetailContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-3 sm:gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/warehouses")}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">{warehouse.name}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/warehouses")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">
+            {warehouse.name}
+          </h1>
+        </div>
+
+        {/* Quick Action Buttons */}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/bins?warehouse=${id}`)}
+            className="flex-shrink-0"
+          >
+            <Package className="h-4 w-4 mr-2" />
+            Tárolóhelyek ({binCount})
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/bins/bulk?warehouse=${id}`)}
+            className="flex-shrink-0"
+          >
+            <Grid3x3 className="h-4 w-4 mr-2" />
+            Tömeges létrehozás
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex">
-          <TabsTrigger value="details" className="text-sm sm:text-base">Részletek</TabsTrigger>
-          <TabsTrigger value="map" className="text-sm sm:text-base">Térkép</TabsTrigger>
+          <TabsTrigger value="details" className="text-sm sm:text-base">
+            Részletek
+          </TabsTrigger>
+          <TabsTrigger value="map" className="text-sm sm:text-base">
+            Térkép
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-6">
           <Card className="overflow-visible">
             <CardContent className="pt-6 overflow-visible">
-              <WarehouseForm warehouse={warehouse} onSuccess={() => navigate("/warehouses")} />
+              <WarehouseForm
+                warehouse={warehouse}
+                onSuccess={() => navigate("/warehouses")}
+              />
             </CardContent>
           </Card>
         </TabsContent>

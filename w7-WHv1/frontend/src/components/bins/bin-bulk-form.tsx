@@ -7,11 +7,28 @@ import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { bulkBinSchema, parseAisles, type BulkBinFormData } from "@/schemas/bin";
+import {
+  bulkBinSchema,
+  parseAisles,
+  type BulkBinFormData,
+} from "@/schemas/bin";
 import { useBulkCreateBins } from "@/queries/bins";
 import { warehousesQueryOptions } from "@/queries/warehouses";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -27,8 +44,16 @@ interface BinPreview {
   position: string;
 }
 
-function WarehouseSelectField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const { data } = useSuspenseQuery(warehousesQueryOptions({ is_active: true, page_size: 100 }));
+function WarehouseSelectField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const { data } = useSuspenseQuery(
+    warehousesQueryOptions({ is_active: true, page_size: 100 })
+  );
 
   return (
     <Select value={value} onValueChange={onChange}>
@@ -53,7 +78,11 @@ function generatePreview(data: BulkBinFormData): BinPreview[] {
   for (const aisle of aisles) {
     for (let rack = data.rack_start; rack <= data.rack_end; rack++) {
       for (let level = data.level_start; level <= data.level_end; level++) {
-        for (let position = data.position_start; position <= data.position_end; position++) {
+        for (
+          let position = data.position_start;
+          position <= data.position_end;
+          position++
+        ) {
           const rackStr = String(rack).padStart(2, "0");
           const levelStr = String(level).padStart(2, "0");
           const positionStr = String(position).padStart(2, "0");
@@ -75,10 +104,14 @@ function generatePreview(data: BulkBinFormData): BinPreview[] {
 }
 
 interface BinBulkFormProps {
+  preselectedWarehouseId?: string;
   onSuccess?: () => void;
 }
 
-export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
+export function BinBulkForm({
+  preselectedWarehouseId,
+  onSuccess,
+}: BinBulkFormProps) {
   const [preview, setPreview] = useState<BinPreview[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const bulkMutation = useBulkCreateBins();
@@ -86,7 +119,7 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
   const form = useForm({
     resolver: zodResolver(bulkBinSchema),
     defaultValues: {
-      warehouse_id: "",
+      warehouse_id: preselectedWarehouseId || "",
       aisles: "",
       rack_start: 1,
       rack_end: 10,
@@ -98,7 +131,13 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
     },
   });
 
-  const { register, handleSubmit, control, formState: { errors }, getValues } = form;
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    getValues,
+  } = form;
 
   const handlePreview = () => {
     const values = getValues();
@@ -123,7 +162,11 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
 
     bulkMutation.mutate(submitData, {
       onSuccess: (result) => {
-        toast.success(`${(result as { created?: number }).created || preview.length} tárolóhely sikeresen létrehozva`);
+        toast.success(
+          `${
+            (result as { created?: number }).created || preview.length
+          } tárolóhely sikeresen létrehozva`
+        );
         onSuccess?.();
       },
       onError: (error) => {
@@ -146,12 +189,17 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
             control={control}
             render={({ field }) => (
               <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-                <WarehouseSelectField value={field.value} onChange={field.onChange} />
+                <WarehouseSelectField
+                  value={field.value}
+                  onChange={field.onChange}
+                />
               </Suspense>
             )}
           />
           {errors.warehouse_id && (
-            <p className="text-sm text-error">{errors.warehouse_id.message as string}</p>
+            <p className="text-sm text-error">
+              {errors.warehouse_id.message as string}
+            </p>
           )}
         </div>
 
@@ -165,7 +213,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
             {...register("aisles")}
           />
           {errors.aisles && (
-            <p className="text-sm text-error">{errors.aisles.message as string}</p>
+            <p className="text-sm text-error">
+              {errors.aisles.message as string}
+            </p>
           )}
           <p className="text-xs text-muted-foreground">
             Lista formátum: A,B,C vagy tartomány: A-C
@@ -177,7 +227,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
             <Label>Állványok</Label>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-2">
-                <Label htmlFor="rack_start" className="text-xs">Kezdő</Label>
+                <Label htmlFor="rack_start" className="text-xs">
+                  Kezdő
+                </Label>
                 <Input
                   id="rack_start"
                   type="number"
@@ -185,7 +237,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="rack_end" className="text-xs">Vég</Label>
+                <Label htmlFor="rack_end" className="text-xs">
+                  Vég
+                </Label>
                 <Input
                   id="rack_end"
                   type="number"
@@ -194,7 +248,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
               </div>
             </div>
             {errors.rack_end && (
-              <p className="text-sm text-error">{errors.rack_end.message as string}</p>
+              <p className="text-sm text-error">
+                {errors.rack_end.message as string}
+              </p>
             )}
           </div>
 
@@ -202,7 +258,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
             <Label>Szintek</Label>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-2">
-                <Label htmlFor="level_start" className="text-xs">Kezdő</Label>
+                <Label htmlFor="level_start" className="text-xs">
+                  Kezdő
+                </Label>
                 <Input
                   id="level_start"
                   type="number"
@@ -210,7 +268,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="level_end" className="text-xs">Vég</Label>
+                <Label htmlFor="level_end" className="text-xs">
+                  Vég
+                </Label>
                 <Input
                   id="level_end"
                   type="number"
@@ -219,7 +279,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
               </div>
             </div>
             {errors.level_end && (
-              <p className="text-sm text-error">{errors.level_end.message as string}</p>
+              <p className="text-sm text-error">
+                {errors.level_end.message as string}
+              </p>
             )}
           </div>
 
@@ -227,7 +289,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
             <Label>Pozíciók</Label>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-2">
-                <Label htmlFor="position_start" className="text-xs">Kezdő</Label>
+                <Label htmlFor="position_start" className="text-xs">
+                  Kezdő
+                </Label>
                 <Input
                   id="position_start"
                   type="number"
@@ -235,7 +299,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="position_end" className="text-xs">Vég</Label>
+                <Label htmlFor="position_end" className="text-xs">
+                  Vég
+                </Label>
                 <Input
                   id="position_end"
                   type="number"
@@ -244,7 +310,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
               </div>
             </div>
             {errors.position_end && (
-              <p className="text-sm text-error">{errors.position_end.message as string}</p>
+              <p className="text-sm text-error">
+                {errors.position_end.message as string}
+              </p>
             )}
           </div>
         </div>
@@ -264,7 +332,10 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
           <Button type="button" variant="outline" onClick={handlePreview}>
             Előnézet
           </Button>
-          <Button type="submit" disabled={bulkMutation.isPending || !showPreview}>
+          <Button
+            type="submit"
+            disabled={bulkMutation.isPending || !showPreview}
+          >
             {bulkMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -281,7 +352,8 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              Előnézet: {formatNumber(preview.length, 0)} tárolóhely lesz létrehozva
+              Előnézet: {formatNumber(preview.length, 0)} tárolóhely lesz
+              létrehozva
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -303,7 +375,9 @@ export function BinBulkForm({ onSuccess }: BinBulkFormProps) {
                       <TableCell className="font-mono">{bin.aisle}</TableCell>
                       <TableCell className="font-mono">{bin.rack}</TableCell>
                       <TableCell className="font-mono">{bin.level}</TableCell>
-                      <TableCell className="font-mono">{bin.position}</TableCell>
+                      <TableCell className="font-mono">
+                        {bin.position}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

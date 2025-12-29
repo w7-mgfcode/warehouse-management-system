@@ -1,6 +1,16 @@
-import { queryOptions, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useMutation,
+  useQueryClient,
+  useQuery,
+} from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import type { Bin, BinWithContent, PaginatedResponse, BinStatus } from "@/types";
+import type {
+  Bin,
+  BinWithContent,
+  PaginatedResponse,
+  BinStatus,
+} from "@/types";
 
 export interface BinFilters {
   warehouse_id?: string;
@@ -48,6 +58,8 @@ export const binKeys = {
 function transformBin(backendBin: any): Bin {
   return {
     ...backendBin,
+    warehouse_name:
+      backendBin.warehouse?.name || backendBin.warehouse_name || undefined,
     aisle: backendBin.structure_data?.aisle || "",
     rack: backendBin.structure_data?.rack || "",
     level: backendBin.structure_data?.level || "",
@@ -169,7 +181,10 @@ export function useBulkCreateBins() {
           aisle: bulkData.aisles,
           rack: { start: bulkData.rack_start, end: bulkData.rack_end },
           level: { start: bulkData.level_start, end: bulkData.level_end },
-          position: { start: bulkData.position_start, end: bulkData.position_end },
+          position: {
+            start: bulkData.position_start,
+            end: bulkData.position_end,
+          },
         },
         defaults: bulkData.capacity_kg
           ? { max_weight: bulkData.capacity_kg }
@@ -206,13 +221,16 @@ export const warehouseMapBinsQueryOptions = (filters: WarehouseMapFilters) =>
   queryOptions({
     queryKey: [...binKeys.all, "map", filters] as const,
     queryFn: async (): Promise<PaginatedResponse<BinWithContent>> => {
-      const { data } = await apiClient.get<PaginatedResponse<BinWithContent>>("/bins", {
-        params: {
-          ...filters,
-          include_content: true,
-          include_expiry_info: true,
-        },
-      });
+      const { data } = await apiClient.get<PaginatedResponse<BinWithContent>>(
+        "/bins",
+        {
+          params: {
+            ...filters,
+            include_content: true,
+            include_expiry_info: true,
+          },
+        }
+      );
       return data;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - warehouse map data

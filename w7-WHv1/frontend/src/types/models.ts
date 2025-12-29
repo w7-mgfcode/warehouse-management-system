@@ -75,6 +75,7 @@ export type BinStatus = "empty" | "occupied" | "reserved" | "inactive";
 export interface Bin {
   id: string;
   warehouse_id: string;
+  warehouse_name?: string; // Optional - populated when joining warehouse data
   code: string;
   structure_data: Record<string, string>; // Dynamic fields based on warehouse template
   status: BinStatus;

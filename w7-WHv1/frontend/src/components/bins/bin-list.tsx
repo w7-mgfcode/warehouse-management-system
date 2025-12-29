@@ -1,6 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { Edit } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteDialog } from "@/components/shared/delete-dialog";
@@ -16,7 +23,12 @@ interface BinListProps {
   isDeleting?: boolean;
 }
 
-export function BinList({ bins, isLoading, onDelete, isDeleting }: BinListProps) {
+export function BinList({
+  bins,
+  isLoading,
+  onDelete,
+  isDeleting,
+}: BinListProps) {
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -43,6 +55,7 @@ export function BinList({ bins, isLoading, onDelete, isDeleting }: BinListProps)
         <TableHeader>
           <TableRow>
             <TableHead>{HU.table.code}</TableHead>
+            <TableHead>Raktár</TableHead>
             <TableHead>Sor</TableHead>
             <TableHead>Állvány</TableHead>
             <TableHead>Szint</TableHead>
@@ -59,18 +72,47 @@ export function BinList({ bins, isLoading, onDelete, isDeleting }: BinListProps)
               className="cursor-pointer hover:bg-secondary/50"
               onClick={() => navigate(`/bins/${bin.id}`)}
             >
-              <TableCell className="font-mono font-medium">{bin.code}</TableCell>
-              <TableCell className="font-mono text-sm">{(bin as any).aisle}</TableCell>
-              <TableCell className="font-mono text-sm">{(bin as any).rack}</TableCell>
-              <TableCell className="font-mono text-sm">{(bin as any).level}</TableCell>
-              <TableCell className="font-mono text-sm">{(bin as any).position}</TableCell>
+              <TableCell className="font-mono font-medium">
+                {bin.code}
+              </TableCell>
+              <TableCell
+                className="text-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/warehouses/${bin.warehouse_id}`);
+                }}
+              >
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-primary hover:underline"
+                >
+                  {bin.warehouse_name || "Ismeretlen"}
+                </Button>
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {(bin as any).aisle}
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {(bin as any).rack}
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {(bin as any).level}
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {(bin as any).position}
+              </TableCell>
               <TableCell className="text-sm text-muted-foreground">
-                {(bin as any).capacity_kg ? `${formatNumber((bin as any).capacity_kg, 0)} kg` : "—"}
+                {(bin as any).capacity_kg
+                  ? `${formatNumber((bin as any).capacity_kg, 0)} kg`
+                  : "—"}
               </TableCell>
               <TableCell>
                 <BinStatusBadge status={bin.status} />
               </TableCell>
-              <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+              <TableCell
+                className="text-right"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="ghost"
