@@ -256,7 +256,7 @@ async def delete_existing_bin(
     """
     Delete bin by ID (warehouse+ only).
 
-    Bin must be empty to be deleted.
+    Bin must be empty and have no movement history to be deleted.
     """
     bin_obj = await get_bin_by_id(db, bin_id)
     if bin_obj is None:
@@ -272,4 +272,10 @@ async def delete_existing_bin(
             detail=HU_MESSAGES["bin_not_empty"],
         )
 
-    await delete_bin(db, bin_obj)
+    try:
+        await delete_bin(db, bin_obj)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        ) from e

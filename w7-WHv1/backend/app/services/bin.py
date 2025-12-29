@@ -12,8 +12,7 @@ from sqlalchemy.orm import selectinload
 from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
 from app.db.models.bin_content import BinContent
-from app.db.models.product import Product
-from app.db.models.supplier import Supplier
+from app.db.models.bin_movement import BinMovement
 from app.schemas.bin import BinCreate, BinUpdate, ExpiryUrgency, RangeSpec
 from app.services.pagination import calculate_pages as _calculate_pages
 from app.services.warehouse import get_warehouse_by_id
@@ -308,10 +307,27 @@ async def delete_bin(db: AsyncSession, bin_obj: Bin) -> None:
     """
     Delete a bin.
 
+    Raises ValueError if bin has contents with movement history.
+
     Args:
         db: Async database session.
         bin_obj: Bin object to delete.
     """
+    # Check if any bin contents have movement history
+    stmt = (
+        select(func.count(BinMovement.id))
+        .join(BinContent, BinMovement.bin_content_id == BinContent.id)
+        .where(BinContent.bin_id == bin_obj.id)
+    )
+    result = await db.execute(stmt)
+    movement_count = result.scalar_one()
+
+    if movement_count > 0:
+        raise ValueError(
+            "Nem törölhető tárolóhely ami rendelkezik mozgástörténettel. "
+            f"Találtam {movement_count} mozgás rekordot."
+        )
+
     await db.delete(bin_obj)
     await db.flush()
 
