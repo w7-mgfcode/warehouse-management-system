@@ -71,11 +71,25 @@ export function useCreateBin() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (bin: BinCreate) => {
-      const { data } = await apiClient.post<Bin>("/bins", bin);
+      // Transform frontend data to match backend schema
+      const backendData = {
+        warehouse_id: bin.warehouse_id,
+        code: bin.code,
+        structure_data: {
+          aisle: bin.aisle,
+          rack: bin.rack,
+          level: bin.level,
+          position: bin.position,
+        },
+        status: "empty" as const,
+        max_weight: bin.capacity_kg || null,
+        is_active: bin.is_active ?? true,
+      };
+      const { data } = await apiClient.post<Bin>("/bins", backendData);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: binKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: binKeys.all });
     },
   });
 }
@@ -84,12 +98,33 @@ export function useUpdateBin(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (bin: BinUpdate) => {
-      const { data } = await apiClient.put<Bin>(`/bins/${id}`, bin);
+      // Transform frontend data to match backend schema
+      const backendData: any = {
+        code: bin.code,
+        is_active: bin.is_active,
+      };
+
+      // Transform structure fields if any are provided
+      if (bin.aisle || bin.rack || bin.level || bin.position) {
+        backendData.structure_data = {
+          aisle: bin.aisle,
+          rack: bin.rack,
+          level: bin.level,
+          position: bin.position,
+        };
+      }
+
+      // Transform capacity_kg to max_weight
+      if (bin.capacity_kg !== undefined) {
+        backendData.max_weight = bin.capacity_kg || null;
+      }
+
+      const { data } = await apiClient.put<Bin>(`/bins/${id}`, backendData);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: binKeys.all });
-      queryClient.invalidateQueries({ queryKey: binKeys.detail(id) });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: binKeys.all });
+      await queryClient.invalidateQueries({ queryKey: binKeys.detail(id) });
     },
   });
 }
