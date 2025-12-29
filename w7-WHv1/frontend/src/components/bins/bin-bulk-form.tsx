@@ -1,4 +1,4 @@
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -282,6 +282,7 @@ export function BinBulkForm({
 }: BinBulkFormProps) {
   const [preview, setPreview] = useState<BinPreview[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
   const bulkMutation = useBulkCreateBins();
 
   const [fieldRanges, setFieldRanges] = useState<
@@ -336,16 +337,16 @@ export function BinBulkForm({
       ? analyzeBins(existingBinsData.items || [], template)
       : null;
 
-  // Debug logging
-  console.log("🔍 Bulk Form Debug:", {
-    warehouseId,
-    hasWarehouse: !!warehouse,
-    hasTemplate: !!template,
-    hasExistingBins: !!existingBinsData,
-    binCount: existingBinsData?.items?.length || 0,
-    hasBinAnalysis: !!binAnalysis,
-    binAnalysis,
-  });
+  // Auto-scroll to preview when it appears
+  useEffect(() => {
+    if (showPreview && preview.length > 0 && previewRef.current) {
+      console.log("🔍 Scrolling to preview...");
+      previewRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [showPreview, preview.length]);
 
   // Detect active preset for display
   const activePreset = template
@@ -866,16 +867,8 @@ export function BinBulkForm({
         </div>
       </form>
 
-      {/* Debug preview render condition */}
-      {console.log("🔍 Preview render check:", {
-        showPreview,
-        previewLength: preview.length,
-        hasTemplate: !!template,
-        shouldShow: showPreview && preview.length > 0 && !!template,
-      })}
-
       {showPreview && preview.length > 0 && template && (
-        <Card>
+        <Card ref={previewRef}>
           <CardHeader>
             <CardTitle>
               Előnézet: {formatNumber(preview.length, 0)} tárolóhely lesz
