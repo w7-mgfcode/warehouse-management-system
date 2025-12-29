@@ -154,54 +154,42 @@ def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
 
 
-# Context manager for adding request context to logs
-class LogContext:
+# Thread-safe request-scoped logging adapter
+def get_request_logger(logger: logging.Logger, **context) -> logging.LoggerAdapter:
     """
-    Context manager for adding request-specific context to logs.
+    Get a thread-safe logger adapter with request-specific context.
+
+    This is the recommended way to add request-scoped fields (request_id, user_id, etc.)
+    to log records. Each request gets its own adapter instance, so there's no
+    interference between concurrent requests.
+
+    Args:
+        logger (logging.Logger): Base logger instance
+        **context: Context key-value pairs to add to all logs from this adapter
+
+    Returns:
+        logging.LoggerAdapter: Logger adapter with context
 
     Usage:
-        with LogContext(request_id="abc123", user_id="user-456"):
-            logger.info("Processing request")
+        logger = get_logger(__name__)
+        request_logger = get_request_logger(logger, request_id="abc123", user_id="user-456")
+        request_logger.info("Processing request")  # Includes request_id and user_id
+
+    Alternative using extra parameter directly:
+        logger.info("Processing request", extra={"request_id": "abc123", "user_id": "user-456"})
     """
 
-    def __init__(self, **kwargs) -> None:
-        """
-        Initialize log context.
+    class ContextAdapter(logging.LoggerAdapter):
+        """LoggerAdapter that merges context with extra fields."""
 
-        Args:
-            **kwargs: Context key-value pairs to add to logs
-        """
-        self.context = kwargs
-        self.old_factory = None
+        def process(self, msg, kwargs):
+            """Add context to log record extra fields."""
+            # Merge adapter context with any extra fields passed to log call
+            extra = kwargs.get("extra", {})
+            kwargs["extra"] = {**self.extra, **extra}
+            return msg, kwargs
 
-    def __enter__(self):
-        """
-        Enter context and add fields to log records.
-
-        Returns:
-            LogContext: Self
-        """
-        self.old_factory = logging.getLogRecordFactory()
-
-        def record_factory(*args, **kwargs):
-            record = self.old_factory(*args, **kwargs)
-            for key, value in self.context.items():
-                setattr(record, key, value)
-            return record
-
-        logging.setLogRecordFactory(record_factory)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Exit context and restore original record factory.
-
-        Args:
-            exc_type: Exception type
-            exc_val: Exception value
-            exc_tb: Exception traceback
-        """
-        logging.setLogRecordFactory(self.old_factory)
+    return ContextAdapter(logger, context)
 
 
 # Middleware helper for logging HTTP requests
