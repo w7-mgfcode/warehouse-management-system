@@ -162,7 +162,20 @@ export function useBulkCreateBins() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (bulkData: BulkBinCreate) => {
-      const { data } = await apiClient.post("/bins/bulk", bulkData);
+      // Transform frontend format to backend format
+      const backendData = {
+        warehouse_id: bulkData.warehouse_id,
+        ranges: {
+          aisle: bulkData.aisles,
+          rack: { start: bulkData.rack_start, end: bulkData.rack_end },
+          level: { start: bulkData.level_start, end: bulkData.level_end },
+          position: { start: bulkData.position_start, end: bulkData.position_end },
+        },
+        defaults: bulkData.capacity_kg
+          ? { max_weight: bulkData.capacity_kg }
+          : null,
+      };
+      const { data } = await apiClient.post("/bins/bulk", backendData);
       return data;
     },
     onSuccess: async () => {
