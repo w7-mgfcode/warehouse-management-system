@@ -32,10 +32,10 @@ export default function WarehousesIndexPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">{HU.nav.warehouses}</h1>
-        <Button onClick={() => navigate("/warehouses/new")}>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{HU.nav.warehouses}</h1>
+        <Button onClick={() => navigate("/warehouses/new")} className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           {HU.actions.create}
         </Button>

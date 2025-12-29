@@ -130,15 +130,20 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
   }
 
   return (
-    <div className="warehouse-map-container space-y-4">
+    <div className="warehouse-map-container space-y-3 sm:space-y-4">
+      {/* Mobile tip */}
+      <div className="md:hidden bg-muted/50 border border-border rounded-lg p-3 text-sm text-muted-foreground">
+        💡 <strong>Tipp:</strong> Forgasd el a készülékedet fekvő módba a jobb térképnézetért, vagy használd a zoom gombokat.
+      </div>
+
       {/* 🎯 Level Tabs for floor selection */}
       {uniqueLevels.length > 0 && (
         <Tabs value={levelFilter} onValueChange={setLevelFilter} className="w-full">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto pb-1">
             <TabsList className="w-full sm:w-auto inline-flex">
-              <TabsTrigger value="all" className="whitespace-nowrap">Összes szint</TabsTrigger>
+              <TabsTrigger value="all" className="whitespace-nowrap text-xs sm:text-sm">Összes szint</TabsTrigger>
               {uniqueLevels.map((level) => (
-                <TabsTrigger key={level} value={level} className="whitespace-nowrap">
+                <TabsTrigger key={level} value={level} className="whitespace-nowrap text-xs sm:text-sm">
                   Szint {level}
                 </TabsTrigger>
               ))}
@@ -162,38 +167,40 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
       />
 
       {/* Grid and Legend */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-3 sm:gap-4">
         {/* Map Grid */}
-        <WarehouseMapGrid
-          bins={filteredBins}
-          template={warehouse.bin_structure_template}
-          cellSize={cellSize}
-          onBinClick={handleBinClick}
-        />
+        <div className="min-w-0">
+          <WarehouseMapGrid
+            bins={filteredBins}
+            template={warehouse.bin_structure_template}
+            cellSize={cellSize}
+            onBinClick={handleBinClick}
+          />
+        </div>
 
         {/* Legend */}
         <WarehouseMapLegend />
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div className="rounded-lg border bg-card p-3">
-          <p className="text-muted-foreground">Összes tárolóhely</p>
-          <p className="text-2xl font-bold text-card-foreground">{binsData.items.length}</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-sm">
+        <div className="rounded-lg border bg-card p-2 sm:p-3">
+          <p className="text-muted-foreground text-xs sm:text-sm">Összes tárolóhely</p>
+          <p className="text-xl sm:text-2xl font-bold text-card-foreground">{binsData.items.length}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3">
-          <p className="text-muted-foreground">Megjelenítve</p>
-          <p className="text-2xl font-bold text-card-foreground">{filteredBins.length}</p>
+        <div className="rounded-lg border bg-card p-2 sm:p-3">
+          <p className="text-muted-foreground text-xs sm:text-sm">Megjelenítve</p>
+          <p className="text-xl sm:text-2xl font-bold text-card-foreground">{filteredBins.length}</p>
         </div>
-        <div className="rounded-lg border bg-card p-3">
-          <p className="text-muted-foreground">Foglalt</p>
-          <p className="text-2xl font-bold text-card-foreground">
+        <div className="rounded-lg border bg-card p-2 sm:p-3">
+          <p className="text-muted-foreground text-xs sm:text-sm">Foglalt</p>
+          <p className="text-xl sm:text-2xl font-bold text-card-foreground">
             {binsData.items.filter((b) => b.status === "occupied").length}
           </p>
         </div>
-        <div className="rounded-lg border bg-card p-3">
-          <p className="text-muted-foreground">Üres</p>
-          <p className="text-2xl font-bold text-card-foreground">
+        <div className="rounded-lg border bg-card p-2 sm:p-3">
+          <p className="text-muted-foreground text-xs sm:text-sm">Üres</p>
+          <p className="text-xl sm:text-2xl font-bold text-card-foreground">
             {binsData.items.filter((b) => b.status === "empty").length}
           </p>
         </div>
