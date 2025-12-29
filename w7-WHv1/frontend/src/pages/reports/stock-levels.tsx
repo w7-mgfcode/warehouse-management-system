@@ -247,7 +247,7 @@ export default function StockLevelsReportPage() {
           <StockAdvancedFilters
             filters={filters}
             onFiltersChange={setFilters}
-            suppliers={suppliersList.map((s: any) => ({ id: s.id, name: s.name }))}
+            suppliers={suppliersList.map((s: any) => ({ id: s.id, name: s.company_name }))}
           />
         </CardContent>
       </Card>
