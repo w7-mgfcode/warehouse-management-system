@@ -416,6 +416,11 @@ export function BinBulkForm({
 
       setPreview(previewData);
       setShowPreview(true);
+      console.log("🔍 Preview state set:", {
+        previewLength: previewData.length,
+        showPreview: true,
+        hasTemplate: !!template,
+      });
       toast.info(`${previewData.length} tárolóhely lesz létrehozva`);
     } catch (error) {
       toast.error(
@@ -860,6 +865,14 @@ export function BinBulkForm({
           </Button>
         </div>
       </form>
+
+      {/* Debug preview render condition */}
+      {console.log("🔍 Preview render check:", {
+        showPreview,
+        previewLength: preview.length,
+        hasTemplate: !!template,
+        shouldShow: showPreview && preview.length > 0 && !!template,
+      })}
 
       {showPreview && preview.length > 0 && template && (
         <Card>
