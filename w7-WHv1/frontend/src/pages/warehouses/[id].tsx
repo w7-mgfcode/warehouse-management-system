@@ -23,18 +23,18 @@ function WarehouseDetailContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-3 sm:gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate("/warehouses")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold text-foreground">{warehouse.name}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">{warehouse.name}</h1>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList>
-          <TabsTrigger value="details">Részletek</TabsTrigger>
-          <TabsTrigger value="map">Térkép</TabsTrigger>
+        <TabsList className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex">
+          <TabsTrigger value="details" className="text-sm sm:text-base">Részletek</TabsTrigger>
+          <TabsTrigger value="map" className="text-sm sm:text-base">Térkép</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-6">

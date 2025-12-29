@@ -48,9 +48,9 @@ export function WarehouseMapToolbar({
   onPrint,
 }: WarehouseMapToolbarProps) {
   return (
-    <div className="warehouse-map-toolbar flex flex-wrap items-center gap-4 rounded-lg border bg-card p-4">
+    <div className="warehouse-map-toolbar flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4 rounded-lg border bg-card p-3 sm:p-4">
       {/* Search input */}
-      <div className="relative flex-1 min-w-[200px]">
+      <div className="relative flex-1 sm:min-w-[200px]">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="text"
@@ -63,7 +63,7 @@ export function WarehouseMapToolbar({
 
       {/* Status filter */}
       <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="Összes állapot" />
         </SelectTrigger>
         <SelectContent>
@@ -75,36 +75,38 @@ export function WarehouseMapToolbar({
         </SelectContent>
       </Select>
 
-      {/* Zoom controls */}
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onZoomOut}
-          disabled={!canZoomOut}
-          title="Kicsinyítés"
-        >
-          <ZoomOut className="h-4 w-4" />
-        </Button>
-        <span className="text-sm text-foreground font-medium min-w-[60px] text-center">
-          {zoom}px
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onZoomIn}
-          disabled={!canZoomIn}
-          title="Nagyítás"
-        >
-          <ZoomIn className="h-4 w-4" />
+      {/* Zoom controls and Print button - row on mobile and desktop */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onZoomOut}
+            disabled={!canZoomOut}
+            title="Kicsinyítés"
+          >
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-foreground font-medium min-w-[50px] sm:min-w-[60px] text-center">
+            {zoom}px
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onZoomIn}
+            disabled={!canZoomIn}
+            title="Nagyítás"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Print button */}
+        <Button variant="outline" onClick={onPrint} className="gap-2">
+          <Printer className="h-4 w-4" />
+          <span className="hidden sm:inline text-foreground">Nyomtatás</span>
         </Button>
       </div>
-
-      {/* Print button */}
-      <Button variant="outline" onClick={onPrint} className="gap-2">
-        <Printer className="h-4 w-4" />
-        <span className="hidden sm:inline text-foreground">Nyomtatás</span>
-      </Button>
     </div>
   );
 }

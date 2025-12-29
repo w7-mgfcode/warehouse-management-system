@@ -134,14 +134,16 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
       {/* 🎯 Level Tabs for floor selection */}
       {uniqueLevels.length > 0 && (
         <Tabs value={levelFilter} onValueChange={setLevelFilter} className="w-full">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="all">Összes szint</TabsTrigger>
-            {uniqueLevels.map((level) => (
-              <TabsTrigger key={level} value={level}>
-                Szint {level}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="w-full sm:w-auto inline-flex">
+              <TabsTrigger value="all" className="whitespace-nowrap">Összes szint</TabsTrigger>
+              {uniqueLevels.map((level) => (
+                <TabsTrigger key={level} value={level} className="whitespace-nowrap">
+                  Szint {level}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
         </Tabs>
       )}
 

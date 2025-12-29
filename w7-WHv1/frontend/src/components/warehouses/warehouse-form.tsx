@@ -160,12 +160,12 @@ export function WarehouseForm({ warehouse, onSuccess }: WarehouseFormProps) {
         </TabsContent>
       </Tabs>
 
-      <div className="flex gap-2 pt-4 border-t">
-        <Button type="submit" disabled={isPending}>
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4 border-t">
+        <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
           {isPending ? "Mentés..." : isEdit ? HU.actions.save : HU.actions.create}
         </Button>
         {onSuccess && (
-          <Button type="button" variant="outline" onClick={onSuccess} disabled={isPending}>
+          <Button type="button" variant="outline" onClick={onSuccess} disabled={isPending} className="w-full sm:w-auto">
             {HU.actions.cancel}
           </Button>
         )}
