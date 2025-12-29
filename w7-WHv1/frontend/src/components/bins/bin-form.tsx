@@ -50,11 +50,11 @@ export function BinForm({ bin, onSuccess }: BinFormProps) {
     defaultValues: {
       warehouse_id: bin?.warehouse_id || "",
       code: bin?.code || "",
-      aisle: bin?.aisle || "",
-      rack: bin?.rack || "",
-      level: bin?.level || "",
-      position: bin?.position || "",
-      capacity_kg: bin?.capacity_kg || undefined,
+      aisle: (bin as any)?.aisle || "",
+      rack: (bin as any)?.rack || "",
+      level: (bin as any)?.level || "",
+      position: (bin as any)?.position || "",
+      capacity_kg: (bin as any)?.capacity_kg || undefined,
       is_active: bin?.is_active ?? true,
     },
   });

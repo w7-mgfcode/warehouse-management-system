@@ -99,7 +99,7 @@ export function FEFOWarningDialog({
               <div>
                 <p className="text-xs text-muted-foreground">Lejárat</p>
                 <p className="font-semibold">
-                  {formatDate(new Date(selectedUseByDate), "yyyy. MM. dd.")}
+                  {formatDate(new Date(selectedUseByDate))}
                 </p>
                 <p className="text-xs text-amber-700 dark:text-amber-300">
                   {selectedDaysUntilExpiry} nap múlva
@@ -122,7 +122,7 @@ export function FEFOWarningDialog({
               <div>
                 <p className="text-xs text-muted-foreground">Lejárat</p>
                 <p className="font-semibold">
-                  {formatDate(new Date(oldestBin.use_by_date), "yyyy. MM. dd.")}
+                  {formatDate(new Date(oldestBin.use_by_date))}
                 </p>
                 <p
                   className={`text-xs ${

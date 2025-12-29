@@ -76,13 +76,12 @@ export interface Bin {
   id: string;
   warehouse_id: string;
   code: string;
-  aisle: string;
-  rack: string;
-  level: string;
-  position: string;
+  structure_data: Record<string, string>; // Dynamic fields based on warehouse template
   status: BinStatus;
-  capacity_kg: number;
-  current_product_id: string | null;
+  max_weight: number | null;
+  max_height: number | null;
+  accessibility: string | null;
+  notes: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -154,6 +153,27 @@ export interface ExpiryWarning {
   use_by_date: string;
   days_until_expiry: number;
   urgency: ExpiryUrgency;
+}
+
+// Warehouse Map types
+export interface BinContentSummary {
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_sku: string | null;
+  supplier_id: string | null;
+  supplier_name: string | null;
+  batch_number: string;
+  use_by_date: string;
+  quantity: number;
+  unit: string;
+  status: string;
+  days_until_expiry: number | null;
+  urgency: ExpiryUrgency | null;
+}
+
+export interface BinWithContent extends Bin {
+  contents: BinContentSummary[];
 }
 
 // Stock Reservation types

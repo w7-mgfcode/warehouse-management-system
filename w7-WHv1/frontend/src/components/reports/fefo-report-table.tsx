@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/date";
-import { formatWeight, formatQuantity } from "@/lib/number";
+import { formatQuantity } from "@/lib/number";
 import type { ExpiryWarning } from "@/types";
 
 interface FEFOReportTableProps {
@@ -64,9 +64,9 @@ export function FEFOReportTable({ data }: FEFOReportTableProps) {
               <TableCell>
                 <div>
                   <div className="font-medium">{item.product_name}</div>
-                  {item.sku && (
+                  {(item as any).sku && (
                     <div className="text-sm text-muted-foreground font-mono">
-                      {item.sku}
+                      {(item as any).sku}
                     </div>
                   )}
                 </div>
@@ -77,7 +77,7 @@ export function FEFOReportTable({ data }: FEFOReportTableProps) {
                 {item.days_until_expiry}
               </TableCell>
               <TableCell className="text-right">
-                {formatQuantity(item.quantity, item.unit)}
+                {formatQuantity(item.quantity, (item as any).unit || "kg")}
               </TableCell>
               <TableCell>{getUrgencyBadge(item.days_until_expiry)}</TableCell>
             </TableRow>

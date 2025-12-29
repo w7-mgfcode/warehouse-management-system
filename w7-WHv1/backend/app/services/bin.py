@@ -1,19 +1,45 @@
 """Bin service for CRUD operations and bulk generation."""
 
+from datetime import date
 from itertools import product as cartesian_product
 from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.i18n import HU_MESSAGES
 from app.db.models.bin import Bin
-from app.schemas.bin import BinCreate, BinUpdate, RangeSpec
+from app.db.models.bin_content import BinContent
+from app.db.models.product import Product
+from app.db.models.supplier import Supplier
+from app.schemas.bin import BinCreate, BinUpdate, ExpiryUrgency, RangeSpec
 from app.services.pagination import calculate_pages as _calculate_pages
 from app.services.warehouse import get_warehouse_by_id
 
 MAX_BULK_BIN_COMBINATIONS = 10_000
+
+
+def calculate_expiry_urgency(days_until_expiry: int) -> ExpiryUrgency:
+    """
+    Calculate expiry urgency level based on days until expiry.
+
+    Args:
+        days_until_expiry: Number of days until product expires.
+
+    Returns:
+        ExpiryUrgency: Urgency level (expired, critical, high, medium, low).
+    """
+    if days_until_expiry < 0:
+        return "expired"
+    if days_until_expiry <= 3:
+        return "critical"
+    if days_until_expiry <= 7:
+        return "high"
+    if days_until_expiry <= 14:
+        return "medium"
+    return "low"
 
 
 def calculate_pages(total: int, page_size: int) -> int:
@@ -192,6 +218,8 @@ async def get_bins(
     warehouse_id: UUID | None = None,
     status: str | None = None,
     search: str | None = None,
+    include_content: bool = False,
+    include_expiry_info: bool = False,
 ) -> tuple[list[Bin], int]:
     """
     Get paginated list of bins.
@@ -203,11 +231,22 @@ async def get_bins(
         warehouse_id: Filter by warehouse.
         status: Filter by status.
         search: Search term for code.
+        include_content: Include bin contents with product/supplier relationships.
+        include_expiry_info: Calculate days_until_expiry and urgency for contents.
 
     Returns:
         tuple: List of bins and total count.
     """
     query = select(Bin)
+
+    # Add eager loading if content is requested
+    if include_content:
+        query = query.options(
+            selectinload(Bin.contents)
+            .selectinload(BinContent.product),
+            selectinload(Bin.contents)
+            .selectinload(BinContent.supplier),
+        )
 
     if warehouse_id:
         query = query.where(Bin.warehouse_id == warehouse_id)
@@ -226,6 +265,15 @@ async def get_bins(
     offset = (page - 1) * page_size
     result = await db.execute(query.order_by(Bin.created_at.desc()).offset(offset).limit(page_size))
     bins = list(result.scalars().all())
+
+    # Calculate expiry info if requested
+    if include_content and include_expiry_info:
+        today = date.today()
+        for bin_obj in bins:
+            for content in bin_obj.contents:
+                days_until = (content.use_by_date - today).days
+                content.days_until_expiry = days_until  # type: ignore[attr-defined]
+                content.urgency = calculate_expiry_urgency(days_until)  # type: ignore[attr-defined]
 
     return bins, total
 

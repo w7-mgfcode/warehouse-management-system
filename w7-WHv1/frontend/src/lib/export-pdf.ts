@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { formatDate } from "@/lib/date";
+import { formatDate, formatDateTime } from "@/lib/date";
 import { formatNumber } from "@/lib/number";
 
 export interface PDFColumn {
@@ -43,7 +43,7 @@ export function exportToPDF(options: PDFExportOptions): void {
   // Add timestamp
   doc.setFontSize(10);
   doc.setTextColor(100);
-  const timestamp = `Generálva: ${formatDate(new Date(), "yyyy. MM. dd. HH:mm")}`;
+  const timestamp = `Generálva: ${formatDateTime(new Date())}`;
   doc.text(timestamp, 40, 60);
 
   // Prepare table data
@@ -84,10 +84,10 @@ export function exportToPDF(options: PDFExportOptions): void {
         const formatting = conditionalFormatting(item, rowIndex);
 
         if (formatting.fillColor) {
-          hookData.cell.styles.fillColor = formatting.fillColor;
+          hookData.cell.styles.fillColor = formatting.fillColor as [number, number, number];
         }
         if (formatting.textColor) {
-          hookData.cell.styles.textColor = formatting.textColor;
+          hookData.cell.styles.textColor = formatting.textColor as [number, number, number];
         }
       }
     },
@@ -131,7 +131,7 @@ export function exportFEFOToPDF(
     ],
     data: data.map((item) => ({
       ...item,
-      use_by_date: formatDate(new Date(item.use_by_date), "yyyy. MM. dd."),
+      use_by_date: formatDate(new Date(item.use_by_date)),
       weight_kg: formatNumber(item.weight_kg),
       supplier_name: item.supplier_name || "-",
     })),

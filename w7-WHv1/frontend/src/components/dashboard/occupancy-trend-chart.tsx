@@ -63,11 +63,9 @@ export function OccupancyTrendChart({ days = 30, warehouseId }: OccupancyTrendCh
             borderRadius: "var(--radius)",
           }}
           labelStyle={{ color: "hsl(var(--foreground))" }}
-          formatter={(value: number, name: string) => {
-            if (name === "Kihasználtság") {
-              return `${formatNumber(value, 1)}%`;
-            }
-            return formatNumber(value, 0);
+          formatter={(value: any) => {
+            if (value === undefined || value === null) return "-";
+            return `${formatNumber(value as number, 1)}%`;
           }}
         />
         <Legend

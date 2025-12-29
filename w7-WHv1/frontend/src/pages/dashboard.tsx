@@ -65,7 +65,7 @@ function DashboardContent() {
 
       {/* Charts Row 1 - Current Status */}
       <div className="grid gap-4 md:grid-cols-2">
-        <OccupancyChart data={stats.warehouse_occupancy ?? []} />
+        <OccupancyChart data={(stats.warehouse_occupancy as any) ?? []} />
         <MovementChart data={formattedMovementHistory} />
       </div>
 

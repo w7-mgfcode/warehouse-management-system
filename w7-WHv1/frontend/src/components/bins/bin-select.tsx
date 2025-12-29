@@ -48,7 +48,7 @@ function BinSelectContent({
           <SelectValue placeholder="Válasszon tárolóhelyet" />
         </SelectTrigger>
         <SelectContent>
-          {data.items.map((bin) => (
+          {data.items.map((bin: any) => (
             <SelectItem key={bin.id} value={bin.id}>
               <div className="flex items-center gap-2">
                 <span className="font-mono">{bin.code}</span>

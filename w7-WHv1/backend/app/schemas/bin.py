@@ -1,7 +1,8 @@
 """Bin schemas for CRUD and bulk generation."""
 
-from datetime import datetime
-from typing import Any, Literal
+from datetime import date, datetime
+from decimal import Decimal
+from typing import Any, Literal, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -9,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.core.i18n import HU_MESSAGES
 
 BinStatus = Literal["empty", "occupied", "reserved", "inactive"]
+ExpiryUrgency = Literal["expired", "critical", "high", "medium", "low"]
 
 
 class BinCreate(BaseModel):
@@ -64,7 +66,7 @@ class BinResponse(BaseModel):
 class BinListResponse(BaseModel):
     """Schema for paginated bin list response."""
 
-    items: list[BinResponse]
+    items: list[Union[BinResponse, "BinResponseWithContent"]]
     total: int
     page: int
     page_size: int
@@ -109,3 +111,30 @@ class BulkBinPreviewResponse(BaseModel):
     sample_codes: list[str]  # First 20 codes
     conflicts: list[str]  # Existing codes that would conflict
     valid: bool  # True if no conflicts
+
+
+# Warehouse Map schemas
+class BinContentSummary(BaseModel):
+    """Summary of bin content for warehouse map visualization."""
+
+    id: UUID
+    product_id: UUID
+    product_name: str
+    product_sku: str | None
+    supplier_id: UUID | None
+    supplier_name: str | None
+    batch_number: str
+    use_by_date: date
+    quantity: Decimal
+    unit: str
+    status: str
+    days_until_expiry: int | None = None
+    urgency: ExpiryUrgency | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class BinResponseWithContent(BinResponse):
+    """Bin response with optional content details for warehouse map."""
+
+    contents: list[BinContentSummary] | None = None

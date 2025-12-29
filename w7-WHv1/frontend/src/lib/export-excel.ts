@@ -26,7 +26,7 @@ export async function exportToExcel(options: ExcelExportOptions): Promise<void> 
     sheetName,
     columns,
     data,
-    title,
+    // title,
     conditionalFormatting,
   } = options;
 
@@ -72,7 +72,7 @@ export async function exportToExcel(options: ExcelExportOptions): Promise<void> 
   worksheet.views = [{ state: "frozen", ySplit: 1 }];
 
   // Add borders to all cells
-  worksheet.eachRow((row, rowNumber) => {
+  worksheet.eachRow((row) => {
     row.eachCell((cell) => {
       cell.border = {
         top: { style: "thin", color: { argb: "FFE0E0E0" } },
@@ -120,7 +120,7 @@ export async function exportFEFOToExcel(
     ],
     data: data.map((item) => ({
       ...item,
-      use_by_date: formatDate(new Date(item.use_by_date), "yyyy. MM. dd."),
+      use_by_date: formatDate(new Date(item.use_by_date)),
       weight_kg: formatNumber(item.weight_kg),
       supplier_name: item.supplier_name || "-",
     })),

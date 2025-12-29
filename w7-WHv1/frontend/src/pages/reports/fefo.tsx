@@ -1,6 +1,6 @@
 import { Suspense, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Download, FileSpreadsheet, FileText, Sheet } from "lucide-react";
+import { FileSpreadsheet, FileText, Sheet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";

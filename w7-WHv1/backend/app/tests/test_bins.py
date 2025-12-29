@@ -1,6 +1,7 @@
 """Tests for bin management endpoints."""
 
 import uuid
+from typing import Any
 
 from httpx import AsyncClient
 
@@ -399,3 +400,135 @@ class TestBulkGeneration:
             },
         )
         assert response.status_code == 403
+
+
+class TestBinsWithContent:
+    """Tests for GET /api/v1/bins with include_content parameter."""
+
+    async def test_list_bins_with_content(
+        self,
+        client: AsyncClient,
+        viewer_token: str,
+        sample_bin: Bin,
+        sample_bin_content: Any,
+    ) -> None:
+        """Test listing bins with content included."""
+        response = await client.get(
+            "/api/v1/bins?include_content=true",
+            headers=auth_header(viewer_token),
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "items" in data
+        assert data["total"] >= 1
+
+        # Find the bin with content
+        bin_with_content = next(
+            (item for item in data["items"] if item["code"] == "A-01"),
+            None,
+        )
+        assert bin_with_content is not None
+        assert "contents" in bin_with_content
+        assert len(bin_with_content["contents"]) >= 1
+
+        # Verify content structure
+        content = bin_with_content["contents"][0]
+        assert "product_name" in content
+        assert "product_sku" in content
+        assert "supplier_name" in content
+        assert "batch_number" in content
+        assert "use_by_date" in content
+        assert "quantity" in content
+        assert "unit" in content
+        assert "status" in content
+
+    async def test_list_bins_without_content(
+        self,
+        client: AsyncClient,
+        viewer_token: str,
+        sample_bin: Bin,
+        sample_bin_content: Any,
+    ) -> None:
+        """Test listing bins without content (default behavior)."""
+        response = await client.get(
+            "/api/v1/bins",
+            headers=auth_header(viewer_token),
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "items" in data
+
+        # Verify contents field is not present
+        if data["items"]:
+            first_bin = data["items"][0]
+            assert "contents" not in first_bin
+
+    async def test_list_bins_with_expiry_info(
+        self,
+        client: AsyncClient,
+        viewer_token: str,
+        sample_bin: Bin,
+        sample_bin_content: Any,
+    ) -> None:
+        """Test listing bins with expiry info calculated."""
+        response = await client.get(
+            "/api/v1/bins?include_content=true&include_expiry_info=true",
+            headers=auth_header(viewer_token),
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "items" in data
+
+        # Find the bin with content
+        bin_with_content = next(
+            (item for item in data["items"] if item["code"] == "A-01"),
+            None,
+        )
+        assert bin_with_content is not None
+        assert len(bin_with_content["contents"]) >= 1
+
+        # Verify expiry fields are present
+        content = bin_with_content["contents"][0]
+        assert "days_until_expiry" in content
+        assert "urgency" in content
+        assert content["days_until_expiry"] is not None
+        assert content["urgency"] is not None
+        # Should be "low" since use_by_date is 30 days in the future
+        assert content["urgency"] == "low"
+
+    async def test_expiry_urgency_levels(
+        self,
+        client: AsyncClient,
+        viewer_token: str,
+        sample_bin_content_expired: Any,
+        sample_bin_content_critical_expiry: Any,
+    ) -> None:
+        """Test different expiry urgency levels are calculated correctly."""
+        response = await client.get(
+            "/api/v1/bins?include_content=true&include_expiry_info=true",
+            headers=auth_header(viewer_token),
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        # Find expired bin content
+        expired_bin = next(
+            (
+                item
+                for item in data["items"]
+                if any(c.get("urgency") == "expired" for c in item.get("contents", []))
+            ),
+            None,
+        )
+        assert expired_bin is not None, "Expected to find bin with expired content"
+
+        # Find critical expiry bin content
+        critical_bin = next(
+            (
+                item
+                for item in data["items"]
+                if any(c.get("urgency") == "critical" for c in item.get("contents", []))
+            ),
+            None,
+        )
+        assert critical_bin is not None, "Expected to find bin with critical expiry content"

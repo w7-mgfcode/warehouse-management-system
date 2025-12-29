@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import type { Bin, PaginatedResponse, BinStatus } from "@/types";
+import type { Bin, BinWithContent, PaginatedResponse, BinStatus } from "@/types";
 
 export interface BinFilters {
   warehouse_id?: string;
@@ -188,3 +188,33 @@ export function useBulkCreateBins() {
 export function useBins(filters: BinFilters = {}) {
   return useQuery(binsQueryOptions(filters));
 }
+
+// Warehouse Map specific queries
+export interface WarehouseMapFilters {
+  warehouse_id: string;
+  status?: BinStatus;
+  search?: string;
+  page?: number;
+  page_size?: number;
+}
+
+/**
+ * Query options for warehouse map visualization
+ * Fetches bins with content, product/supplier details, and expiry info
+ */
+export const warehouseMapBinsQueryOptions = (filters: WarehouseMapFilters) =>
+  queryOptions({
+    queryKey: [...binKeys.all, "map", filters] as const,
+    queryFn: async (): Promise<PaginatedResponse<BinWithContent>> => {
+      const { data } = await apiClient.get<PaginatedResponse<BinWithContent>>("/bins", {
+        params: {
+          ...filters,
+          include_content: true,
+          include_expiry_info: true,
+        },
+      });
+      return data;
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes - warehouse map data
+    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
+  });

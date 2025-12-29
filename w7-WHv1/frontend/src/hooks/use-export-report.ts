@@ -14,7 +14,7 @@ import {
   type PDFExportOptions,
 } from "@/lib/export-pdf";
 import { exportToCSV } from "@/lib/export";
-import { HU } from "@/lib/i18n";
+// import { HU } from "@/lib/i18n";
 
 export type ReportType = "fefo" | "supplier-stats" | "bin-status" | "stock-levels" | "movements" | "generic";
 

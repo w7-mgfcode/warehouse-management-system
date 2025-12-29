@@ -160,7 +160,7 @@ export function PalletLabel({ data, trigger }: PalletLabelProps) {
             >
               <p className="text-xs text-gray-600 uppercase">Lejárati dátum</p>
               <p className="font-bold text-lg">
-                {formatDate(new Date(data.use_by_date), "yyyy. MM. dd.")}
+                {formatDate(new Date(data.use_by_date))}
               </p>
               <p className="text-xs text-gray-600">
                 ({daysUntilExpiry} nap múlva jár le)
@@ -171,7 +171,7 @@ export function PalletLabel({ data, trigger }: PalletLabelProps) {
               <div className="border border-gray-300 p-2 rounded">
                 <p className="text-xs text-gray-600 uppercase">Minőség megőrzés</p>
                 <p className="font-semibold text-sm">
-                  {formatDate(new Date(data.best_before_date), "yyyy. MM. dd.")}
+                  {formatDate(new Date(data.best_before_date))}
                 </p>
               </div>
             )}
@@ -187,7 +187,7 @@ export function PalletLabel({ data, trigger }: PalletLabelProps) {
             )}
             <p>
               <span className="text-gray-600">Beérkezés:</span>{" "}
-              {formatDate(new Date(data.received_date), "yyyy. MM. dd.")}
+              {formatDate(new Date(data.received_date))}
             </p>
             {data.weight_kg && (
               <p>

@@ -95,3 +95,56 @@
   --color-destructive: hsl(0, 84%, 65%);
   --color-info: hsl(199, 89%, 58%);
 }
+
+/* Print styles for warehouse map */
+@media print {
+  /* Hide non-essential UI elements */
+  .warehouse-map-toolbar,
+  .app-layout-sidebar,
+  .app-layout-header,
+  nav,
+  header,
+  footer,
+  button {
+    display: none !important;
+  }
+
+  /* Ensure warehouse map grid is visible */
+  .warehouse-map-grid {
+    max-width: 100%;
+    overflow: visible !important;
+    page-break-inside: avoid;
+  }
+
+  /* Preserve colors in print */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  /* Ensure SVG elements print with colors */
+  svg rect,
+  svg text,
+  svg line {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Optimize page layout */
+  @page {
+    size: landscape;
+    margin: 1cm;
+  }
+
+  /* Show legend on print */
+  .warehouse-map-legend {
+    page-break-before: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Ensure text is readable */
+  body {
+    font-size: 10pt;
+  }
+}

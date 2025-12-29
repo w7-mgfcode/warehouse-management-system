@@ -55,9 +55,9 @@ export function ProductSupplierPieChart({ warehouseId }: ProductSupplierPieChart
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ name, percent }) => {
+          label={({ name, percent }: any) => {
             // Only show label if slice is large enough (>5%)
-            if (percent < 0.05) return null;
+            if (!percent || percent < 0.05) return null;
             return `${name}: ${(percent * 100).toFixed(0)}%`;
           }}
           outerRadius={100}
@@ -75,10 +75,10 @@ export function ProductSupplierPieChart({ warehouseId }: ProductSupplierPieChart
             borderRadius: "var(--radius)",
           }}
           labelStyle={{ color: "hsl(var(--foreground))" }}
-          formatter={(value: number, name: string, props: any) => {
-            if (name === "value") {
+          formatter={(value: any, name: any, props: any) => {
+            if (name === "value" && value !== undefined) {
               return [
-                `${formatNumber(value, 0)} termék (${formatNumber(props.payload.quantity, 2)} kg)`,
+                `${formatNumber(value as number, 0)} termék (${formatNumber(props.payload.quantity, 2)} kg)`,
                 "Mennyiség",
               ];
             }

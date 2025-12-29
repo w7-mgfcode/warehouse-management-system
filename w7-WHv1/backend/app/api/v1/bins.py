@@ -1,6 +1,6 @@
 """Bin management API endpoints."""
 
-from typing import Any
+from typing import Any, Union
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -8,9 +8,11 @@ from fastapi import APIRouter, HTTPException, Query, status
 from app.api.deps import DbSession, RequireManager, RequireViewer, RequireWarehouse
 from app.core.i18n import HU_MESSAGES
 from app.schemas.bin import (
+    BinContentSummary,
     BinCreate,
     BinListResponse,
     BinResponse,
+    BinResponseWithContent,
     BinUpdate,
     BulkBinCreate,
     BulkBinPreviewResponse,
@@ -40,9 +42,15 @@ async def list_bins(
     warehouse_id: UUID | None = None,
     status: str | None = None,
     search: str | None = None,
+    include_content: bool = Query(False, description="Include bin contents with product/supplier"),
+    include_expiry_info: bool = Query(False, description="Calculate expiry urgency for contents"),
 ) -> BinListResponse:
     """
     List all bins with pagination and optional filtering.
+
+    Query Parameters:
+    - include_content: Include bin contents with product/supplier relationships
+    - include_expiry_info: Calculate days_until_expiry and urgency levels (requires include_content=true)
     """
     bins, total = await get_bins(
         db,
@@ -51,11 +59,44 @@ async def list_bins(
         warehouse_id=warehouse_id,
         status=status,
         search=search,
+        include_content=include_content,
+        include_expiry_info=include_expiry_info,
     )
     pages = calculate_pages(total, page_size)
 
+    # Transform bins to response format
+    items: list[Union[BinResponse, BinResponseWithContent]] = []
+    for bin_obj in bins:
+        if include_content:
+            # Build content summaries
+            content_summaries = []
+            for content in bin_obj.contents:
+                content_summary = BinContentSummary(
+                    id=content.id,
+                    product_id=content.product_id,
+                    product_name=content.product.name,
+                    product_sku=content.product.sku,
+                    supplier_id=content.supplier_id,
+                    supplier_name=content.supplier.company_name if content.supplier else None,
+                    batch_number=content.batch_number,
+                    use_by_date=content.use_by_date,
+                    quantity=content.quantity,
+                    unit=content.unit,
+                    status=content.status,
+                    days_until_expiry=getattr(content, 'days_until_expiry', None),
+                    urgency=getattr(content, 'urgency', None),
+                )
+                content_summaries.append(content_summary)
+
+            items.append(BinResponseWithContent(
+                **BinResponse.model_validate(bin_obj).model_dump(),
+                contents=content_summaries,
+            ))
+        else:
+            items.append(BinResponse.model_validate(bin_obj))
+
     return BinListResponse(
-        items=[BinResponse.model_validate(b) for b in bins],
+        items=items,
         total=total,
         page=page,
         page_size=page_size,

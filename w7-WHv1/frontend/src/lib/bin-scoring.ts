@@ -74,9 +74,9 @@ export function calculateBinScore(
   }
 
   // 2. Capacity check (40 points max)
-  if (params.requiredWeightKg && capacity?.available_weight_kg !== null) {
+  if (params.requiredWeightKg && capacity?.available_weight_kg !== null && capacity?.max_weight_kg) {
     if (capacity.available_weight_kg >= params.requiredWeightKg) {
-      const utilizationRatio = params.requiredWeightKg / (capacity.max_weight_kg || 1);
+      const utilizationRatio = params.requiredWeightKg / capacity.max_weight_kg;
       // Prefer 60-80% utilization (sweet spot)
       if (utilizationRatio >= 0.6 && utilizationRatio <= 0.8) {
         score += 40;

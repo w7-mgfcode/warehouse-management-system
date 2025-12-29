@@ -60,12 +60,12 @@ export function BinList({ bins, isLoading, onDelete, isDeleting }: BinListProps)
               onClick={() => navigate(`/bins/${bin.id}`)}
             >
               <TableCell className="font-mono font-medium">{bin.code}</TableCell>
-              <TableCell className="font-mono text-sm">{bin.aisle}</TableCell>
-              <TableCell className="font-mono text-sm">{bin.rack}</TableCell>
-              <TableCell className="font-mono text-sm">{bin.level}</TableCell>
-              <TableCell className="font-mono text-sm">{bin.position}</TableCell>
+              <TableCell className="font-mono text-sm">{(bin as any).aisle}</TableCell>
+              <TableCell className="font-mono text-sm">{(bin as any).rack}</TableCell>
+              <TableCell className="font-mono text-sm">{(bin as any).level}</TableCell>
+              <TableCell className="font-mono text-sm">{(bin as any).position}</TableCell>
               <TableCell className="text-sm text-muted-foreground">
-                {bin.capacity_kg ? `${formatNumber(bin.capacity_kg, 0)} kg` : "—"}
+                {(bin as any).capacity_kg ? `${formatNumber((bin as any).capacity_kg, 0)} kg` : "—"}
               </TableCell>
               <TableCell>
                 <BinStatusBadge status={bin.status} />

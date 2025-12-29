@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
+// import { DatePicker } from "@/components/ui/date-picker";
 import { receiptSchema, type ReceiptFormData, UNIT_OPTIONS } from "@/schemas/inventory";
 import { useReceiveGoods } from "@/queries/inventory";
 import { ProductSelect } from "@/components/products/product-select";

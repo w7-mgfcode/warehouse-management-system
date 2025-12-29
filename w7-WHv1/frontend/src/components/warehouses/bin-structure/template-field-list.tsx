@@ -67,7 +67,7 @@ export function TemplateFieldList({
     };
   }, [isDragging]);
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = (_event: DragStartEvent) => {
     setIsDragging(true);
   };
 
