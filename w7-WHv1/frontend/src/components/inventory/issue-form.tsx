@@ -1,18 +1,31 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { issueSchema, type IssueFormData } from "@/schemas/inventory";
 import { useIssueGoods } from "@/queries/inventory";
 import { ProductSelect } from "@/components/products/product-select";
 import { FEFORecommendation } from "./fefo-recommendation";
+import { BinSearch } from "./bin-search";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { HU } from "@/lib/i18n";
 import type { APIError } from "@/types/api";
+
+// Issue reason options
+const ISSUE_REASONS = [
+  { value: "customer_order", label: "Vevői megrendelés" },
+  { value: "internal_use", label: "Belső felhasználás" },
+  { value: "transfer", label: "Áthelyezés" },
+  { value: "quality_check", label: "Minőségellenőrzés" },
+  { value: "sample", label: "Mintavétel" },
+  { value: "return", label: "Visszáru" },
+  { value: "other", label: "Egyéb" },
+] as const;
 
 interface IssueFormProps {
   onSuccess?: () => void;
@@ -117,22 +130,22 @@ export function IssueForm({ onSuccess }: IssueFormProps) {
 
       {/* Issue Form */}
       <form onSubmit={onSubmit} className="space-y-4 pt-4 border-t">
-        <div className="space-y-2">
-          <Label htmlFor="bin_content_id">
-            Tárolóhely / Sarzs kiválasztása <span className="text-error">*</span>
-          </Label>
-          <Input
-            id="bin_content_id"
-            placeholder="A FEFO javaslatból válasszon"
-            {...register("bin_content_id")}
-          />
-          {errors.bin_content_id && (
-            <p className="text-sm text-error">{errors.bin_content_id.message as string}</p>
+        <Controller
+          name="bin_content_id"
+          control={form.control}
+          render={({ field }) => (
+            <BinSearch
+              value={field.value}
+              onValueChange={field.onChange}
+              label="Tárolóhely keresése (QR beolvasással)"
+              required
+              placeholder="Keresse meg vagy olvassa be a tárolóhelyet"
+            />
           )}
-          <p className="text-xs text-muted-foreground">
-            Használja a FEFO javaslat bin_content_id értékét
-          </p>
-        </div>
+        />
+        {errors.bin_content_id && (
+          <p className="text-sm text-error">{errors.bin_content_id.message as string}</p>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="quantity">
@@ -154,10 +167,23 @@ export function IssueForm({ onSuccess }: IssueFormProps) {
           <Label htmlFor="reason">
             Kiadás oka <span className="text-error">*</span>
           </Label>
-          <Input
-            id="reason"
-            placeholder="Vevői megrendelés"
-            {...register("reason")}
+          <Controller
+            name="reason"
+            control={form.control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="reason">
+                  <SelectValue placeholder="Válasszon okot..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {ISSUE_REASONS.map((reason) => (
+                    <SelectItem key={reason.value} value={reason.value}>
+                      {reason.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
           {errors.reason && (
             <p className="text-sm text-error">{errors.reason.message as string}</p>
