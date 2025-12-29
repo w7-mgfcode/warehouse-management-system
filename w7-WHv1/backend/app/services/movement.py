@@ -1,6 +1,6 @@
 """Movement tracking service for immutable audit trail."""
 
-from datetime import UTC, date
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -127,13 +127,9 @@ async def get_movements(
     if movement_type:
         query = query.where(BinMovement.movement_type == movement_type)
     if start_date:
-        from datetime import datetime
-
         start_datetime = datetime.combine(start_date, datetime.min.time()).replace(tzinfo=UTC)
         query = query.where(BinMovement.created_at >= start_datetime)
     if end_date:
-        from datetime import datetime
-
         end_datetime = datetime.combine(end_date, datetime.max.time()).replace(tzinfo=UTC)
         query = query.where(BinMovement.created_at <= end_datetime)
     if created_by:
