@@ -8,7 +8,7 @@ Default: 100 requests per minute per IP address.
 import logging
 from collections.abc import Callable
 
-from fastapi import HTTPException, Request, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
@@ -113,38 +113,39 @@ def get_rate_limit_for_endpoint(endpoint_type: str = "write") -> str:
     return RATE_LIMITS.get(endpoint_type, RATE_LIMITS["write"])
 
 
-# Dependency for applying rate limits in routes
-def rate_limit(limit: str = "100/minute") -> Callable:
+# Helper function to create route-specific limiters
+def create_route_limiter(limit: str, key_func: Callable | None = None) -> Limiter:
     """
-    Rate limit decorator factory for FastAPI routes.
-
-    Usage:
-        @router.get("/items", dependencies=[Depends(rate_limit("200/minute"))])
+    Create a limiter instance for specific routes.
 
     Args:
         limit (str): Rate limit string (e.g., "100/minute")
+        key_func (Callable, optional): Custom key function. Defaults to get_rate_limit_key.
 
     Returns:
-        Callable: Dependency function for FastAPI
+        Limiter: Configured limiter instance
+
+    Usage:
+        from app.core.rate_limit import limiter
+
+        # Apply to specific routes using decorator:
+        @router.post("/auth/login")
+        @limiter.limit("20/minute")
+        async def login(request: Request, ...):
+            ...
+
+        # Or use predefined limits:
+        from app.core.rate_limit import RATE_LIMITS
+
+        @router.get("/products")
+        @limiter.limit(RATE_LIMITS["read"])
+        async def get_products(request: Request, ...):
+            ...
     """
-
-    async def dependency(request: Request) -> None:
-        """
-        Rate limit dependency function.
-
-        Args:
-            request (Request): FastAPI request object
-
-        Raises:
-            HTTPException: When rate limit is exceeded
-        """
-        try:
-            # This will be replaced by SlowAPI middleware check
-            pass
-        except RateLimitExceeded:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Túl sok kérés. Kérjük, próbálja újra később.",
-            ) from None
-
-    return dependency
+    return Limiter(
+        key_func=key_func or get_rate_limit_key,
+        default_limits=[limit],
+        storage_uri="memory://",
+        strategy="fixed-window",
+        headers_enabled=True,
+    )
