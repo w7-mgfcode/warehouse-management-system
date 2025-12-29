@@ -69,7 +69,7 @@ export function useCreateReservation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (reservation: ReservationCreate) => {
-      const { data } = await apiClient.post("/reservations", reservation);
+      const { data } = await apiClient.post("/reservations/", reservation);
       return data;
     },
     onSuccess: () => {

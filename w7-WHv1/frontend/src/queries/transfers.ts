@@ -80,7 +80,7 @@ export function useCreateTransfer() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (transfer: TransferCreate) => {
-      const { data } = await apiClient.post("/transfers", transfer);
+      const { data } = await apiClient.post("/transfers/", transfer);
       return data;
     },
     onSuccess: () => {
