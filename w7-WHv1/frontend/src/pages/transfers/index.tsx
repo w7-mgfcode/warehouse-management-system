@@ -5,12 +5,16 @@ import { Plus } from "lucide-react";
 import { TransferList } from "@/components/transfers/transfer-list";
 import { StockPickerDialog } from "@/components/transfers/stock-picker-dialog";
 import { TransferDialog } from "@/components/inventory/transfer-dialog";
-import { useTransfers } from "@/queries/transfers";
+import { useMovements } from "@/queries/movements";
 import type { StockLevel } from "@/queries/inventory";
 import { HU } from "@/lib/i18n";
 
 export default function TransfersIndexPage() {
-  const { data, isLoading } = useTransfers({ page: 1, page_size: 50 });
+  const { data, isLoading } = useMovements({
+    movement_type: "transfer",
+    page: 1,
+    page_size: 50,
+  });
   const [stockPickerOpen, setStockPickerOpen] = useState(false);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<StockLevel | null>(null);
@@ -23,7 +27,9 @@ export default function TransfersIndexPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">{HU.nav.transfers}</h1>
+        <h1 className="text-3xl font-bold text-foreground">
+          {HU.nav.transfers}
+        </h1>
         <Button onClick={() => setStockPickerOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Új áthelyezés
@@ -35,7 +41,7 @@ export default function TransfersIndexPage() {
           <CardTitle>Áthelyezések listája</CardTitle>
         </CardHeader>
         <CardContent>
-          <TransferList transfers={data?.items || []} isLoading={isLoading} />
+          <TransferList movements={data?.items || []} isLoading={isLoading} />
         </CardContent>
       </Card>
 
