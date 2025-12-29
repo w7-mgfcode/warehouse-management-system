@@ -8,7 +8,7 @@ export default function WarehousesNewPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-5xl mx-auto px-4 space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate("/warehouses")}>
           <ArrowLeft className="h-4 w-4" />
@@ -16,8 +16,8 @@ export default function WarehousesNewPage() {
         <h1 className="text-3xl font-bold text-foreground">Új raktár</h1>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="overflow-visible">
+        <CardContent className="pt-6 overflow-visible">
           <WarehouseForm onSuccess={() => navigate("/warehouses")} />
         </CardContent>
       </Card>

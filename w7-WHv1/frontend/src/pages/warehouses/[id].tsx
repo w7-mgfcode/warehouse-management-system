@@ -14,7 +14,7 @@ function WarehouseDetailContent() {
   const { data: warehouse } = useSuspenseQuery(warehouseQueryOptions(id!));
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-5xl mx-auto px-4 space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate("/warehouses")}>
           <ArrowLeft className="h-4 w-4" />
@@ -22,8 +22,8 @@ function WarehouseDetailContent() {
         <h1 className="text-3xl font-bold text-foreground">{warehouse.name}</h1>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="overflow-visible">
+        <CardContent className="pt-6 overflow-visible">
           <WarehouseForm warehouse={warehouse} onSuccess={() => navigate("/warehouses")} />
         </CardContent>
       </Card>
@@ -33,10 +33,10 @@ function WarehouseDetailContent() {
 
 function WarehouseDetailSkeleton() {
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-5xl mx-auto px-4 space-y-6">
       <Skeleton className="h-9 w-64" />
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="overflow-visible">
+        <CardContent className="pt-6 overflow-visible">
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-10 w-full" />
