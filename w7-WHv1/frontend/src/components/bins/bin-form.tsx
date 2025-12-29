@@ -32,7 +32,7 @@ function WarehouseSelectField({ value, onChange }: { value: string; onChange: (v
       <SelectContent>
         {data.items.map((warehouse) => (
           <SelectItem key={warehouse.id} value={warehouse.id}>
-            {warehouse.name} ({warehouse.code})
+            {warehouse.name}
           </SelectItem>
         ))}
       </SelectContent>
