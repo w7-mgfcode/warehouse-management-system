@@ -1,6 +1,6 @@
 # PLANNING
 
-Last updated: 2025-12-28
+Last updated: 2025-12-29
 
 ## Purpose
 This file is the lightweight "source of truth" for project direction, constraints, and working agreements.
@@ -16,8 +16,9 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 2 | ✅ Complete | `main` | Products, suppliers, bins CRUD + bulk generation |
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
-| Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
-| Phase 6 | ✅ Complete | `06-Testing-Phase_6` → Ready for merge | Testing, QA & DevOps (100% complete + all coderabbitai fixes + CI passing ✅) |
+| Phase 5 | ✅ Complete | `main` (PR #6 merged 2025-12-28) | React 19 frontend + all fixes |
+| Phase 6 | ✅ Complete | `main` (PR #7 merged 2025-12-29) | Testing, QA & DevOps (CI passing ✅) |
+| Phase 7 | 🔄 Active | `07-MANUALTesting-Phase_7` | Manual testing phase |
 
 **Test Coverage**: 173 backend + 106 frontend (47 E2E: 41 passed + 6 skipped | 59 Vitest unit) = 279 total tests - Phase 1-6: 100%
 **CI Status**: ✅ ALL CHECKS PASSING (backend: 1m45s, frontend: 38s, E2E: 3m50s)

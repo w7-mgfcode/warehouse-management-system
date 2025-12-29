@@ -39,3 +39,8 @@ dist/
 *.db
 *.sqlite
 *.sqlite3
+
+# Scripts (some files)
+scripts/fetch-reviews.sh
+scripts/process-review.sh
+scripts/batch-process-reviews.sh
