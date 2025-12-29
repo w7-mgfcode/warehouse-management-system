@@ -52,7 +52,7 @@ export function MovementHistory({
   // Only fetch if data is not provided
   const queryResult = useQuery({
     ...movementsQueryOptions(filters),
-    enabled: !propData && propIsLoading === undefined,
+    enabled: propData === undefined,
   });
   const data = propData ?? queryResult.data;
   const isLoading = propIsLoading ?? queryResult.isLoading;
