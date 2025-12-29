@@ -464,7 +464,7 @@ async def get_stock_levels(
                 days_until_expiry=days_until_expiry,
                 status=bc.status,
                 supplier_id=bc.supplier_id,
-                supplier_name=bc.supplier.name if bc.supplier else None,
+                supplier_name=bc.supplier.company_name if bc.supplier else None,
                 is_fefo_compliant=is_compliant,
                 oldest_bin_code=oldest_bin_code,
                 oldest_use_by_date=oldest_use_by_date,
