@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
+import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SearchInput } from "@/components/shared/search-input";
 import { SupplierList } from "@/components/suppliers/supplier-list";
 import { useSuppliers, useDeleteSupplier } from "@/queries/suppliers";
+import type { APIError } from "@/types/api";
 import { HU } from "@/lib/i18n";
 import { toast } from "sonner";
 
@@ -21,8 +23,10 @@ export default function SuppliersIndexPage() {
       onSuccess: () => {
         toast.success("Beszállító törölve");
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.detail || HU.errors.generic);
+      onError: (error) => {
+        const axiosError = error as AxiosError<APIError>;
+        const message = axiosError.response?.data?.detail;
+        toast.error(typeof message === "string" ? message : HU.errors.generic);
       },
     });
   };

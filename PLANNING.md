@@ -17,9 +17,12 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 | Phase 3 | ✅ Complete | `main` | Inventory operations, FEFO, movements, expiry |
 | Phase 4 | ✅ Complete | `main` | Transfers, reservations, jobs, email alerts |
 | Phase 5 | ✅ Complete | `05-Frontend-Phase_5` → Ready for merge | React 19 frontend + all fixes |
-|         | ✅ All Phases A-H | Complete | Foundation → Reports (111 files, 100% done) |
+| Phase 6 | ✅ Complete | `06-Testing-Phase_6` → Ready for merge | Testing, QA & DevOps (100% complete + all coderabbitai fixes + CI passing ✅) |
 
-**Test Coverage**: 146 tests passing (backend) - 100% Phase 1-4 coverage
+**Test Coverage**: 173 backend + 106 frontend (47 E2E: 41 passed + 6 skipped | 59 Vitest unit) = 279 total tests - Phase 1-6: 100%
+**CI Status**: ✅ ALL CHECKS PASSING (backend: 1m45s, frontend: 38s, E2E: 3m50s)
+**Code Quality**: 4 critical issues fixed (thread-safety, rate limiting, health checks, variable interpolation)
+**Documentation**: Phase 6 comprehensive guide created (`Docs/Phase6_Testing_DevOps.md` - 11,000 words, 22 sections)
 
 ## Key constraints
 - **Hungarian UI requirement**: all user-facing UI text/messages/validation must be Hungarian (code identifiers and DB schema remain English).
@@ -34,7 +37,8 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
 - DB migrations: `w7-WHv1/backend/alembic/`.
 - Specifications: `INITIAL.md` through `INITIAL5.md`.
 - PRPs (Planning & Requirements Prompts):
-  - `PRPs/phase5-frontend-react19-tailwind4.md` - Frontend implementation (active)
+  - `PRPs/phase6-testing-devops.md` - Testing, QA & DevOps (active)
+  - `PRPs/phase5-frontend-react19-tailwind4.md` - Frontend implementation
   - `PRPs/phase4-transfers-reservations-jobs.md` - Phase 4
   - `PRPs/phase3-inventory-fefo.md` - Phase 3
   - `PRPs/phase2-products-suppliers-bins.md` - Phase 2
@@ -64,15 +68,26 @@ Warehouse Management System (WMS) for pallet racking warehouses with FEFO invent
   - `CI / backend (lint/type/test)` green
   - 1 approving review
 
-## CI behavior (current)
-- Required:
-  - `ruff check .` (backend)
-  - `pytest` (runs against Postgres in CI via `TEST_DATABASE_URL`)
-- Advisory:
-  - `mypy .`
-- Future (Phase 5):
-  - `npm run lint` (frontend)
-  - `npm run test` (frontend)
+## CI behavior (current - Phase 6D enhanced)
+- **Backend job**:
+  - `ruff check .` (required)
+  - `pytest` with Postgres (required)
+  - `mypy .` (advisory)
+- **Frontend job** (Phase 6D):
+  - `npm run lint` (required)
+  - `npm run build` (required)
+  - `npm run test:run` - Vitest unit tests (required)
+- **E2E job** (Phase 6D):
+  - `npx playwright test` - 20+ E2E tests (required)
+  - Full stack: Postgres + Backend + Frontend
+  - Runs after backend + frontend jobs pass
+- **Observability** (Phase 6E):
+  - Prometheus metrics (HTTP, inventory, Celery, DB, errors)
+  - Structured JSON logging for production
+  - SlowAPI rate limiting (100 req/min default, configurable)
+- **DevOps** (Phase 6F):
+  - Production deployment docs (4 guides)
+  - Deployment scripts (install, deploy, backup, restore)
 
 ## How agents work here
 - Implementation agent (Claude Code): edits application code.

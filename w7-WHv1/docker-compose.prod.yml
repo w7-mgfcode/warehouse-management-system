@@ -1,0 +1,156 @@
+# Production Docker Compose for WMS
+# All services: PostgreSQL, Valkey, Backend, Celery, Frontend (Nginx)
+
+services:
+  # PostgreSQL 17 Database
+  db:
+    image: postgres:17
+    container_name: wms-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-wms}
+      POSTGRES_USER: ${DB_USER:-wms_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - wms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-wms_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Valkey (Redis alternative)
+  valkey:
+    image: valkey/valkey:8.1-alpine
+    container_name: wms-valkey-prod
+    restart: unless-stopped
+    command: valkey-server --requirepass ${VALKEY_PASSWORD}
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD}
+    volumes:
+      - valkey_data:/data
+    networks:
+      - wms-network
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$${VALKEY_PASSWORD} valkey-cli ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: wms-backend-prod
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-wms_user}:${DB_PASSWORD}@db:5432/${DB_NAME:-wms}
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-15}
+      REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      VALKEY_URL: valkey://valkey:6379
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD}
+      CELERY_BROKER_URL: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+      CELERY_RESULT_BACKEND: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+      TIMEZONE: ${TIMEZONE:-Europe/Budapest}
+      LANGUAGE: ${LANGUAGE:-hu}
+      DEBUG: ${DEBUG:-false}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
+      SMTP_TLS: ${SMTP_TLS:-true}
+      EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+      EXPIRY_WARNING_DAYS: ${EXPIRY_WARNING_DAYS:-14}
+      EXPIRY_CRITICAL_DAYS: ${EXPIRY_CRITICAL_DAYS:-7}
+      ALERT_RECIPIENT_EMAILS: ${ALERT_RECIPIENT_EMAILS}
+    depends_on:
+      db:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks:
+      - wms-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: wms-celery-worker-prod
+    restart: unless-stopped
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-wms_user}:${DB_PASSWORD}@db:5432/${DB_NAME:-wms}
+      CELERY_BROKER_URL: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+      CELERY_RESULT_BACKEND: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
+      EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+    depends_on:
+      - db
+      - valkey
+      - backend
+    networks:
+      - wms-network
+
+  # Celery Beat (Scheduler)
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: wms-celery-beat-prod
+    restart: unless-stopped
+    command: celery -A app.tasks.celery_app beat --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-wms_user}:${DB_PASSWORD}@db:5432/${DB_NAME:-wms}
+      CELERY_BROKER_URL: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+      CELERY_RESULT_BACKEND: redis://:${VALKEY_PASSWORD}@valkey:6379/0
+    depends_on:
+      - db
+      - valkey
+      - backend
+    networks:
+      - wms-network
+
+  # Frontend (React 19 + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: wms-frontend-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - wms-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  wms-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  valkey_data:
+    driver: local

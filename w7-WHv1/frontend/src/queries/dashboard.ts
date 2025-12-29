@@ -56,6 +56,19 @@ export const dashboardStatsQueryOptions = () =>
     },
   });
 
+// API response format for expiry warnings
+interface ExpiryWarningResponse {
+  items: ExpiryWarning[];
+  summary: {
+    critical_count: number;
+    high_count: number;
+    medium_count: number;
+    low_count: number;
+    total_count: number;
+  };
+  warehouse_id: string | null;
+}
+
 /**
  * Query for expiry warnings list
  */
@@ -63,12 +76,13 @@ export const expiryWarningsQueryOptions = (limit = 10) =>
   queryOptions({
     queryKey: ["expiry-warnings", limit],
     queryFn: async () => {
-      const { data } = await apiClient.get<ExpiryWarning[]>(
+      const { data } = await apiClient.get<ExpiryWarningResponse>(
         "/inventory/expiry-warnings",
         {
-          params: { limit },
+          params: { days_threshold: 60 },
         }
       );
-      return data;
+      // Return items array, limited to requested count
+      return data.items.slice(0, limit);
     },
   });

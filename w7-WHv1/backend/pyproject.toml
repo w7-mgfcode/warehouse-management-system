@@ -22,6 +22,8 @@ dependencies = [
     "valkey>=6.0.0",
     "aiosmtplib>=3.0.0",
     "aiosqlite>=0.20.0",
+    "slowapi>=0.1.9",
+    "python-json-logger>=3.2.0",
 ]
 
 [project.optional-dependencies]

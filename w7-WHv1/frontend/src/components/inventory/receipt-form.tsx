@@ -35,7 +35,7 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
       batch_number: "",
       use_by_date: "",
       quantity: 0,
-      unit: "kg" as any,
+      unit: "kg",
       weight_kg: undefined,
       reference_number: "",
       notes: "",

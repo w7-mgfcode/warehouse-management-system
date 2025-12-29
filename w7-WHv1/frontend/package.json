@@ -7,7 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:full": "playwright test --config=playwright.config.full.ts",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -42,17 +51,27 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.57.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.4",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^4.0.16",
+    "axe-playwright": "^2.2.2",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "jsdom": "^27.4.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.16"
   }
 }

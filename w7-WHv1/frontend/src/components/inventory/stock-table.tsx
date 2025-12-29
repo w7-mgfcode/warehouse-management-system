@@ -4,6 +4,7 @@ import { ExpiryBadge } from "./expiry-badge";
 import { BinStatusBadge } from "@/components/bins/bin-status-badge";
 import { useStockLevels } from "@/queries/inventory";
 import type { StockFilters } from "@/queries/inventory";
+import type { BinStatus } from "@/types";
 import { HU } from "@/lib/i18n";
 import { formatDate } from "@/lib/date";
 import { formatNumber, formatWeight } from "@/lib/number";
@@ -75,7 +76,7 @@ export function StockTable({ filters = {} }: StockTableProps) {
                 </div>
               </TableCell>
               <TableCell>
-                <BinStatusBadge status={stock.status as any} />
+                <BinStatusBadge status={stock.status as BinStatus} />
               </TableCell>
             </TableRow>
           ))}

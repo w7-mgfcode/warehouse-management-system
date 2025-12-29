@@ -2,6 +2,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Suspense } from "react";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import { useCreateBin, useUpdateBin } from "@/queries/bins";
 import { warehousesQueryOptions } from "@/queries/warehouses";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { Bin } from "@/types";
+import type { APIError } from "@/types/api";
 import { HU, interpolate } from "@/lib/i18n";
 
 interface BinFormProps {
@@ -68,8 +70,10 @@ export function BinForm({ bin, onSuccess }: BinFormProps) {
           toast.success(interpolate(HU.success.updated, { entity: "Tárolóhely" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     } else {
@@ -78,8 +82,10 @@ export function BinForm({ bin, onSuccess }: BinFormProps) {
           toast.success(interpolate(HU.success.created, { entity: "Tárolóhely" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     }

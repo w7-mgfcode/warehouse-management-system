@@ -1,12 +1,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { warehouseSchema, type WarehouseFormData } from "@/schemas/warehouse";
 import { useCreateWarehouse, useUpdateWarehouse } from "@/queries/warehouses";
 import type { Warehouse } from "@/types";
+import type { APIError } from "@/types/api";
 import { HU, interpolate } from "@/lib/i18n";
 
 interface WarehouseFormProps {
@@ -40,8 +42,10 @@ export function WarehouseForm({ warehouse, onSuccess }: WarehouseFormProps) {
           toast.success(interpolate(HU.success.updated, { entity: "Raktár" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     } else {
@@ -50,8 +54,10 @@ export function WarehouseForm({ warehouse, onSuccess }: WarehouseFormProps) {
           toast.success(interpolate(HU.success.created, { entity: "Raktár" }));
           onSuccess?.();
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.detail || HU.errors.generic);
+        onError: (error) => {
+          const axiosError = error as AxiosError<APIError>;
+          const message = axiosError.response?.data?.detail;
+          toast.error(typeof message === "string" ? message : HU.errors.generic);
         },
       });
     }

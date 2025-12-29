@@ -60,6 +60,7 @@ function FEFOContent({ productId, requestedQuantity, warehouseId }: FEFORecommen
             data.recommendations.map((rec, index) => (
               <div
                 key={rec.bin_content_id}
+                data-testid="fefo-item"
                 className="flex items-center justify-between p-3 border rounded-lg hover:bg-secondary/30 transition-colors"
               >
                 <div className="flex-1">

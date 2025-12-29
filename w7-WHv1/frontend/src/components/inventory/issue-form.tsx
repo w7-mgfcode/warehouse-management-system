@@ -175,7 +175,7 @@ export function IssueForm({ onSuccess }: IssueFormProps) {
 
         {/* Manager override (RBAC: manager+ only) */}
         <RoleGuard allowedRoles={["admin", "manager"]}>
-          <div className="space-y-4 p-4 border rounded-lg bg-warning/5">
+          <div data-testid="fefo-override" className="space-y-4 p-4 border rounded-lg bg-warning/5">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
