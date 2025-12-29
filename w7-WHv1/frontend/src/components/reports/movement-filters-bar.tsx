@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, X, Calendar } from "lucide-react";
+import { X, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,6 @@ import { HU } from "@/lib/i18n";
 interface MovementFiltersBarProps {
   onFiltersChange: (filters: {
     movement_type?: MovementType;
-    search?: string;
     start_date?: string;
     end_date?: string;
   }) => void;
@@ -35,7 +34,6 @@ export function MovementFiltersBar({
   onFiltersChange,
 }: MovementFiltersBarProps) {
   const [movementType, setMovementType] = useState<MovementType | "all">("all");
-  const [search, setSearch] = useState("");
   const [datePreset, setDatePreset] = useState<DatePreset>("custom");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -79,7 +77,6 @@ export function MovementFiltersBar({
       setEndDate(range.end);
       applyFilters({
         movement_type: movementType === "all" ? undefined : movementType,
-        search: search || undefined,
         start_date: range.start,
         end_date: range.end,
       });
@@ -88,7 +85,6 @@ export function MovementFiltersBar({
 
   const applyFilters = (filters: {
     movement_type?: MovementType;
-    search?: string;
     start_date?: string;
     end_date?: string;
   }) => {
@@ -98,7 +94,6 @@ export function MovementFiltersBar({
   const handleApplyFilters = () => {
     applyFilters({
       movement_type: movementType === "all" ? undefined : movementType,
-      search: search || undefined,
       start_date: startDate || undefined,
       end_date: endDate || undefined,
     });
@@ -106,7 +101,6 @@ export function MovementFiltersBar({
 
   const handleClearFilters = () => {
     setMovementType("all");
-    setSearch("");
     setDatePreset("custom");
     setStartDate("");
     setEndDate("");
@@ -114,67 +108,39 @@ export function MovementFiltersBar({
   };
 
   const hasActiveFilters =
-    movementType !== "all" ||
-    search !== "" ||
-    startDate !== "" ||
-    endDate !== "";
+    movementType !== "all" || startDate !== "" || endDate !== "";
 
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="space-y-4">
-          {/* Search and Movement Type */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="search">Keresés</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="search"
-                  placeholder="Termék, sarzs, tárolóhely..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleApplyFilters();
-                    }
-                  }}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="movement_type">Mozgástípus</Label>
-              <Select
-                value={movementType}
-                onValueChange={(value) =>
-                  setMovementType(value as MovementType | "all")
-                }
-              >
-                <SelectTrigger id="movement_type">
-                  <SelectValue placeholder="Összes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Összes típus</SelectItem>
-                  <SelectItem value="receipt">
-                    {HU.movementTypes.receipt}
-                  </SelectItem>
-                  <SelectItem value="issue">
-                    {HU.movementTypes.issue}
-                  </SelectItem>
-                  <SelectItem value="transfer">
-                    {HU.movementTypes.transfer}
-                  </SelectItem>
-                  <SelectItem value="adjustment">
-                    {HU.movementTypes.adjustment}
-                  </SelectItem>
-                  <SelectItem value="scrap">
-                    {HU.movementTypes.scrap}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Movement Type */}
+          <div className="space-y-2">
+            <Label htmlFor="movement_type">Mozgástípus</Label>
+            <Select
+              value={movementType}
+              onValueChange={(value) =>
+                setMovementType(value as MovementType | "all")
+              }
+            >
+              <SelectTrigger id="movement_type">
+                <SelectValue placeholder="Összes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Összes típus</SelectItem>
+                <SelectItem value="receipt">
+                  {HU.movementTypes.receipt}
+                </SelectItem>
+                <SelectItem value="issue">{HU.movementTypes.issue}</SelectItem>
+                <SelectItem value="transfer">
+                  {HU.movementTypes.transfer}
+                </SelectItem>
+                <SelectItem value="adjustment">
+                  {HU.movementTypes.adjustment}
+                </SelectItem>
+                <SelectItem value="scrap">{HU.movementTypes.scrap}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Date Presets */}

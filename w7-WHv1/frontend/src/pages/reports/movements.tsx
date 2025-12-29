@@ -14,7 +14,6 @@ export default function MovementsReportPage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<{
     movement_type?: MovementType;
-    search?: string;
     start_date?: string;
     end_date?: string;
   }>({});
@@ -28,7 +27,6 @@ export default function MovementsReportPage() {
 
   const handleFiltersChange = (newFilters: {
     movement_type?: MovementType;
-    search?: string;
     start_date?: string;
     end_date?: string;
   }) => {
@@ -112,9 +110,7 @@ export default function MovementsReportPage() {
       </div>
 
       {/* Statistics Dashboard */}
-      {data && data.items.length > 0 && !isLoading && (
-        <MovementStats movements={data.items} />
-      )}
+      <MovementStats movements={data?.items || []} isLoading={isLoading} />
 
       {/* Movement History Table */}
       <MovementHistory data={data} isLoading={isLoading} />
