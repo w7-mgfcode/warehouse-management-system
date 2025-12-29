@@ -171,9 +171,8 @@ LANGUAGE=hu
 DEBUG=false
 
 # Celery (Background Tasks)
-# Note: Celery uses redis:// protocol even for Valkey
-CELERY_BROKER_URL=redis://:${VALKEY_PASSWORD}@valkey:6379/0
-CELERY_RESULT_BACKEND=redis://:${VALKEY_PASSWORD}@valkey:6379/0
+# Note: CELERY_BROKER_URL and CELERY_RESULT_BACKEND are automatically constructed
+# in docker-compose.prod.yml using VALKEY_PASSWORD. Do NOT set them here.
 
 # Email Configuration (SMTP)
 SMTP_HOST=smtp.example.com
@@ -217,6 +216,11 @@ services:
 ```
 
 **No changes needed** - the compose file uses environment variables from `.env.prod`.
+
+**Variable Substitution Pattern**:
+- Simple variables (e.g., `JWT_SECRET`, `VALKEY_PASSWORD`) are read directly from `.env.prod`
+- Complex URLs with embedded variables (e.g., `CELERY_BROKER_URL=redis://:${VALKEY_PASSWORD}@valkey:6379/0`) are constructed in `docker-compose.prod.yml` using Docker Compose's `${VAR}` substitution
+- Docker Compose performs variable expansion **only** in the compose file, **not** in `.env` files
 
 ---
 
