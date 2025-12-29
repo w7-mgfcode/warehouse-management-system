@@ -322,9 +322,9 @@ export function BinBulkForm({
     enabled: !!warehouseId,
   });
 
-  // Fetch existing bins for smart suggestions
+  // Fetch existing bins for smart suggestions (max 200 per backend limit)
   const { data: existingBinsData } = useQuery({
-    ...binsQueryOptions({ warehouse_id: warehouseId, page_size: 1000 }),
+    ...binsQueryOptions({ warehouse_id: warehouseId, page_size: 200 }),
     enabled: !!warehouseId,
   });
 
