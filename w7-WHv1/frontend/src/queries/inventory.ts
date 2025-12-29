@@ -25,6 +25,13 @@ export interface IssueRequest {
   notes?: string;
 }
 
+export interface ScrapRequest {
+  bin_content_id: string;
+  quantity: number;
+  reason: string;
+  notes?: string;
+}
+
 export interface FEFORecommendation {
   bin_id: string;
   bin_content_id: string;
@@ -141,6 +148,22 @@ export function useIssueGoods() {
   return useMutation({
     mutationFn: async (data: IssueRequest) => {
       const response = await apiClient.post("/inventory/issue", data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: inventoryKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["bins"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["movements"] });
+    },
+  });
+}
+
+export function useScrapGoods() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: ScrapRequest) => {
+      const response = await apiClient.post("/inventory/scrap", data);
       return response.data;
     },
     onSuccess: () => {

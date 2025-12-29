@@ -15,6 +15,9 @@ import { BinStatusBadge } from "@/components/bins/bin-status-badge";
 import { StockRowActions } from "./stock-row-actions";
 import { StockDetailsDialog } from "./stock-details-dialog";
 import { MovementHistoryDialog } from "./movement-history-dialog";
+import { TransferDialog } from "./transfer-dialog";
+import { ReserveDialog } from "./reserve-dialog";
+import { ScrapDialog } from "./scrap-dialog";
 import { FEFOWarningIndicator } from "./fefo-warning-indicator";
 import { StockMobileCard } from "./stock-mobile-card";
 import type { StockLevel } from "@/queries/inventory";
@@ -71,6 +74,9 @@ export function StockTable({
   const [selectedStock, setSelectedStock] = useState<StockLevel | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [movementHistoryDialogOpen, setMovementHistoryDialogOpen] = useState(false);
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+  const [reserveDialogOpen, setReserveDialogOpen] = useState(false);
+  const [scrapDialogOpen, setScrapDialogOpen] = useState(false);
 
   // Sorting logic
   const sortedData = useMemo(() => {
@@ -168,8 +174,8 @@ export function StockTable({
   };
 
   const handleTransfer = (stock: StockLevel) => {
-    toast.info(`Áthelyezés funkció hamarosan elérhető: ${stock.product_name}`);
-    // TODO: Open transfer dialog
+    setSelectedStock(stock);
+    setTransferDialogOpen(true);
   };
 
   const handleIssue = (stock: StockLevel) => {
@@ -178,13 +184,13 @@ export function StockTable({
   };
 
   const handleScrap = (stock: StockLevel) => {
-    toast.info(`Selejtezés funkció hamarosan elérhető: ${stock.product_name}`);
-    // TODO: Open scrap confirmation dialog
+    setSelectedStock(stock);
+    setScrapDialogOpen(true);
   };
 
   const handleReserve = (stock: StockLevel) => {
-    toast.info(`Foglalás funkció hamarosan elérhető: ${stock.product_name}`);
-    // TODO: Open reserve dialog
+    setSelectedStock(stock);
+    setReserveDialogOpen(true);
   };
 
   const handleViewHistory = (stock: StockLevel) => {
@@ -457,6 +463,27 @@ export function StockTable({
         stock={selectedStock}
         open={movementHistoryDialogOpen}
         onOpenChange={setMovementHistoryDialogOpen}
+      />
+
+      {/* Transfer Dialog */}
+      <TransferDialog
+        stock={selectedStock}
+        open={transferDialogOpen}
+        onOpenChange={setTransferDialogOpen}
+      />
+
+      {/* Reserve Dialog */}
+      <ReserveDialog
+        stock={selectedStock}
+        open={reserveDialogOpen}
+        onOpenChange={setReserveDialogOpen}
+      />
+
+      {/* Scrap Dialog */}
+      <ScrapDialog
+        stock={selectedStock}
+        open={scrapDialogOpen}
+        onOpenChange={setScrapDialogOpen}
       />
     </div>
   );
