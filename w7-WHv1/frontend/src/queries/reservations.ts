@@ -38,7 +38,7 @@ export const reservationsQueryOptions = (filters: ReservationFilters = {}) =>
     queryKey: reservationKeys.list(filters),
     queryFn: async () => {
       const { data } = await apiClient.get<PaginatedResponse<StockReservation>>(
-        "/reservations",
+        "/reservations/",
         { params: filters }
       );
       return data;
@@ -49,7 +49,7 @@ export const reservationQueryOptions = (id: string) =>
   queryOptions({
     queryKey: reservationKeys.detail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<StockReservation>(`/reservations/${id}`);
+      const { data } = await apiClient.get<StockReservation>(`/reservations/${id}/`);
       return data;
     },
     enabled: !!id,
@@ -59,7 +59,7 @@ export const expiringReservationsQueryOptions = () =>
   queryOptions({
     queryKey: reservationKeys.expiring(),
     queryFn: async () => {
-      const { data } = await apiClient.get<StockReservation[]>("/reservations/expiring");
+      const { data } = await apiClient.get<StockReservation[]>("/reservations/expiring/");
       return data;
     },
   });

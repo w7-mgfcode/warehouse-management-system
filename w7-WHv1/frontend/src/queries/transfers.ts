@@ -49,7 +49,7 @@ export const transfersQueryOptions = (filters: TransferFilters = {}) =>
     queryKey: transferKeys.list(filters),
     queryFn: async () => {
       const { data } = await apiClient.get<PaginatedResponse<WarehouseTransfer>>(
-        "/transfers",
+        "/transfers/",
         { params: filters }
       );
       return data;
@@ -60,7 +60,7 @@ export const pendingTransfersQueryOptions = () =>
   queryOptions({
     queryKey: transferKeys.pending(),
     queryFn: async () => {
-      const { data } = await apiClient.get<WarehouseTransfer[]>("/transfers/pending");
+      const { data } = await apiClient.get<WarehouseTransfer[]>("/transfers/pending/");
       return data;
     },
   });
