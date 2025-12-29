@@ -13,7 +13,7 @@ export default function BinsBulkPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/bins")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">Tömeges tárolóhely létrehozás</h1>
+        <h1 className="text-3xl font-bold text-foreground">Tömeges tárolóhely létrehozás</h1>
       </div>
 
       <Card>

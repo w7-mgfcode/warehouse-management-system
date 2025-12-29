@@ -43,7 +43,7 @@ export default function ExpiryReportPage() {
           <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Lejárati figyelmeztetések riport</h1>
+          <h1 className="text-3xl font-bold text-foreground">Lejárati figyelmeztetések riport</h1>
         </div>
         <Button onClick={handleExport} variant="outline">
           <Download className="h-4 w-4 mr-2" />

@@ -24,7 +24,7 @@ function ProductDetailContent() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">{product.name}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{product.name}</h1>
       </div>
 
       {/* Form */}

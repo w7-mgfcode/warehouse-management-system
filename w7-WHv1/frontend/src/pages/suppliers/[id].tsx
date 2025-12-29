@@ -19,7 +19,7 @@ function SupplierDetailContent() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/suppliers")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">{supplier.company_name}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{supplier.company_name}</h1>
       </div>
 
       <Card>

@@ -13,7 +13,7 @@ export default function SuppliersNewPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/suppliers")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">Új beszállító</h1>
+        <h1 className="text-3xl font-bold text-foreground">Új beszállító</h1>
       </div>
 
       <Card>

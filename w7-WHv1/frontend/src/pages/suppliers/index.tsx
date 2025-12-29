@@ -34,7 +34,7 @@ export default function SuppliersIndexPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{HU.nav.suppliers}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{HU.nav.suppliers}</h1>
         <Button onClick={() => navigate("/suppliers/new")}>
           <Plus className="h-4 w-4 mr-2" />
           {HU.actions.create}

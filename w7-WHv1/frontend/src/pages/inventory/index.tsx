@@ -8,7 +8,7 @@ export default function InventoryIndexPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Készlet áttekintés</h1>
+      <h1 className="text-3xl font-bold text-foreground">Készlet áttekintés</h1>
 
       <Card>
         <CardContent className="pt-6">

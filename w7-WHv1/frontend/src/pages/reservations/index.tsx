@@ -8,7 +8,7 @@ export default function ReservationsIndexPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{HU.nav.reservations}</h1>
+      <h1 className="text-3xl font-bold text-foreground">{HU.nav.reservations}</h1>
 
       <Card>
         <CardHeader>

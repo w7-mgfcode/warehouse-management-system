@@ -29,7 +29,7 @@ export default function ReportsIndexPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{HU.nav.reports}</h1>
+      <h1 className="text-3xl font-bold text-foreground">{HU.nav.reports}</h1>
 
       <div className="grid md:grid-cols-3 gap-4">
         {reports.map((report) => {

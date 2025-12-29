@@ -24,7 +24,7 @@ function ExpiryPageContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Lejárati figyelmeztetések</h1>
+      <h1 className="text-3xl font-bold text-foreground">Lejárati figyelmeztetések</h1>
 
       {/* Summary KPIs */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

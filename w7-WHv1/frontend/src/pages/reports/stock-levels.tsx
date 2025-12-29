@@ -46,7 +46,7 @@ export default function StockLevelsReportPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">Készletszint riport</h1>
+        <h1 className="text-3xl font-bold text-foreground">Készletszint riport</h1>
       </div>
 
       <Card>

@@ -8,7 +8,7 @@ export default function TransfersIndexPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{HU.nav.transfers}</h1>
+      <h1 className="text-3xl font-bold text-foreground">{HU.nav.transfers}</h1>
 
       <Card>
         <CardHeader>

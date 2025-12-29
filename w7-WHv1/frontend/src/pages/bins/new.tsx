@@ -13,7 +13,7 @@ export default function BinsNewPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/bins")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">Új tárolóhely</h1>
+        <h1 className="text-3xl font-bold text-foreground">Új tárolóhely</h1>
       </div>
 
       <Card>

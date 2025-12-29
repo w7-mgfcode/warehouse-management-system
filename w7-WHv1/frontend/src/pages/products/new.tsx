@@ -18,7 +18,7 @@ export default function ProductsNewPage() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-3xl font-bold">Új termék</h1>
+        <h1 className="text-3xl font-bold text-foreground">Új termék</h1>
       </div>
 
       {/* Form */}

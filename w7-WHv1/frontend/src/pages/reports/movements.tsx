@@ -56,7 +56,7 @@ export default function MovementsReportPage() {
           <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold">Mozgási riport</h1>
+          <h1 className="text-3xl font-bold text-foreground">Mozgási riport</h1>
         </div>
         <Button onClick={handleExport} variant="outline">
           <Download className="h-4 w-4 mr-2" />

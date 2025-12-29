@@ -35,7 +35,7 @@ export default function ProductsIndexPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{HU.nav.products}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{HU.nav.products}</h1>
         <Button onClick={() => navigate("/products/new")}>
           <Plus className="h-4 w-4 mr-2" />
           {HU.actions.create}

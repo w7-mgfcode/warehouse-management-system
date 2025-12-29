@@ -34,7 +34,7 @@ export default function BinsIndexPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{HU.nav.bins}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{HU.nav.bins}</h1>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => navigate("/bins/bulk")}>
             <Grid3x3 className="h-4 w-4 mr-2" />
