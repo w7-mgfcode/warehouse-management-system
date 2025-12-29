@@ -296,7 +296,7 @@ export function BinBulkForm({
     resolver: zodResolver(bulkBinSchema),
     defaultValues: {
       warehouse_id: preselectedWarehouseId || "",
-      aisles: "",
+      aisles: "A", // Default value to satisfy schema (not used in template-aware mode)
       rack_start: 1,
       rack_end: 10,
       level_start: 1,
