@@ -27,12 +27,14 @@ services:
     container_name: wms-valkey-prod
     restart: unless-stopped
     command: valkey-server --requirepass ${VALKEY_PASSWORD}
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD}
     volumes:
       - valkey_data:/data
     networks:
       - wms-network
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$${VALKEY_PASSWORD} valkey-cli ping"]
       interval: 10s
       timeout: 3s
       retries: 5
