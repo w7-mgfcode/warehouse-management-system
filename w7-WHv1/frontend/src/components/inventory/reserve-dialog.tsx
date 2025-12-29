@@ -22,7 +22,7 @@ const reserveSchema = z.object({
   quantity: z.number().positive("Mennyiség nagyobb kell legyen mint 0"),
   order_reference: z.string().min(1, "Megrendelés szám kötelező"),
   customer_name: z.string().optional(),
-  reserved_until: z.string().min(1, "Foglalás lejárati dátum kötelező"),
+  reserved_until: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -63,9 +63,9 @@ export function ReserveDialog({ stock, open, onOpenChange }: ReserveDialogProps)
         product_id: stock.product_id,
         quantity: data.quantity,
         order_reference: data.order_reference,
-        customer_name: data.customer_name,
+        customer_name: data.customer_name || undefined,
         reserved_until: reservedUntilISO,
-        notes: data.notes,
+        notes: data.notes || undefined,
       },
       {
         onSuccess: () => {
@@ -142,7 +142,7 @@ export function ReserveDialog({ stock, open, onOpenChange }: ReserveDialogProps)
 
           <div className="space-y-2">
             <Label htmlFor="reserved_until">
-              Foglalás lejárata <span className="text-error">*</span>
+              Foglalás lejárata (opcionális - alapértelmezett: 7 nap)
             </Label>
             <Input
               id="reserved_until"

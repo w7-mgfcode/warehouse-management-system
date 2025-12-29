@@ -71,7 +71,7 @@ export function ScrapDialog({ stock, open, onOpenChange }: ScrapDialogProps) {
         bin_content_id: stock.bin_content_id,
         quantity: data.quantity,
         reason: data.reason,
-        notes: data.notes,
+        notes: data.notes || undefined,
       },
       {
         onSuccess: () => {

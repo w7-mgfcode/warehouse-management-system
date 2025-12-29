@@ -81,8 +81,8 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
         source_bin_content_id: stock.bin_content_id,
         target_bin_id: data.target_bin_id,
         quantity: data.quantity,
-        reason: data.reason,
-        notes: data.notes,
+        reason: data.reason || undefined,
+        notes: data.notes || undefined,
       },
       {
         onSuccess: () => {
