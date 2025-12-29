@@ -10,6 +10,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpiryBadge } from "./expiry-badge";
 import { BinStatusBadge } from "@/components/bins/bin-status-badge";
+import { StockRowActions } from "./stock-row-actions";
+import { StockDetailsDialog } from "./stock-details-dialog";
 import type { StockLevel } from "@/queries/inventory";
 import type { BinStatus } from "@/types";
 import { HU } from "@/lib/i18n";
@@ -17,6 +19,7 @@ import { formatDate, getExpiryUrgency } from "@/lib/date";
 import { formatNumber, formatWeight } from "@/lib/number";
 import { ArrowUpDown, ArrowUp, ArrowDown, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface StockTableProps {
   data?: StockLevel[];
@@ -52,6 +55,8 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
   const [sortField, setSortField] = useState<SortField>("none");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
+  const [selectedStock, setSelectedStock] = useState<StockLevel | null>(null);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
   // Sorting logic
   const sortedData = useMemo(() => {
@@ -140,6 +145,37 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
     };
 
     return urgencyClasses[urgency];
+  };
+
+  // Action handlers
+  const handleViewDetails = (stock: StockLevel) => {
+    setSelectedStock(stock);
+    setDetailsDialogOpen(true);
+  };
+
+  const handleTransfer = (stock: StockLevel) => {
+    toast.info(`Áthelyezés funkció hamarosan elérhető: ${stock.product_name}`);
+    // TODO: Open transfer dialog
+  };
+
+  const handleIssue = (stock: StockLevel) => {
+    toast.info(`Kiadás funkció hamarosan elérhető: ${stock.product_name}`);
+    // TODO: Open issue dialog
+  };
+
+  const handleScrap = (stock: StockLevel) => {
+    toast.info(`Selejtezés funkció hamarosan elérhető: ${stock.product_name}`);
+    // TODO: Open scrap confirmation dialog
+  };
+
+  const handleReserve = (stock: StockLevel) => {
+    toast.info(`Foglalás funkció hamarosan elérhető: ${stock.product_name}`);
+    // TODO: Open reserve dialog
+  };
+
+  const handleViewHistory = (stock: StockLevel) => {
+    toast.info(`Mozgástörténet funkció hamarosan elérhető: ${stock.product_name}`);
+    // TODO: Open movement history dialog
   };
 
   if (isLoading) {
@@ -253,6 +289,7 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
               {columnVisibility.status && (
                 <SortableHeader field="status">{HU.table.status}</SortableHeader>
               )}
+              <TableHead className="w-[50px]">Műveletek</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -300,11 +337,29 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
                     <BinStatusBadge status={stock.status as BinStatus} />
                   </TableCell>
                 )}
+                <TableCell>
+                  <StockRowActions
+                    stock={stock}
+                    onViewDetails={handleViewDetails}
+                    onTransfer={handleTransfer}
+                    onIssue={handleIssue}
+                    onScrap={handleScrap}
+                    onReserve={handleReserve}
+                    onViewHistory={handleViewHistory}
+                  />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      {/* Stock Details Dialog */}
+      <StockDetailsDialog
+        stock={selectedStock}
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+      />
     </div>
   );
 }
