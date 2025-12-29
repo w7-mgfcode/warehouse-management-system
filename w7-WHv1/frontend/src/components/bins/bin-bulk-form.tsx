@@ -339,12 +339,19 @@ export function BinBulkForm({
 
   // Auto-scroll to preview when it appears
   useEffect(() => {
+    console.log("🔍 useEffect preview check:", {
+      showPreview,
+      previewLength: preview.length,
+      hasRef: !!previewRef.current,
+    });
     if (showPreview && preview.length > 0 && previewRef.current) {
-      console.log("🔍 Scrolling to preview...");
-      previewRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+      console.log("🔍 Scrolling to preview...", previewRef.current);
+      setTimeout(() => {
+        previewRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
     }
   }, [showPreview, preview.length]);
 
