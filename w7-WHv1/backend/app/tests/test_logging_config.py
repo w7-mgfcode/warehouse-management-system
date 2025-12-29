@@ -6,8 +6,6 @@ import json
 import logging
 from io import StringIO
 
-import pytest
-
 from app.core.logging_config import (
     CustomJsonFormatter,
     get_logger,

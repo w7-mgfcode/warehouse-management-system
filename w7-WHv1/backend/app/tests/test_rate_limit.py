@@ -2,8 +2,6 @@
 Tests for rate limiting functionality.
 """
 
-import pytest
-from fastapi import Request
 from fastapi.testclient import TestClient
 from slowapi.errors import RateLimitExceeded
 
@@ -12,7 +10,6 @@ from app.core.rate_limit import (
     create_route_limiter,
     get_rate_limit_for_endpoint,
     get_rate_limit_key,
-    rate_limit_exceeded_handler,
 )
 from app.main import app
 
