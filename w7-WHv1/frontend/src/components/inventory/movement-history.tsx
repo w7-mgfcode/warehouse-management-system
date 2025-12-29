@@ -10,7 +10,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useMovements } from "@/queries/movements";
+import { useQuery } from "@tanstack/react-query";
+import { movementsQueryOptions } from "@/queries/movements";
 import type { MovementFilters } from "@/queries/movements";
 import type { BinMovement, PaginatedResponse } from "@/types";
 import { HU } from "@/lib/i18n";
@@ -49,7 +50,10 @@ export function MovementHistory({
   isLoading: propIsLoading,
 }: MovementHistoryProps) {
   // Only fetch if data is not provided
-  const queryResult = useMovements(filters);
+  const queryResult = useQuery({
+    ...movementsQueryOptions(filters),
+    enabled: !propData && propIsLoading === undefined,
+  });
   const data = propData ?? queryResult.data;
   const isLoading = propIsLoading ?? queryResult.isLoading;
   const [sortField, setSortField] = useState<SortField>("created_at");
