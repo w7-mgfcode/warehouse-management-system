@@ -186,6 +186,7 @@ class StockLevel(BaseModel):
     sku: str | None
     batch_number: str
     quantity: Decimal
+    reserved_quantity: Decimal  # NEW: Show reserved quantity
     unit: str
     weight_kg: Decimal
     use_by_date: date | None

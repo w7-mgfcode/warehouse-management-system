@@ -84,9 +84,12 @@ export function useCreateTransfer() {
       return data;
     },
     onSuccess: () => {
+      // Invalidate all related queries to ensure UI updates
       queryClient.invalidateQueries({ queryKey: transferKeys.all });
       queryClient.invalidateQueries({ queryKey: ["bins"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["movements"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }

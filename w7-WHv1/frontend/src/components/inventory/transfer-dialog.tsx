@@ -66,10 +66,11 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = form;
   const targetBinId = watch("target_bin_id");
 
-  // Update quantity when stock changes
+  // Update quantity when stock changes (use available quantity)
   useEffect(() => {
     if (stock && open) {
-      setValue("quantity", stock.quantity);
+      const availableQty = stock.quantity - stock.reserved_quantity;
+      setValue("quantity", availableQty);
     }
   }, [stock, open, setValue]);
 
@@ -114,7 +115,12 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
             <br />
             Jelenlegi tárolóhely: <span className="font-mono text-foreground">{stock.bin_code}</span>
             {" • "}
-            Elérhető mennyiség: <span className="text-foreground">{stock.quantity} {stock.unit}</span>
+            Elérhető: <span className="text-foreground font-semibold">{stock.quantity - stock.reserved_quantity} {stock.unit}</span>
+            {stock.reserved_quantity > 0 && (
+              <span className="text-warning ml-2">
+                (Foglalt: {stock.reserved_quantity} {stock.unit})
+              </span>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +171,7 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
               id="quantity"
               type="number"
               step="0.01"
-              max={stock.quantity}
+              max={stock.quantity - stock.reserved_quantity}
               placeholder="100"
               {...register("quantity", { valueAsNumber: true })}
             />

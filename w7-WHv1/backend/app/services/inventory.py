@@ -458,6 +458,7 @@ async def get_stock_levels(
                 sku=bc.product.sku,
                 batch_number=bc.batch_number,
                 quantity=bc.quantity,
+                reserved_quantity=bc.reserved_quantity,  # NEW: Include reserved quantity
                 unit=bc.unit,
                 weight_kg=bc.weight_kg or bc.quantity,  # Use weight_kg if available, fallback to quantity
                 use_by_date=bc.use_by_date,

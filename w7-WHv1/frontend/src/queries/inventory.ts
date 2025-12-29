@@ -65,6 +65,7 @@ export interface StockLevel {
   sku?: string;
   batch_number: string;
   quantity: number;
+  reserved_quantity: number;  // NEW: Reserved quantity
   unit: string;
   weight_kg: number;
   use_by_date: string;
