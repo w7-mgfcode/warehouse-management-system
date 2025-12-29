@@ -57,6 +57,10 @@ class BinResponse(BaseModel):
     accessibility: str | None
     notes: str | None
     is_active: bool
+    is_archived: bool
+    archived_at: datetime | None
+    archived_by: UUID | None
+    archive_reason: str | None
     created_at: datetime
     updated_at: datetime
 

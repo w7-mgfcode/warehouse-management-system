@@ -1,6 +1,6 @@
 """Bin service for CRUD operations and bulk generation."""
 
-from datetime import date
+from datetime import UTC, date, datetime
 from itertools import product as cartesian_product
 from typing import Any
 from uuid import UUID, uuid4
@@ -219,6 +219,7 @@ async def get_bins(
     search: str | None = None,
     include_content: bool = False,
     include_expiry_info: bool = False,
+    include_archived: bool = False,
 ) -> tuple[list[Bin], int]:
     """
     Get paginated list of bins.
@@ -232,11 +233,16 @@ async def get_bins(
         search: Search term for code.
         include_content: Include bin contents with product/supplier relationships.
         include_expiry_info: Calculate days_until_expiry and urgency for contents.
+        include_archived: Include archived bins (default: False).
 
     Returns:
         tuple: List of bins and total count.
     """
     query = select(Bin)
+
+    # Filter archived by default
+    if not include_archived:
+        query = query.where(Bin.is_archived == False)
 
     # Add eager loading if content is requested
     if include_content:
@@ -305,14 +311,24 @@ async def update_bin(
 
 async def delete_bin(db: AsyncSession, bin_obj: Bin) -> None:
     """
-    Delete a bin.
+    Delete a bin (hard delete).
 
-    Raises ValueError if bin has contents with movement history.
+    Only allowed for bins without movement history.
+    For bins with history, use archive_bin() instead.
+
+    Raises ValueError if bin has movement history or is archived.
 
     Args:
         db: Async database session.
         bin_obj: Bin object to delete.
     """
+    # Check if bin is archived
+    if bin_obj.is_archived:
+        raise ValueError(
+            "Archivált tárolóhely nem törölhető. "
+            "Használja az unarchive funkciót visszaállításhoz."
+        )
+
     # Check if any bin contents have movement history
     stmt = (
         select(func.count(BinMovement.id))
@@ -324,12 +340,44 @@ async def delete_bin(db: AsyncSession, bin_obj: Bin) -> None:
 
     if movement_count > 0:
         raise ValueError(
-            "Nem törölhető tárolóhely ami rendelkezik mozgástörténettel. "
-            f"Találtam {movement_count} mozgás rekordot."
+            "Nem törölhető tárolóhely mozgástörténettel. "
+            f"Használja az archiválást helyette ({movement_count} mozgás rekord)."
         )
 
     await db.delete(bin_obj)
     await db.flush()
+
+
+async def archive_bin(
+    db: AsyncSession,
+    bin_obj: Bin,
+    user_id: UUID,
+    reason: str | None = None,
+) -> Bin:
+    """
+    Archive a bin (soft delete).
+
+    Archived bins are hidden from default views but preserve all history.
+
+    Args:
+        db: Database session
+        bin_obj: Bin to archive
+        user_id: User performing the archive
+        reason: Optional reason for archival
+
+    Returns:
+        Updated bin object
+    """
+    bin_obj.is_archived = True
+    bin_obj.archived_at = datetime.now(UTC)
+    bin_obj.archived_by = user_id
+    bin_obj.archive_reason = reason
+    if bin_obj.status != "inactive":
+        bin_obj.status = "inactive"
+
+    await db.flush()
+    await db.refresh(bin_obj)
+    return bin_obj
 
 
 async def preview_bulk_bins(

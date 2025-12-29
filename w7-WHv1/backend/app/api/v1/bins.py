@@ -18,6 +18,7 @@ from app.schemas.bin import (
     BulkBinPreviewResponse,
 )
 from app.services.bin import (
+    archive_bin,
     calculate_pages,
     create_bin,
     create_bulk_bins,
@@ -44,6 +45,7 @@ async def list_bins(
     search: str | None = None,
     include_content: bool = Query(False, description="Include bin contents with product/supplier"),
     include_expiry_info: bool = Query(False, description="Calculate expiry urgency for contents"),
+    include_archived: bool = Query(False, description="Include archived bins"),
 ) -> BinListResponse:
     """
     List all bins with pagination and optional filtering.
@@ -51,6 +53,7 @@ async def list_bins(
     Query Parameters:
     - include_content: Include bin contents with product/supplier relationships
     - include_expiry_info: Calculate days_until_expiry and urgency levels (requires include_content=true)
+    - include_archived: Include archived bins (default: false)
     """
     bins, total = await get_bins(
         db,
@@ -61,6 +64,7 @@ async def list_bins(
         search=search,
         include_content=include_content,
         include_expiry_info=include_expiry_info,
+        include_archived=include_archived,
     )
     pages = calculate_pages(total, page_size)
 
@@ -247,6 +251,38 @@ async def update_existing_bin(
     return BinResponse.model_validate(updated_bin)
 
 
+@router.post("/{bin_id}/archive", status_code=status.HTTP_200_OK)
+async def archive_existing_bin(
+    bin_id: UUID,
+    db: DbSession,
+    current_user: RequireWarehouse,
+    reason: str | None = Query(None, description="Optional reason for archiving"),
+) -> BinResponse:
+    """
+    Archive a bin (soft delete).
+
+    Archived bins are hidden from default views but preserve all movement history.
+    This is the recommended way to remove bins that have historical data.
+    """
+    bin_obj = await get_bin_by_id(db, bin_id)
+    if bin_obj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=HU_MESSAGES["bin_not_found"],
+        )
+
+    if bin_obj.is_archived:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Tárolóhely már archivált",
+        )
+
+    archived_bin = await archive_bin(db, bin_obj, current_user.id, reason)
+    await db.commit()
+
+    return BinResponse.model_validate(archived_bin)
+
+
 @router.delete("/{bin_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_existing_bin(
     bin_id: UUID,
@@ -256,7 +292,8 @@ async def delete_existing_bin(
     """
     Delete bin by ID (warehouse+ only).
 
-    Bin must be empty and have no movement history to be deleted.
+    Bin must be empty and have no movement history.
+    For bins with movement history, use POST /bins/{bin_id}/archive instead.
     """
     bin_obj = await get_bin_by_id(db, bin_id)
     if bin_obj is None:
@@ -275,7 +312,11 @@ async def delete_existing_bin(
     try:
         await delete_bin(db, bin_obj)
     except ValueError as e:
+        error_msg = str(e)
+        # Add helpful guidance for movement history error
+        if "mozgástörténettel" in error_msg:
+            error_msg = f"{error_msg} Használja a POST /bins/{bin_id}/archive endpointot."
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(e),
+            detail=error_msg,
         ) from e
