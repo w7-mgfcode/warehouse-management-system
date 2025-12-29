@@ -19,6 +19,7 @@ export default function BinsIndexPage() {
   const [warehouseId, setWarehouseId] = useState<string | undefined>(
     searchParams.get("warehouse") || undefined
   );
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   // Sync warehouse filter with URL
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function BinsIndexPage() {
   };
 
   const handleBulkDelete = async (ids: string[]) => {
+    setIsBulkDeleting(true);
     let successCount = 0;
     let errorCount = 0;
 
@@ -69,6 +71,8 @@ export default function BinsIndexPage() {
     if (errorCount > 0) {
       toast.error(`${errorCount} tárolóhely törlése sikertelen`);
     }
+
+    setIsBulkDeleting(false);
   };
 
   return (
@@ -115,6 +119,7 @@ export default function BinsIndexPage() {
         onDelete={handleDelete}
         onBulkDelete={handleBulkDelete}
         isDeleting={deleteMutation.isPending}
+        isBulkDeleting={isBulkDeleting}
       />
     </div>
   );

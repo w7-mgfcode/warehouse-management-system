@@ -32,6 +32,7 @@ interface BinListProps {
   onDelete: (id: string) => void;
   onBulkDelete?: (ids: string[]) => void;
   isDeleting?: boolean;
+  isBulkDeleting?: boolean;
 }
 
 export function BinList({
@@ -40,6 +41,7 @@ export function BinList({
   onDelete,
   onBulkDelete,
   isDeleting,
+  isBulkDeleting,
 }: BinListProps) {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -105,7 +107,7 @@ export function BinList({
             variant="destructive"
             size="sm"
             onClick={() => setShowBulkDeleteDialog(true)}
-            disabled={isDeleting}
+            disabled={isBulkDeleting}
           >
             <Trash2 className="h-4 w-4 mr-2" />
             Kiválasztottak törlése
@@ -233,16 +235,16 @@ export function BinList({
             <Button
               variant="outline"
               onClick={() => setShowBulkDeleteDialog(false)}
-              disabled={isDeleting}
+              disabled={isBulkDeleting}
             >
               Mégse
             </Button>
             <Button
               variant="destructive"
               onClick={handleBulkDelete}
-              disabled={isDeleting}
+              disabled={isBulkDeleting}
             >
-              {isDeleting ? "Törlés..." : "Törlés"}
+              {isBulkDeleting ? "Törlés..." : "Törlés"}
             </Button>
           </DialogFooter>
         </DialogContent>
