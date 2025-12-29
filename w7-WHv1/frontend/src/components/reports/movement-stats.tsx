@@ -84,7 +84,9 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
       <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 md:px-6 pt-4 md:pt-6">
-            <CardTitle className="text-xs md:text-sm font-medium">Összes mozgás</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">
+              Összes mozgás
+            </CardTitle>
             <Activity className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground shrink-0" />
           </CardHeader>
           <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
@@ -99,7 +101,9 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 md:px-6 pt-4 md:pt-6">
-            <CardTitle className="text-xs md:text-sm font-medium">Beérkezett</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">
+              Beérkezett
+            </CardTitle>
             <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-green-600 shrink-0" />
           </CardHeader>
           <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
@@ -114,7 +118,9 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 md:px-6 pt-4 md:pt-6">
-            <CardTitle className="text-xs md:text-sm font-medium">Kibocsátott</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">
+              Kibocsátott
+            </CardTitle>
             <ArrowDownRight className="h-3 w-3 md:h-4 md:w-4 text-red-600 shrink-0" />
           </CardHeader>
           <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
@@ -129,7 +135,9 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 md:px-6 pt-4 md:pt-6">
-            <CardTitle className="text-xs md:text-sm font-medium">Nettó változás</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">
+              Nettó változás
+            </CardTitle>
             <TrendingUp
               className={`h-3 w-3 md:h-4 md:w-4 shrink-0 ${
                 netChange >= 0 ? "text-green-600" : "text-red-600"
@@ -145,60 +153,9 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
               {netChange >= 0 ? "+" : ""}
               {formatNumber(netChange, 2)}
             </div>
-            <p className="text-[10px] md:text-xs text-muted-foreground">Készletváltozás</p>
-          </CardContent>
-        </Card>
-      </div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Beérkezett</CardTitle>
-            <ArrowDownRight className="h-4 w-4 text-success" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">
-              +{formatNumber(totalIn, 2)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {inboundMovements.length} mozgás
+            <p className="text-[10px] md:text-xs text-muted-foreground">
+              Készletváltozás
             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kibocsátott</CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">
-              -{formatNumber(totalOut, 2)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {outboundMovements.length} mozgás
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Nettó változás
-            </CardTitle>
-            <TrendingUp
-              className={`h-4 w-4 ${
-                netChange >= 0 ? "text-success" : "text-destructive"
-              }`}
-            />
-          </CardHeader>
-          <CardContent>
-            <div
-              className={`text-2xl font-bold ${
-                netChange >= 0 ? "text-success" : "text-destructive"
-              }`}
-            >
-              {netChange >= 0 ? "+" : ""}
-              {formatNumber(netChange, 2)}
-            </div>
-            <p className="text-xs text-muted-foreground">Készletváltozás</p>
           </CardContent>
         </Card>
       </div>
@@ -207,7 +164,9 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="px-4 md:px-6">
-            <CardTitle className="text-sm md:text-base">Mozgástípus megoszlás</CardTitle>
+            <CardTitle className="text-sm md:text-base">
+              Mozgástípus megoszlás
+            </CardTitle>
           </CardHeader>
           <CardContent className="px-4 md:px-6">
             {Object.entries(typeBreakdown).length > 0 ? (
@@ -266,14 +225,17 @@ export function MovementStats({ movements, isLoading }: MovementStatsProps) {
                         {product.name}
                       </div>
                       <div className="text-[10px] md:text-xs text-muted-foreground">
-                        {formatNumber(product.volume, 2)} {product.unit} · {product.count} mozgás
+                        {formatNumber(product.volume, 2)} {product.unit} ·{" "}
+                        {product.count} mozgás
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs md:text-sm text-muted-foreground">Nincs adat</p>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                Nincs adat
+              </p>
             )}
           </CardContent>
         </Card>
