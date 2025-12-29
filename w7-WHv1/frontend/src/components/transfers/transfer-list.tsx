@@ -38,8 +38,13 @@ export function TransferList({ transfers, isLoading }: TransferListProps) {
 
   if (transfers.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        {HU.empty.transfers}
+      <div className="text-center py-12">
+        <div className="text-muted-foreground mb-2">
+          {HU.empty.transfers}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Kattints a <span className="font-semibold">"Új áthelyezés"</span> gombra az első áthelyezés létrehozásához.
+        </p>
       </div>
     );
   }
