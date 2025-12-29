@@ -19,7 +19,7 @@ export default function MovementsReportPage() {
     end_date?: string;
   }>({});
 
-  // Fetch data with current filters
+  // Fetch data with current filters for stats and export
   const { data, isLoading } = useMovements({
     ...filters,
     page: 1,
@@ -112,27 +112,12 @@ export default function MovementsReportPage() {
       </div>
 
       {/* Statistics Dashboard */}
-      {data && data.items.length > 0 && (
+      {data && data.items.length > 0 && !isLoading && (
         <MovementStats movements={data.items} />
       )}
 
-      {/* Loading state */}
-      {isLoading && (
-        <div className="text-center py-12">
-          <div className="text-muted-foreground">Mozgások betöltése...</div>
-        </div>
-      )}
-
       {/* Movement History Table */}
-      {!isLoading && (
-        <MovementHistory
-          filters={{
-            ...filters,
-            page: 1,
-            page_size: 500,
-          }}
-        />
-      )}
+      <MovementHistory data={data} isLoading={isLoading} />
     </div>
   );
 }

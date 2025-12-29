@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useMovements } from "@/queries/movements";
 import type { MovementFilters } from "@/queries/movements";
-import type { BinMovement } from "@/types";
+import type { BinMovement, PaginatedResponse } from "@/types";
 import { HU } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/date";
 import { formatNumber } from "@/lib/number";
@@ -28,6 +28,8 @@ import { MovementDetailDialog } from "@/components/reports/movement-detail-dialo
 
 interface MovementHistoryProps {
   filters?: MovementFilters;
+  data?: PaginatedResponse<BinMovement>;
+  isLoading?: boolean;
 }
 
 type SortField = "created_at" | "movement_type" | "product_name" | "quantity";
@@ -41,8 +43,15 @@ const movementTypeColors: Record<string, string> = {
   scrap: "bg-secondary text-muted-foreground",
 };
 
-export function MovementHistory({ filters = {} }: MovementHistoryProps) {
-  const { data, isLoading } = useMovements(filters);
+export function MovementHistory({
+  filters = {},
+  data: propData,
+  isLoading: propIsLoading,
+}: MovementHistoryProps) {
+  // Only fetch if data is not provided
+  const queryResult = useMovements(filters);
+  const data = propData ?? queryResult.data;
+  const isLoading = propIsLoading ?? queryResult.isLoading;
   const [sortField, setSortField] = useState<SortField>("created_at");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [selectedMovement, setSelectedMovement] = useState<BinMovement | null>(
