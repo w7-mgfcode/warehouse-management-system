@@ -63,6 +63,10 @@ class BinContent(Base):
     unit: Mapped[str] = mapped_column(String(50), nullable=False)
     pallet_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     weight_kg: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
+    gross_weight_kg: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
+    pallet_height_cm: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    delivery_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    cmr_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
     received_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -99,6 +103,14 @@ class BinContent(Base):
             name="check_positive_pallet_count",
         ),
         CheckConstraint(
+            "pallet_height_cm > 0 OR pallet_height_cm IS NULL",
+            name="check_positive_pallet_height",
+        ),
+        CheckConstraint(
+            "gross_weight_kg >= weight_kg OR gross_weight_kg IS NULL OR weight_kg IS NULL",
+            name="check_gross_weight_ge_net_weight",
+        ),
+        CheckConstraint(
             "status IN ('available', 'reserved', 'expired', 'scrapped')",
             name="check_bin_content_status",
         ),
@@ -106,6 +118,7 @@ class BinContent(Base):
         Index("idx_bin_contents_product_status", "product_id", "status", "use_by_date"),
         Index("idx_bin_contents_expiry", "use_by_date"),
         Index("idx_bin_contents_bin", "bin_id"),
+        Index("idx_bin_contents_cmr", "cmr_number"),
     )
 
     # Relationships

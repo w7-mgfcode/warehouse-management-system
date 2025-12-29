@@ -100,10 +100,14 @@ async def receive_goods(
             use_by_date=receive_data.use_by_date,
             best_before_date=receive_data.best_before_date,
             freeze_date=receive_data.freeze_date,
+            delivery_date=receive_data.delivery_date,
             quantity=receive_data.quantity,
             unit=receive_data.unit,
             pallet_count=receive_data.pallet_count,
             weight_kg=receive_data.weight_kg,
+            gross_weight_kg=receive_data.gross_weight_kg,
+            pallet_height_cm=receive_data.pallet_height_cm,
+            cmr_number=receive_data.cmr_number,
             received_date=datetime.now(UTC),
             status="available",
             notes=receive_data.notes,
@@ -124,7 +128,7 @@ async def receive_goods(
         quantity_after=quantity_after,
         reason="supplier_delivery",
         user_id=user_id,
-        reference_number=receive_data.reference_number,
+        reference_number=receive_data.cmr_number,
         notes=receive_data.notes,
     )
 
@@ -497,3 +501,36 @@ async def get_warehouse_stock(
         )
     )
     return list(result.scalars().all())
+
+
+async def check_cmr_uniqueness(
+    db: AsyncSession,
+    cmr_number: str,
+) -> dict:
+    """
+    Check if CMR number already exists in the system.
+
+    Args:
+        db: Async database session.
+        cmr_number: CMR/Waybill number to check.
+
+    Returns:
+        dict: {"exists": bool, "bin_content_id": UUID | None, "bin_code": str | None}
+    """
+    result = await db.execute(
+        select(BinContent, Bin.code)
+        .join(Bin, BinContent.bin_id == Bin.id)
+        .where(BinContent.cmr_number == cmr_number)
+        .limit(1)
+    )
+    row = result.first()
+
+    if row:
+        bin_content, bin_code = row
+        return {
+            "exists": True,
+            "bin_content_id": bin_content.id,
+            "bin_code": bin_code,
+        }
+
+    return {"exists": False, "bin_content_id": None, "bin_code": None}

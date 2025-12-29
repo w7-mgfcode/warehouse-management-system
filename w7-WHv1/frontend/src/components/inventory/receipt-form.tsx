@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { receiptSchema, type ReceiptFormData, UNIT_OPTIONS } from "@/schemas/inventory";
 import { useReceiveGoods } from "@/queries/inventory";
 import { ProductSelect } from "@/components/products/product-select";
@@ -34,10 +35,16 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
       supplier_id: "",
       batch_number: "",
       use_by_date: "",
+      best_before_date: "",
+      freeze_date: "",
+      delivery_date: new Date().toISOString().split("T")[0],
       quantity: 0,
       unit: "kg",
+      pallet_count: undefined,
       weight_kg: undefined,
-      reference_number: "",
+      gross_weight_kg: undefined,
+      pallet_height_cm: undefined,
+      cmr_number: "",
       notes: "",
     },
   });
@@ -146,6 +153,48 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
         </p>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="best_before_date">Minőségmegőrzési dátum (opcionális)</Label>
+        <Input
+          id="best_before_date"
+          type="date"
+          {...register("best_before_date")}
+        />
+        {errors.best_before_date && (
+          <p className="text-sm text-error">{errors.best_before_date.message as string}</p>
+        )}
+        <p className="text-xs text-muted-foreground">
+          Korábbinak kell lennie, mint a lejárati dátum
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="freeze_date">Fagyasztási dátum (opcionális)</Label>
+          <Input
+            id="freeze_date"
+            type="date"
+            max={new Date().toISOString().split("T")[0]}
+            {...register("freeze_date")}
+          />
+          {errors.freeze_date && (
+            <p className="text-sm text-error">{errors.freeze_date.message as string}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="delivery_date">Szállítási dátum (opcionális)</Label>
+          <Input
+            id="delivery_date"
+            type="date"
+            {...register("delivery_date")}
+          />
+          {errors.delivery_date && (
+            <p className="text-sm text-error">{errors.delivery_date.message as string}</p>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="quantity">
@@ -188,24 +237,81 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="weight_kg">Súly (kg) - opcionális</Label>
-        <Input
-          id="weight_kg"
-          type="number"
-          step="0.01"
-          placeholder="Auto-calculated if empty"
-          {...register("weight_kg", { valueAsNumber: true })}
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="weight_kg">Nettó súly (kg) - opcionális</Label>
+          <Input
+            id="weight_kg"
+            type="number"
+            step="0.01"
+            placeholder="100.5"
+            {...register("weight_kg", { valueAsNumber: true })}
+          />
+          {errors.weight_kg && (
+            <p className="text-sm text-error">{errors.weight_kg.message as string}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="gross_weight_kg">Bruttó súly (kg) - opcionális</Label>
+          <Input
+            id="gross_weight_kg"
+            type="number"
+            step="0.01"
+            placeholder="110.0"
+            {...register("gross_weight_kg", { valueAsNumber: true })}
+          />
+          {errors.gross_weight_kg && (
+            <p className="text-sm text-error">{errors.gross_weight_kg.message as string}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Nagyobb vagy egyenlő, mint a nettó súly
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="pallet_count">Raklap darabszám - opcionális</Label>
+          <Input
+            id="pallet_count"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="1"
+            {...register("pallet_count", { valueAsNumber: true })}
+          />
+          {errors.pallet_count && (
+            <p className="text-sm text-error">{errors.pallet_count.message as string}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="pallet_height_cm">Raklap magasság (cm) - opcionális</Label>
+          <Input
+            id="pallet_height_cm"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="150"
+            {...register("pallet_height_cm", { valueAsNumber: true })}
+          />
+          {errors.pallet_height_cm && (
+            <p className="text-sm text-error">{errors.pallet_height_cm.message as string}</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="reference_number">Hivatkozási szám (opcionális)</Label>
+        <Label htmlFor="cmr_number">CMR / Fuvarlevél szám (opcionális)</Label>
         <Input
-          id="reference_number"
-          placeholder="PO-2025-001"
-          {...register("reference_number")}
+          id="cmr_number"
+          placeholder="CMR-2025-001"
+          {...register("cmr_number")}
         />
+        {errors.cmr_number && (
+          <p className="text-sm text-error">{errors.cmr_number.message as string}</p>
+        )}
       </div>
 
       <div className="space-y-2">

@@ -22,11 +22,14 @@ class ReceiveRequest(BaseModel):
     use_by_date: date
     best_before_date: date | None = None
     freeze_date: date | None = None
+    delivery_date: date | None = None
     quantity: Decimal = Field(..., gt=0)
     unit: str = Field(..., min_length=1, max_length=50)
     pallet_count: int | None = Field(None, gt=0)
     weight_kg: Decimal | None = Field(None, gt=0)
-    reference_number: str | None = Field(None, max_length=100)
+    gross_weight_kg: Decimal | None = Field(None, gt=0)
+    pallet_height_cm: int | None = Field(None, gt=0)
+    cmr_number: str | None = Field(None, max_length=100)
     notes: str | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -51,6 +54,28 @@ class ReceiveRequest(BaseModel):
 
         if v > date_type.today():
             raise ValueError(HU_MESSAGES["freeze_date_future"])
+        return v
+
+    @field_validator("best_before_date")
+    @classmethod
+    def validate_best_before_date(cls, v: date | None, info) -> date | None:
+        """Validate best_before_date <= use_by_date."""
+        if v is None:
+            return v
+        data = info.data
+        if "use_by_date" in data and v > data["use_by_date"]:
+            raise ValueError("A minőségmegőrzési dátumnak korábbinak kell lennie, mint a lejárati dátum")
+        return v
+
+    @field_validator("gross_weight_kg")
+    @classmethod
+    def validate_gross_weight(cls, v: Decimal | None, info) -> Decimal | None:
+        """Validate gross_weight_kg >= weight_kg."""
+        if v is None:
+            return v
+        data = info.data
+        if "weight_kg" in data and data["weight_kg"] is not None and v < data["weight_kg"]:
+            raise ValueError("A bruttó súlynak nagyobbnak vagy egyenlőnek kell lennie, mint a nettó súly")
         return v
 
 

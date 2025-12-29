@@ -371,3 +371,44 @@ async def create_bulk_bins(
     await db.flush()
 
     return len(bins_data)
+
+
+async def get_bin_capacity(db: AsyncSession, bin_obj: Bin) -> dict[str, Any]:
+    """
+    Get bin capacity information with current usage.
+
+    Args:
+        db: Async database session.
+        bin_obj: Bin object.
+
+    Returns:
+        dict: Capacity information with max limits and current usage.
+    """
+    from decimal import Decimal
+
+    from app.db.models.bin_content import BinContent
+
+    # Get current weight from all contents in this bin
+    weight_result = await db.execute(
+        select(func.sum(BinContent.weight_kg)).where(
+            BinContent.bin_id == bin_obj.id,
+            BinContent.quantity > 0,
+        )
+    )
+    current_weight = weight_result.scalar_one_or_none() or Decimal("0")
+
+    # Calculate available capacity
+    max_weight_kg = float(bin_obj.max_weight) if bin_obj.max_weight is not None else None
+    max_height_cm = float(bin_obj.max_height) if bin_obj.max_height is not None else None
+    current_weight_kg = float(current_weight)
+    available_weight_kg = (
+        float(max_weight_kg - current_weight_kg) if max_weight_kg is not None else None
+    )
+
+    return {
+        "max_weight_kg": max_weight_kg,
+        "max_height_cm": max_height_cm,
+        "current_weight_kg": current_weight_kg,
+        "available_weight_kg": available_weight_kg,
+        "has_capacity_limits": max_weight_kg is not None or max_height_cm is not None,
+    }

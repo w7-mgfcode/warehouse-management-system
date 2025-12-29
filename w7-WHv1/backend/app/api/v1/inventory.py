@@ -21,6 +21,7 @@ from app.services.expiry import get_expired_products, get_expiry_warnings
 from app.services.fefo import calculate_days_until_expiry, get_fefo_recommendation
 from app.services.inventory import (
     adjust_stock,
+    check_cmr_uniqueness,
     get_stock_levels,
     issue_goods,
     receive_goods,
@@ -175,6 +176,21 @@ async def get_expired_endpoint(
     Returns list of expired products requiring scrapping.
     """
     return await get_expired_products(db, warehouse_id)
+
+
+@router.get("/cmr-check")
+async def check_cmr_number(
+    db: DbSession,
+    _current_user: RequireViewer,
+    cmr_number: str = Query(..., min_length=1, description="CMR/Waybill number"),
+) -> dict:
+    """
+    Check if CMR number already exists in the system (all users).
+
+    Returns existence status and bin content details if found.
+    """
+    result = await check_cmr_uniqueness(db, cmr_number)
+    return result
 
 
 @router.post("/adjust", status_code=status.HTTP_200_OK)

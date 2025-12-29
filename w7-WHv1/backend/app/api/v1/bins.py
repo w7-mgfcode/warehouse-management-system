@@ -22,6 +22,7 @@ from app.services.bin import (
     delete_bin,
     get_bin_by_code,
     get_bin_by_id,
+    get_bin_capacity,
     get_bins,
     preview_bulk_bins,
     update_bin,
@@ -151,6 +152,28 @@ async def get_bin(
             detail=HU_MESSAGES["bin_not_found"],
         )
     return BinResponse.model_validate(bin_obj)
+
+
+@router.get("/{bin_id}/capacity")
+async def get_capacity(
+    bin_id: UUID,
+    db: DbSession,
+    _current_user: RequireViewer,
+) -> dict:
+    """
+    Get bin capacity information (all users).
+
+    Returns max weight/height limits and current usage.
+    """
+    bin_obj = await get_bin_by_id(db, bin_id)
+    if bin_obj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=HU_MESSAGES["bin_not_found"],
+        )
+
+    capacity = await get_bin_capacity(db, bin_obj)
+    return capacity
 
 
 @router.put("/{bin_id}", response_model=BinResponse)
