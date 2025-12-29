@@ -20,7 +20,7 @@ function DashboardContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Irányítópult</h1>
+      <h1 className="text-3xl font-bold text-foreground">Irányítópult</h1>
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -31,7 +31,7 @@ export function Breadcrumb() {
     return (
       <div className="flex items-center gap-2 text-sm">
         <Home className="h-4 w-4" />
-        <span className="font-medium">{HU.nav.dashboard}</span>
+        <span className="font-medium text-foreground">{HU.nav.dashboard}</span>
       </div>
     );
   }
@@ -56,7 +56,7 @@ export function Breadcrumb() {
           <div key={path} className="flex items-center gap-2">
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             {isLast ? (
-              <span className="font-medium">{label}</span>
+              <span className="font-medium text-foreground">{label}</span>
             ) : (
               <Link
                 to={path}
