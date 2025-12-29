@@ -2,6 +2,50 @@ import { queryOptions } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import type { ExpiryWarning } from "@/types";
 
+// Warehouse occupancy data point for chart
+export interface WarehouseOccupancyData {
+  warehouse_id: string;
+  warehouse_name: string;
+  occupied: number;
+  empty: number;
+  total: number;
+  occupancy_rate: number;
+}
+
+// Movement history data point for chart
+export interface MovementHistoryData {
+  date: string;
+  receipts: number;
+  issues: number;
+  total: number;
+}
+
+// Supplier distribution data point for pie chart
+export interface SupplierDistributionData {
+  supplier_id: string | null;
+  supplier_name: string;
+  product_count: number;
+  total_quantity_kg: number;
+}
+
+// Occupancy history data point for trend chart
+export interface OccupancyHistoryPoint {
+  date: string;
+  warehouse_id: string | null;
+  warehouse_name: string | null;
+  total_bins: number;
+  occupied_bins: number;
+  empty_bins: number;
+  occupancy_rate: number;
+}
+
+// Occupancy history response
+export interface OccupancyHistoryResponse {
+  data: OccupancyHistoryPoint[];
+  start_date: string;
+  end_date: string;
+}
+
 // Dashboard statistics interface
 export interface DashboardStats {
   total_stock_kg: number;
@@ -15,44 +59,27 @@ export interface DashboardStats {
     high: number;
     medium: number;
     low: number;
+    expired: number;
   };
   today_movements: number;
   today_receipts: number;
   today_issues: number;
+  warehouse_occupancy: WarehouseOccupancyData[];
+  movement_history: MovementHistoryData[];
+  supplier_distribution: SupplierDistributionData[];
 }
 
 /**
  * Query for dashboard statistics
- * Aggregates data from multiple endpoints
+ * Fetches aggregated KPIs and chart data from backend
  */
-export const dashboardStatsQueryOptions = () =>
+export const dashboardStatsQueryOptions = (warehouseId?: string) =>
   queryOptions({
-    queryKey: ["dashboard", "stats"],
+    queryKey: ["dashboard", "stats", warehouseId],
     queryFn: async (): Promise<DashboardStats> => {
-      // For now, return mock data
-      // In production, this would aggregate from:
-      // - GET /reports/inventory-summary
-      // - GET /bins (count)
-      // - GET /inventory/expiry-warnings
-      // - GET /movements (filter by today)
-
-      return {
-        total_stock_kg: 0,
-        total_products: 0,
-        total_batches: 0,
-        occupancy_rate: 0,
-        occupied_bins: 0,
-        total_bins: 0,
-        expiry_warnings: {
-          critical: 0,
-          high: 0,
-          medium: 0,
-          low: 0,
-        },
-        today_movements: 0,
-        today_receipts: 0,
-        today_issues: 0,
-      };
+      const params = warehouseId ? { warehouse_id: warehouseId } : {};
+      const response = await apiClient.get<DashboardStats>("/dashboard/stats", { params });
+      return response.data;
     },
   });
 
@@ -70,7 +97,7 @@ interface ExpiryWarningResponse {
 }
 
 /**
- * Query for expiry warnings list
+ * Query for expiry warnings list (limited for dashboard)
  */
 export const expiryWarningsQueryOptions = (limit = 10) =>
   queryOptions({
@@ -84,5 +111,51 @@ export const expiryWarningsQueryOptions = (limit = 10) =>
       );
       // Return items array, limited to requested count
       return data.items.slice(0, limit);
+    },
+  });
+
+/**
+ * Query for full expiry warnings response (for reports)
+ */
+export const expiryWarningsFullQueryOptions = (params?: {
+  days_threshold?: number;
+  warehouse_id?: string;
+}) =>
+  queryOptions({
+    queryKey: ["expiry-warnings-full", params],
+    queryFn: async (): Promise<ExpiryWarningResponse> => {
+      const { data } = await apiClient.get<ExpiryWarningResponse>(
+        "/inventory/expiry-warnings",
+        {
+          params: {
+            days_threshold: params?.days_threshold ?? 60,
+            warehouse_id: params?.warehouse_id,
+          },
+        }
+      );
+      return data;
+    },
+  });
+
+/**
+ * Query for occupancy history (for trend chart)
+ */
+export const occupancyHistoryQueryOptions = (params?: {
+  days?: number;
+  warehouse_id?: string;
+}) =>
+  queryOptions({
+    queryKey: ["reports", "occupancy-history", params],
+    queryFn: async (): Promise<OccupancyHistoryResponse> => {
+      const { data } = await apiClient.get<OccupancyHistoryResponse>(
+        "/reports/occupancy-history",
+        {
+          params: {
+            days: params?.days ?? 30,
+            warehouse_id: params?.warehouse_id,
+          },
+        }
+      );
+      return data;
     },
   });

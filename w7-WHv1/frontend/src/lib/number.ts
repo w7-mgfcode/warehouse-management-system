@@ -8,8 +8,16 @@
  * Format number with Hungarian locale
  * Manual implementation to ensure consistent formatting across environments
  */
-export function formatNumber(value: number, decimals = 2): string {
-  const fixed = value.toFixed(decimals);
+export function formatNumber(value: number | string, decimals = 2): string {
+  // Convert string to number if needed (handles backend Decimal serialization)
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+
+  // Handle invalid numbers
+  if (isNaN(numValue)) {
+    return "0";
+  }
+
+  const fixed = numValue.toFixed(decimals);
   const [integerPart, decimalPart] = fixed.split(".");
 
   // Add space thousands separator
@@ -22,14 +30,14 @@ export function formatNumber(value: number, decimals = 2): string {
 /**
  * Format weight in kilograms
  */
-export function formatWeight(kg: number): string {
+export function formatWeight(kg: number | string): string {
   return `${formatNumber(kg)} kg`;
 }
 
 /**
  * Format quantity with unit label
  */
-export function formatQuantity(value: number, unit: string): string {
+export function formatQuantity(value: number | string, unit: string): string {
   const unitLabels: Record<string, string> = {
     db: "db",
     kg: "kg",
@@ -43,17 +51,21 @@ export function formatQuantity(value: number, unit: string): string {
 /**
  * Format percentage (0.85 → "85,0%")
  */
-export function formatPercentage(value: number, decimals = 1): string {
-  return `${formatNumber(value * 100, decimals)}%`;
+export function formatPercentage(value: number | string, decimals = 1): string {
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+  return `${formatNumber(numValue * 100, decimals)}%`;
 }
 
 /**
  * Format currency in Hungarian Forint
  * Manual implementation to ensure consistent formatting across environments
  */
-export function formatCurrency(value: number): string {
+export function formatCurrency(value: number | string): string {
+  // Convert string to number if needed
+  const numValue = typeof value === "string" ? parseFloat(value) : value;
+
   // HUF doesn't use decimals, so round to integer
-  const rounded = Math.round(value);
+  const rounded = Math.round(numValue);
   const integerStr = String(rounded);
 
   // Add space thousands separator

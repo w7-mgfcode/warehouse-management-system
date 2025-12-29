@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from app.api.v1.auth import router as auth_router
 from app.api.v1.bins import router as bins_router
+from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.inventory import router as inventory_router
 from app.api.v1.jobs import router as jobs_router
 from app.api.v1.movements import router as movements_router
@@ -18,6 +19,7 @@ from app.api.v1.warehouses import router as warehouses_router
 router = APIRouter(prefix="/api/v1")
 
 router.include_router(auth_router)
+router.include_router(dashboard_router)
 router.include_router(users_router)
 router.include_router(warehouses_router)
 router.include_router(products_router)

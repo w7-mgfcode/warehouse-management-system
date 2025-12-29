@@ -48,6 +48,7 @@ import ReportsIndexPage from "@/pages/reports/index";
 import StockLevelsReportPage from "@/pages/reports/stock-levels";
 import ExpiryReportPage from "@/pages/reports/expiry";
 import MovementsReportPage from "@/pages/reports/movements";
+import FEFOReportPage from "@/pages/reports/fefo";
 
 export default function App() {
   return (
@@ -103,6 +104,7 @@ export default function App() {
 
             {/* Reports */}
             <Route path="/reports" element={<ReportsIndexPage />} />
+            <Route path="/reports/fefo" element={<FEFOReportPage />} />
             <Route path="/reports/stock-levels" element={<StockLevelsReportPage />} />
             <Route path="/reports/expiry" element={<ExpiryReportPage />} />
             <Route path="/reports/movements" element={<MovementsReportPage />} />

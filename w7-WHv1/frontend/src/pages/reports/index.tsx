@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Package, AlertTriangle, TrendingUp } from "lucide-react";
+import { Package, AlertTriangle, TrendingUp, Clock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { HU } from "@/lib/i18n";
 
@@ -7,6 +7,12 @@ export default function ReportsIndexPage() {
   const navigate = useNavigate();
 
   const reports = [
+    {
+      path: "/reports/fefo",
+      title: "FEFO Riport",
+      description: "First Expired, First Out - Lejárat szerinti kiadási sorrend",
+      icon: Clock,
+    },
     {
       path: "/reports/stock-levels",
       title: "Készletszint riport",
@@ -31,7 +37,7 @@ export default function ReportsIndexPage() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-foreground">{HU.nav.reports}</h1>
 
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {reports.map((report) => {
           const Icon = report.icon;
           return (

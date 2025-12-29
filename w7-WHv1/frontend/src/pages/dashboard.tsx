@@ -12,11 +12,21 @@ import { KPICard } from "@/components/dashboard/kpi-card";
 import { ExpiryWarningsList } from "@/components/dashboard/expiry-warnings-list";
 import { OccupancyChart } from "@/components/dashboard/occupancy-chart";
 import { MovementChart } from "@/components/dashboard/movement-chart";
+import { ExpiryDistributionChart } from "@/components/dashboard/expiry-distribution-chart";
+import { OccupancyTrendChart } from "@/components/dashboard/occupancy-trend-chart";
+import { ProductSupplierPieChart } from "@/components/dashboard/product-supplier-pie-chart";
 import { dashboardStatsQueryOptions } from "@/queries/dashboard";
 import { formatNumber, formatPercentage } from "@/lib/number";
+import { format, parseISO } from "date-fns";
 
 function DashboardContent() {
   const { data: stats } = useSuspenseQuery(dashboardStatsQueryOptions());
+
+  // Format movement history dates for chart
+  const formattedMovementHistory = stats.movement_history?.map((item) => ({
+    ...item,
+    date: format(parseISO(item.date), "MM. dd."),
+  })) ?? [];
 
   return (
     <div className="space-y-6">
@@ -53,10 +63,49 @@ function DashboardContent() {
         />
       </div>
 
-      {/* Charts */}
+      {/* Charts Row 1 - Current Status */}
       <div className="grid gap-4 md:grid-cols-2">
-        <OccupancyChart />
-        <MovementChart />
+        <OccupancyChart data={stats.warehouse_occupancy ?? []} />
+        <MovementChart data={formattedMovementHistory} />
+      </div>
+
+      {/* Charts Row 2 - Trends and Analysis */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold">Kihasználtsági trend</h3>
+            <p className="text-sm text-muted-foreground">30 napos előzmény</p>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <OccupancyTrendChart days={30} />
+            </Suspense>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold">Termékek beszállítónként</h3>
+            <p className="text-sm text-muted-foreground">Top 10 beszállító</p>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <ProductSupplierPieChart />
+            </Suspense>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold">Lejárati eloszlás</h3>
+            <p className="text-sm text-muted-foreground">Termékek sürgősség szerint</p>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <ExpiryDistributionChart />
+            </Suspense>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Expiry Warnings */}
@@ -85,12 +134,27 @@ function DashboardSkeleton() {
         ))}
       </div>
 
-      {/* Charts Skeleton */}
+      {/* Charts Skeleton Row 1 */}
       <div className="grid gap-4 md:grid-cols-2">
         {[...Array(2)].map((_, i) => (
           <Card key={i}>
             <CardHeader>
               <Skeleton className="h-5 w-32" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[300px] w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Charts Skeleton Row 2 */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {[...Array(3)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader>
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-3 w-24 mt-1" />
             </CardHeader>
             <CardContent>
               <Skeleton className="h-[300px] w-full" />
