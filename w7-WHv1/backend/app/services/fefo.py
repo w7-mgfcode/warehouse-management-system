@@ -169,6 +169,7 @@ async def is_fefo_compliant(
     # Get the oldest available bin_content for this product (with unreserved stock)
     oldest_result = await db.execute(
         select(BinContent)
+        .options(selectinload(BinContent.bin))  # Eagerly load bin relationship
         .where(
             BinContent.product_id == product_id,
             BinContent.status == "available",

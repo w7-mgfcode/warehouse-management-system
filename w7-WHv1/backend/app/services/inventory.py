@@ -21,7 +21,7 @@ from app.schemas.inventory import (
     StockLevel,
 )
 from app.services.bin import get_bin_by_id
-from app.services.fefo import is_fefo_compliant
+from app.services.fefo import is_fefo_compliant, calculate_days_until_expiry
 from app.services.movement import create_movement
 from app.services.product import get_product_by_id
 from app.services.supplier import get_supplier_by_id
@@ -435,6 +435,18 @@ async def get_stock_levels(
         if bc.use_by_date:
             days_until_expiry = (bc.use_by_date - today).days
 
+        # Check FEFO compliance
+        is_compliant, oldest_bin = await is_fefo_compliant(db, bc.id, bc.product_id)
+
+        # Prepare FEFO info
+        oldest_bin_code = None
+        oldest_use_by_date = None
+        oldest_days = None
+        if not is_compliant and oldest_bin:
+            oldest_bin_code = oldest_bin.bin.code
+            oldest_use_by_date = oldest_bin.use_by_date
+            oldest_days = calculate_days_until_expiry(oldest_bin.use_by_date) if oldest_bin.use_by_date else None
+
         stock_levels.append(
             StockLevel(
                 bin_content_id=bc.id,
@@ -451,6 +463,10 @@ async def get_stock_levels(
                 use_by_date=bc.use_by_date,
                 days_until_expiry=days_until_expiry,
                 status=bc.status,
+                is_fefo_compliant=is_compliant,
+                oldest_bin_code=oldest_bin_code,
+                oldest_use_by_date=oldest_use_by_date,
+                oldest_days_until_expiry=oldest_days,
             )
         )
 

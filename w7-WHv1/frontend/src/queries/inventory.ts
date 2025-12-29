@@ -63,6 +63,11 @@ export interface StockLevel {
   use_by_date: string;
   days_until_expiry: number;
   status: string;
+  // FEFO compliance info
+  is_fefo_compliant: boolean;
+  oldest_bin_code?: string;
+  oldest_use_by_date?: string;
+  oldest_days_until_expiry?: number;
 }
 
 export interface StockFilters {

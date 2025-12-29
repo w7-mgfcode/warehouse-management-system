@@ -191,6 +191,11 @@ class StockLevel(BaseModel):
     use_by_date: date | None
     days_until_expiry: int
     status: str
+    # FEFO compliance info
+    is_fefo_compliant: bool = True
+    oldest_bin_code: str | None = None
+    oldest_use_by_date: date | None = None
+    oldest_days_until_expiry: int | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

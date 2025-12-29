@@ -12,6 +12,7 @@ import { ExpiryBadge } from "./expiry-badge";
 import { BinStatusBadge } from "@/components/bins/bin-status-badge";
 import { StockRowActions } from "./stock-row-actions";
 import { StockDetailsDialog } from "./stock-details-dialog";
+import { FEFOWarningIndicator } from "./fefo-warning-indicator";
 import type { StockLevel } from "@/queries/inventory";
 import type { BinStatus } from "@/types";
 import { HU } from "@/lib/i18n";
@@ -309,7 +310,15 @@ export function StockTable({ data, isLoading = false }: StockTableProps) {
                   <TableCell>{stock.warehouse_name}</TableCell>
                 )}
                 {columnVisibility.bin && (
-                  <TableCell className="font-mono text-sm">{stock.bin_code}</TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {stock.bin_code}
+                    <FEFOWarningIndicator
+                      isCompliant={stock.is_fefo_compliant}
+                      oldestBinCode={stock.oldest_bin_code}
+                      oldestUseByDate={stock.oldest_use_by_date}
+                      oldestDaysUntilExpiry={stock.oldest_days_until_expiry}
+                    />
+                  </TableCell>
                 )}
                 {columnVisibility.batch && (
                   <TableCell className="text-sm">{stock.batch_number}</TableCell>
