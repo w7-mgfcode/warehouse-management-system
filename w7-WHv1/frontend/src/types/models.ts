@@ -14,11 +14,27 @@ export interface AuthUser {
 }
 
 // Warehouse types
+export interface BinStructureField {
+  name: string;
+  label: string;
+  required: boolean;
+  order: number;
+}
+
+export interface BinStructureTemplate {
+  fields: BinStructureField[];
+  code_format: string;
+  separator: string;
+  auto_uppercase: boolean;
+  zero_padding: boolean;
+}
+
 export interface Warehouse {
   id: string;
   name: string;
-  code: string;
-  address: string | null;
+  location: string | null;
+  description: string | null;
+  bin_structure_template: BinStructureTemplate;
   is_active: boolean;
   created_at: string;
   updated_at: string;

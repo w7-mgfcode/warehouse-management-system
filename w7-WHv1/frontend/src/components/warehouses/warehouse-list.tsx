@@ -43,7 +43,6 @@ export function WarehouseList({ warehouses, isLoading, onDelete, isDeleting }: W
         <TableHeader>
           <TableRow>
             <TableHead>{HU.table.name}</TableHead>
-            <TableHead>{HU.table.code}</TableHead>
             <TableHead>Cím</TableHead>
             <TableHead>{HU.table.status}</TableHead>
             <TableHead>{HU.table.createdAt}</TableHead>
@@ -58,9 +57,8 @@ export function WarehouseList({ warehouses, isLoading, onDelete, isDeleting }: W
               onClick={() => navigate(`/warehouses/${warehouse.id}`)}
             >
               <TableCell className="font-medium">{warehouse.name}</TableCell>
-              <TableCell className="font-mono text-sm">{warehouse.code}</TableCell>
               <TableCell className="text-muted-foreground text-sm">
-                {warehouse.address || "—"}
+                {warehouse.location || "—"}
               </TableCell>
               <TableCell>
                 {warehouse.is_active ? (

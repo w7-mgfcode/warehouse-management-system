@@ -11,8 +11,20 @@ export interface WarehouseFilters {
 
 export interface WarehouseCreate {
   name: string;
-  code: string;
-  address?: string;
+  location?: string;
+  description?: string;
+  bin_structure_template: {
+    fields: Array<{
+      name: string;
+      label: string;
+      required: boolean;
+      order: number;
+    }>;
+    code_format: string;
+    separator: string;
+    auto_uppercase: boolean;
+    zero_padding: boolean;
+  };
   is_active?: boolean;
 }
 
@@ -58,8 +70,8 @@ export function useCreateWarehouse() {
       const { data } = await apiClient.post<Warehouse>("/warehouses", warehouse);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: warehouseKeys.all });
     },
   });
 }
@@ -71,9 +83,9 @@ export function useUpdateWarehouse(id: string) {
       const { data } = await apiClient.put<Warehouse>(`/warehouses/${id}`, warehouse);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.all });
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(id) });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: warehouseKeys.all });
+      await queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(id) });
     },
   });
 }
@@ -84,8 +96,8 @@ export function useDeleteWarehouse() {
     mutationFn: async (id: string) => {
       await apiClient.delete(`/warehouses/${id}`);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: warehouseKeys.all });
     },
   });
 }

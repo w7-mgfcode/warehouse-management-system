@@ -25,8 +25,20 @@ export function WarehouseForm({ warehouse, onSuccess }: WarehouseFormProps) {
     resolver: zodResolver(warehouseSchema),
     defaultValues: {
       name: warehouse?.name || "",
-      code: warehouse?.code || "",
-      address: warehouse?.address || "",
+      location: warehouse?.location || "",
+      description: warehouse?.description || "",
+      bin_structure_template: warehouse?.bin_structure_template || {
+        fields: [
+          { name: "aisle", label: "Sor", required: true, order: 1 },
+          { name: "rack", label: "Állvány", required: true, order: 2 },
+          { name: "level", label: "Szint", required: true, order: 3 },
+          { name: "position", label: "Pozíció", required: true, order: 4 },
+        ],
+        code_format: "{aisle}-{rack}-{level}-{position}",
+        separator: "-",
+        auto_uppercase: true,
+        zero_padding: true,
+      },
       is_active: warehouse?.is_active ?? true,
     },
   });
@@ -82,31 +94,26 @@ export function WarehouseForm({ warehouse, onSuccess }: WarehouseFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="code">
-          Raktárkód <span className="text-error">*</span>
-        </Label>
+        <Label htmlFor="location">Cím</Label>
         <Input
-          id="code"
-          placeholder="pl. BP_CENTRAL"
-          {...register("code")}
+          id="location"
+          placeholder="1234 Budapest, Raktár utca 12."
+          {...register("location")}
         />
-        {errors.code && (
-          <p className="text-sm text-error">{errors.code.message as string}</p>
+        {errors.location && (
+          <p className="text-sm text-error">{errors.location.message as string}</p>
         )}
-        <p className="text-xs text-muted-foreground">
-          Nagybetűk, számok, _ és - karakterek használhatók
-        </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">Cím</Label>
+        <Label htmlFor="description">Leírás</Label>
         <Input
-          id="address"
-          placeholder="1234 Budapest, Raktár utca 12."
-          {...register("address")}
+          id="description"
+          placeholder="További információk..."
+          {...register("description")}
         />
-        {errors.address && (
-          <p className="text-sm text-error">{errors.address.message as string}</p>
+        {errors.description && (
+          <p className="text-sm text-error">{errors.description.message as string}</p>
         )}
       </div>
 
