@@ -50,6 +50,27 @@ export default function BinsIndexPage() {
     });
   };
 
+  const handleBulkDelete = async (ids: string[]) => {
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const id of ids) {
+      try {
+        await deleteMutation.mutateAsync(id);
+        successCount++;
+      } catch (error) {
+        errorCount++;
+      }
+    }
+
+    if (successCount > 0) {
+      toast.success(`${successCount} tárolóhely törölve`);
+    }
+    if (errorCount > 0) {
+      toast.error(`${errorCount} tárolóhely törlése sikertelen`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -92,6 +113,7 @@ export default function BinsIndexPage() {
         bins={data?.items || []}
         isLoading={isLoading}
         onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
         isDeleting={deleteMutation.isPending}
       />
     </div>
