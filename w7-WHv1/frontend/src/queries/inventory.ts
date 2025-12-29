@@ -112,7 +112,7 @@ export const fefoRecommendationQueryOptions = (
       const { data } = await apiClient.get<FEFORecommendationResponse>(
         "/inventory/fefo-recommendation",
         {
-          params: { product_id: productId, requested_quantity: quantity, warehouse_id: warehouseId },
+          params: { product_id: productId, quantity: quantity },
         }
       );
       return data;
