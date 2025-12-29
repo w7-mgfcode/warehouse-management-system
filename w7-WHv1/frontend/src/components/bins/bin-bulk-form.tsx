@@ -440,15 +440,63 @@ export function BinBulkForm({
   };
 
   const onSubmit = handleSubmit((data) => {
-    const formData = data as BulkBinFormData;
+    console.log("🔍 Submit started:", { preview: preview.length, template });
 
-    // Parse aisles from string to array for API
+    if (!template) {
+      toast.error("Kérem válasszon raktárt először");
+      return;
+    }
+
+    if (preview.length === 0) {
+      toast.error(
+        "Kérem kattintson az Előnézet gombra a tárolóhelyek generálásához"
+      );
+      return;
+    }
+
+    // Build ranges from fieldRanges for backend
+    const ranges: Record<string, any> = {};
+    template.fields.forEach((field) => {
+      const range = fieldRanges[field.name];
+      if (range) {
+        if (range.text !== undefined) {
+          // Text input: convert to array
+          const trimmed = range.text.trim().toUpperCase();
+          if (/^[A-Z]-[A-Z]$/.test(trimmed)) {
+            // Range format A-C
+            const [start, end] = trimmed.split("-");
+            const startCode = start.charCodeAt(0);
+            const endCode = end.charCodeAt(0);
+            const values: string[] = [];
+            for (let i = startCode; i <= endCode; i++) {
+              values.push(String.fromCharCode(i));
+            }
+            ranges[field.name] = values;
+          } else {
+            // Comma-separated
+            ranges[field.name] = trimmed.split(",").map((v) => v.trim()).filter(Boolean);
+          }
+        } else if (range.start !== undefined && range.end !== undefined) {
+          // Numeric range
+          ranges[field.name] = {
+            start: Number(range.start),
+            end: Number(range.end),
+          };
+        }
+      }
+    });
+
     const submitData = {
-      ...formData,
-      aisles: parseAisles(formData.aisles as unknown as string),
+      warehouse_id: data.warehouse_id,
+      ranges,
+      defaults: data.capacity_kg
+        ? { max_weight: data.capacity_kg }
+        : null,
     };
 
-    bulkMutation.mutate(submitData, {
+    console.log("🔍 Submitting bulk create:", submitData);
+
+    bulkMutation.mutate(submitData as any, {
       onSuccess: (result) => {
         toast.success(
           `${
