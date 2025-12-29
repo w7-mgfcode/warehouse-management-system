@@ -1,6 +1,6 @@
 """Bin management API endpoints."""
 
-from typing import Any, Union
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -65,7 +65,7 @@ async def list_bins(
     pages = calculate_pages(total, page_size)
 
     # Transform bins to response format
-    items: list[Union[BinResponse, BinResponseWithContent]] = []
+    items: list[BinResponse | BinResponseWithContent] = []
     for bin_obj in bins:
         if include_content:
             # Build content summaries

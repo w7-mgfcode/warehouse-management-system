@@ -39,7 +39,7 @@ async def list_movements(
     # Parse date strings to date objects
     parsed_start_date: date | None = None
     parsed_end_date: date | None = None
-    
+
     if start_date:
         try:
             parsed_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -47,8 +47,8 @@ async def list_movements(
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Invalid start_date format. Use YYYY-MM-DD",
-            )
-    
+            ) from None
+
     if end_date:
         try:
             parsed_end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
@@ -56,8 +56,8 @@ async def list_movements(
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Invalid end_date format. Use YYYY-MM-DD",
-            )
-    
+            ) from None
+
     movements, total = await get_movements(
         db=db,
         page=page,

@@ -2,13 +2,15 @@
 """Test dashboard API endpoint."""
 import asyncio
 import sys
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import select
-from app.db.models.user import User
-from app.core.security import create_access_token
-from app.core.config import settings
+
 import httpx
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.core.config import settings
+from app.core.security import create_access_token
+from app.db.models.user import User
 
 
 async def main():
@@ -49,7 +51,7 @@ async def main():
 
                 # Check date format
                 if data['movement_history']:
-                    print(f"\nFirst movement history item:")
+                    print("\nFirst movement history item:")
                     print(f"  Date: {data['movement_history'][0]['date']}")
                     print(f"  Date type: {type(data['movement_history'][0]['date'])}")
 

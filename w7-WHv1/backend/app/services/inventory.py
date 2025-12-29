@@ -21,7 +21,7 @@ from app.schemas.inventory import (
     StockLevel,
 )
 from app.services.bin import get_bin_by_id
-from app.services.fefo import is_fefo_compliant, calculate_days_until_expiry
+from app.services.fefo import calculate_days_until_expiry, is_fefo_compliant
 from app.services.movement import create_movement
 from app.services.product import get_product_by_id
 from app.services.supplier import get_supplier_by_id
@@ -391,7 +391,7 @@ async def get_stock_levels(
     Returns:
         list[StockLevel]: Individual stock records per bin/batch combination.
     """
-    from datetime import date as date_type, timedelta
+    from datetime import date as date_type
 
     query = (
         select(BinContent)
