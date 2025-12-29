@@ -18,13 +18,15 @@ Make the warehouse detail page and bins page more useful by creating seamless na
 
 **Before**: Could only search by bin code, no way to filter by warehouse
 
-**After**: 
+**After**:
+
 - Warehouse dropdown filter at top of bins page
 - Filter persists in URL (`?warehouse=xxx`)
 - "Összes raktár" option to clear filter
 - Works in combination with search
 
 **Files Modified**:
+
 - `/src/pages/bins/index.tsx` - Added warehouse filter state and URL sync
 - `/src/components/warehouses/warehouse-select.tsx` - Added `onChange`, `allowClear`, `placeholder` props
 - `/src/queries/bins.ts` - Already supported `warehouse_id` filter ✅
@@ -36,11 +38,13 @@ Make the warehouse detail page and bins page more useful by creating seamless na
 **Before**: No indication of which warehouse owns each bin
 
 **After**:
+
 - New "Raktár" column showing warehouse name
 - Clickable link to navigate to warehouse detail
 - Stops row click propagation (doesn't open bin detail)
 
 **Files Modified**:
+
 - `/src/components/bins/bin-list.tsx` - Added warehouse column with navigation
 - `/src/types/models.ts` - Added `warehouse_name?` to `Bin` interface
 - `/src/queries/bins.ts` - Updated `transformBin()` to extract warehouse name from response
@@ -52,11 +56,13 @@ Make the warehouse detail page and bins page more useful by creating seamless na
 **Before**: No direct way to manage bins from warehouse page
 
 **After**:
+
 - "Tárolóhelyek (X)" button → navigates to bins page filtered by this warehouse
 - "Tömeges létrehozás" button → navigates to bulk creation with warehouse pre-selected
 - Bin count displayed in real-time
 
 **Files Modified**:
+
 - `/src/pages/warehouses/[id].tsx` - Added action buttons and bin count query
 - `/src/pages/bins/bulk.tsx` - Pre-select warehouse from URL parameter
 - `/src/components/bins/bin-bulk-form.tsx` - Accept `preselectedWarehouseId` prop
@@ -81,11 +87,11 @@ Back to filtered bins page
 
 ### Time Savings
 
-| Task | Before | After | Saved |
-|------|--------|-------|-------|
-| Find warehouse bins | 30s (manual search) | 2s (one click) | **-93%** |
-| Bulk create from warehouse | 45s (navigate + select) | 5s (one click) | **-89%** |
-| See bin's warehouse | 15s (copy ID, search) | 1s (visible in table) | **-93%** |
+| Task                       | Before                  | After                 | Saved    |
+| -------------------------- | ----------------------- | --------------------- | -------- |
+| Find warehouse bins        | 30s (manual search)     | 2s (one click)        | **-93%** |
+| Bulk create from warehouse | 45s (navigate + select) | 5s (one click)        | **-89%** |
+| See bin's warehouse        | 15s (copy ID, search)   | 1s (visible in table) | **-93%** |
 
 ---
 
@@ -94,17 +100,20 @@ Back to filtered bins page
 ### URL Query Parameters
 
 **Bins Page**: `/bins?warehouse={warehouse_id}`
+
 - Persists warehouse filter across page refreshes
 - Can be bookmarked for quick access
 - Cleared when selecting "Összes raktár"
 
 **Bulk Create**: `/bins/bulk?warehouse={warehouse_id}`
+
 - Pre-selects warehouse in form
 - Returns to filtered bins page on success
 
 ### API Integration
 
 No backend changes required! ✅
+
 - `GET /bins?warehouse_id=xxx` already supported
 - Warehouse name returned via joined query (if backend supports it)
 - Fallback to "Ismeretlen" if warehouse name not available
@@ -112,13 +121,14 @@ No backend changes required! ✅
 ### Component Reusability
 
 `WarehouseSelect` component enhanced:
+
 ```tsx
 <WarehouseSelect
   value={warehouseId}
-  onChange={setWarehouseId}  // New: supports undefined
+  onChange={setWarehouseId} // New: supports undefined
   placeholder="Összes raktár"
-  allowClear  // New: adds clear option
-  label={false}  // Optional: hide label
+  allowClear // New: adds clear option
+  label={false} // Optional: hide label
 />
 ```
 
@@ -142,11 +152,13 @@ No backend changes required! ✅
 ## 📈 Impact Metrics (Expected)
 
 ### User Engagement
+
 - ⬆️ **+300%** increase in warehouse→bins navigation
 - ⬆️ **+150%** increase in bulk bin creation from warehouse page
 - ⬇️ **-50%** reduction in "lost" users unable to find bins
 
 ### System Usage
+
 - 📊 More warehouse-specific bin management
 - 🔗 Better data context understanding
 - ⚡ Faster workflows = more productive users
@@ -168,6 +180,7 @@ See [WAREHOUSE_BIN_INTEGRATION_PLAN.md](WAREHOUSE_BIN_INTEGRATION_PLAN.md) for S
 **Total**: 8 files modified
 
 ### Frontend
+
 - ✏️ `/src/pages/bins/index.tsx` - Warehouse filter
 - ✏️ `/src/pages/bins/bulk.tsx` - Pre-select warehouse
 - ✏️ `/src/pages/warehouses/[id].tsx` - Quick action buttons
@@ -178,6 +191,7 @@ See [WAREHOUSE_BIN_INTEGRATION_PLAN.md](WAREHOUSE_BIN_INTEGRATION_PLAN.md) for S
 - ✏️ `/src/queries/bins.ts` - Transform warehouse_name
 
 ### Documentation
+
 - 📄 `WAREHOUSE_BIN_INTEGRATION_PLAN.md` - Master plan (created)
 - 📄 `WAREHOUSE_BIN_INTEGRATION_SPRINT1_COMPLETE.md` - This file (created)
 
