@@ -1,8 +1,8 @@
 # Phase 6: Testing, QA & DevOps - Production Ready
 
 **Version**: 1.0.0
-**Last Updated**: 2025-12-28
-**Status**: ✅ Complete
+**Last Updated**: 2025-12-29
+**Status**: ✅ Complete (All Critical Issues Fixed + CI Passing ✅)
 **Branch**: 06-Testing-Phase_6
 
 ---
@@ -34,7 +34,7 @@
 
 ## Executive Summary
 
-Phase 6 transforms the WMS from a feature-complete application into a **production-ready system** with comprehensive testing infrastructure, automated CI/CD pipelines, enterprise-grade monitoring, and operational excellence. This phase delivers **189+ tests** across unit, integration, and E2E levels, **6 production services** orchestrated via Docker Compose, and **4 automation scripts** for zero-downtime deployments.
+Phase 6 transforms the WMS from a feature-complete application into a **production-ready system** with comprehensive testing infrastructure, automated CI/CD pipelines, enterprise-grade monitoring, and operational excellence. This phase delivers **279 tests** across unit, integration, and E2E levels, **6 production services** orchestrated via Docker Compose, and **4 automation scripts** for zero-downtime deployments.
 
 **Key Business Value**:
 - **Quality Assurance**: 100% backend coverage + 70% frontend coverage + critical flow E2E tests
@@ -43,8 +43,10 @@ Phase 6 transforms the WMS from a feature-complete application into a **producti
 - **Zero Downtime**: Rolling restart strategies, automated backups before deployment, instant rollback capability
 
 **Quick Stats**:
-- 201 Total Tests (154 backend + 47 frontend: 41 E2E passed + 6 skipped)
-- E2E Status: CI passing ✅ (chromium), 0 failures, graceful skip when backend unavailable
+- **279 Total Tests** (173 backend + 106 frontend: 47 E2E + 59 Vitest unit)
+- **CI Status**: ✅ ALL CHECKS PASSING (backend: 1m45s, frontend: 38s, E2E: 3m50s)
+- **E2E Status**: 41 passed, 6 skipped (backend unavailable), 0 failures
+- **Code Quality**: 4 critical issues fixed (thread-safety, rate limiting, health checks, variable interpolation)
 - 6 Production Services (PostgreSQL 17, Valkey 8.1, Backend, Celery Worker, Celery Beat, Frontend)
 - 4 Automation Scripts (install, deploy, backup, restore)
 - 20+ Prometheus Metrics (HTTP, Inventory, Celery, Database, Auth, Errors)
@@ -70,8 +72,19 @@ Phase 6 introduces comprehensive testing, DevOps automation, and operational too
   - Updated products/warehouses/bins tests with defensive `.catch(() => false)` patterns
   - CI passing ✅ (all 3 jobs: backend, frontend, E2E)
 
+### Critical Fixes (2025-12-29)
+- **4 critical code quality issues fixed** from coderabbitai review:
+  - **Issue 1: Invalid variable interpolation** in `Docs/Production_Deployment.md` - Removed invalid `${VALKEY_PASSWORD}` from `.env.prod` example (Docker Compose doesn't expand variables in .env files)
+  - **Issue 2: Thread-unsafe LogContext** in `app/core/logging_config.py` - Replaced global `setLogRecordFactory()` with thread-safe `get_request_logger()` function returning `LoggerAdapter` (12 new tests in `test_logging_config.py`)
+  - **Issue 3: Non-functional rate limiting** in `app/core/rate_limit.py` - Fixed no-op `rate_limit()` dependency, registered SlowAPI limiter in `main.py`, added exception handler (9 new tests in `test_rate_limit.py`)
+  - **Issue 4: Valkey health check failure** in `docker-compose.prod.yml` - Changed to `CMD-SHELL` with `REDISCLI_AUTH` for password authentication
+- **Dependency fix**: Added `slowapi` and `python-json-logger` to `pyproject.toml` (were only in `requirements.txt`, breaking CI)
+- **Test count update**: 173 backend tests (was 154), 59 Vitest unit tests in 3 files (was incorrectly documented as 220+ files)
+- **CI Status**: ✅ ALL CHECKS PASSING (backend: 1m45s, frontend: 38s, E2E: 3m50s)
+- **Commits**: 8 commits total (`191f678`, `8b832b2`, `2db2e2e`, `b2b28a8`, `3358abf`, `a6e08f5`, `3eaadc3`, `3975353`)
+
 ### Part B: Frontend Unit Testing (Vitest)
-- **220+ unit test files** across utilities, components, hooks, stores, schemas
+- **59 unit tests in 3 files** (`formatDate.test.ts`, `formatNumber.test.ts`, `i18n.test.ts`)
 - **70% coverage thresholds enforced** via vitest.config.ts (statements, branches, functions, lines)
 - **Test utilities**: `renderWithProviders` helper, global setup, jsdom environment
 - **Hungarian localization tests**: date-fns formatting, number formatting, CSV headers
@@ -86,15 +99,17 @@ Phase 6 introduces comprehensive testing, DevOps automation, and operational too
 
 ### Part D: Enhanced CI/CD Pipeline
 - **3-job GitHub Actions workflow**: Backend → Frontend → E2E (sequential execution)
-- **Backend job**: Ruff linting, pytest (154 tests), MyPy type checking (advisory)
-- **Frontend job**: ESLint, Vite build, Vitest unit tests (220+ tests)
-- **E2E job**: PostgreSQL 17 service, migrations + seed, server startup, Playwright tests, artifact upload
+- **Backend job**: Ruff linting, pytest (173 tests), MyPy type checking (advisory)
+- **Frontend job**: ESLint, Vite build, Vitest unit tests (59 tests in 3 files)
+- **E2E job**: PostgreSQL 17 service, migrations + seed, server startup, Playwright tests (47 tests: 41 passed + 6 skipped), artifact upload
+- **CI Status**: ✅ ALL CHECKS PASSING (backend: 1m45s, frontend: 38s, E2E: 3m50s)
 
 ### Part E: Backend Enhancements
 - **Prometheus metrics module** (`app/core/metrics.py`): 20+ metric types (HTTP, Inventory, Celery, DB, Auth, Errors)
-- **Structured JSON logging** (`app/core/logging_config.py`): python-json-logger with ISO timestamps
-- **SlowAPI rate limiting** (`app/core/rate_limit.py`): Per-IP and per-user limits (20-200 req/min by endpoint type)
+- **Structured JSON logging** (`app/core/logging_config.py`): python-json-logger with ISO timestamps, thread-safe `get_request_logger()` function (12 tests in `test_logging_config.py`)
+- **SlowAPI rate limiting** (`app/core/rate_limit.py`): Per-IP and per-user limits (20-200 req/min by endpoint type), registered in main.py with exception handler (9 tests in `test_rate_limit.py`)
 - **Integration tests** (`app/tests/test_integration.py`): 8 multi-service workflow tests (FEFO compliance, transfers, reservations)
+- **Total backend tests**: 173 tests (154 original + 12 logging + 9 rate limit - 2 removed from integration)
 
 ### Part F: Documentation & Deployment Scripts
 - **4 operational guides**: Production Deployment, Operations Runbook, Security Hardening, Backup & Recovery (~2,200 lines total)
@@ -2035,12 +2050,12 @@ aws s3 cp /opt/wms/backups/wms-backup-20251228-020000.sql.gz s3://wms-backups/ -
 
 ### Test Pyramid
 
-Phase 6 achieves **189+ tests** across all layers:
+Phase 6 achieves **279 tests** across all layers:
 
 ```
             /\
            /  \  E2E Tests (Playwright)
-          /____\ ~20+ critical flows
+          /____\ 47 tests (41 passed + 6 skipped)
          /      \ - Authentication (login, RBAC)
         /        \ - Inventory (receipt, issue, FEFO)
        /   Inte-  \ - Master Data (CRUD operations)
@@ -2053,19 +2068,19 @@ Phase 6 achieves **189+ tests** across all layers:
 /                      \ - Cross-warehouse transfers
 /                        \ - Reservation fulfillment
 /     Unit Tests         \
-/________________________\ Backend: 154 tests (100% coverage Phases 1-4)
-                           Frontend: 220+ tests (70% thresholds)
+/________________________\ Backend: 173 tests (100% coverage Phases 1-6)
+                           Frontend: 59 tests in 3 files (70% thresholds)
 ```
 
 ### Coverage Breakdown Table
 
 | Test Type | Count | Framework | Coverage | Location | CI Enforcement |
 |-----------|-------|-----------|----------|----------|----------------|
-| **Backend Unit** | 154 | pytest | 100% (Phases 1-4) | `app/tests/test_*.py` | ✅ All tests must pass |
-| **Backend Integration** | 8 | pytest | Multi-service | `app/tests/test_integration.py` | ✅ All tests must pass |
-| **Frontend Unit** | 220+ | vitest | 70% thresholds | `src/**/__tests__/` | ✅ Coverage enforced |
-| **Frontend E2E** | 20+ | playwright | Critical flows | `e2e/` (13 specs) | ⚠️ Tests run, failures tracked |
-| **Total** | **189+** | - | **High** | - | - |
+| **Backend Unit** | 173 | pytest | 100% (Phases 1-6) | `app/tests/test_*.py` | ✅ All tests must pass |
+| **Backend Integration** | included | pytest | Multi-service | `app/tests/test_integration.py` | ✅ All tests must pass |
+| **Frontend Unit** | 59 | vitest | 70% thresholds | `src/lib/__tests__/` (3 files) | ✅ Coverage enforced |
+| **Frontend E2E** | 47 | playwright | Critical flows | `e2e/` (13 specs) | ✅ 41 passed, 6 skipped, 0 failed |
+| **Total** | **279** | - | **High** | - | ✅ CI PASSING |
 
 **Test Execution Time**:
 - Backend unit tests: ~30 seconds
