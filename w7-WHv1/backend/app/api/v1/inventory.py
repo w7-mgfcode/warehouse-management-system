@@ -140,13 +140,14 @@ async def get_stock_levels_endpoint(
     _current_user: RequireViewer,
     warehouse_id: UUID | None = Query(None, description="Filter by warehouse"),
     product_id: UUID | None = Query(None, description="Filter by product"),
+    search: str | None = Query(None, description="Search by product name, bin code, or batch number"),
 ) -> list[StockLevel]:
     """
-    Get aggregated stock levels by product (all users).
+    Get detailed stock levels for each bin content (all users).
 
-    Returns total quantities, bin counts, expiry dates, and locations.
+    Returns individual records per bin/batch combination with search support.
     """
-    return await get_stock_levels(db, warehouse_id, product_id)
+    return await get_stock_levels(db, warehouse_id, product_id, search)
 
 
 @router.get("/expiry-warnings", response_model=ExpiryWarningResponse)

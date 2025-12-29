@@ -20,14 +20,15 @@ export function SupplierSelect({
   required = false,
   disabled = false,
 }: SupplierSelectProps) {
-  // CONSTRAINT: Hard limit of 1000 active suppliers for dropdown performance.
-  // If more than 1000 suppliers exist, results will be truncated and a warning displayed.
+  // CONSTRAINT: Backend max page_size is 200.
+  // Hard limit of 200 active suppliers for dropdown performance.
+  // If more than 200 suppliers exist, results will be truncated and a warning displayed.
   // TODO: Consider implementing Combobox with search for better UX with large datasets.
   const { data } = useSuspenseQuery(
-    suppliersQueryOptions({ is_active: true, page_size: 1000 })
+    suppliersQueryOptions({ is_active: true, page_size: 200 })
   );
 
-  const isTruncated = data.total > 1000;
+  const isTruncated = data.total > 200;
 
   return (
     <div className="space-y-2">
@@ -53,7 +54,7 @@ export function SupplierSelect({
         <Alert variant="destructive" className="py-2">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="text-sm">
-            Figyelem! {data.total} beszállítóból csak az első 1000 jelenik meg.
+            Figyelem! {data.total} beszállítóból csak az első 200 jelenik meg.
             Használja a beszállítók listát részletesebb kereséséhez.
           </AlertDescription>
         </Alert>

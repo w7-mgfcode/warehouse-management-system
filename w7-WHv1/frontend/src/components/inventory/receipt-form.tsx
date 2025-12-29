@@ -12,6 +12,7 @@ import { useReceiveGoods } from "@/queries/inventory";
 import { ProductSelect } from "@/components/products/product-select";
 import { SupplierSelect } from "@/components/suppliers/supplier-select";
 import { BinSelect } from "@/components/bins/bin-select";
+import { WarehouseSelect } from "@/components/warehouses/warehouse-select";
 import { HU } from "@/lib/i18n";
 import type { APIError } from "@/types/api";
 
@@ -30,6 +31,7 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
   const form = useForm({
     resolver: zodResolver(receiptSchema),
     defaultValues: {
+      warehouse_id: "",
       bin_id: "",
       product_id: "",
       supplier_id: "",
@@ -49,7 +51,10 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
     },
   });
 
-  const { register, handleSubmit, control, formState: { errors } } = form;
+  const { register, handleSubmit, control, formState: { errors }, watch } = form;
+
+  // Watch warehouse_id to enable/disable bin selection
+  const selectedWarehouseId = watch("warehouse_id");
 
   const onSubmit = handleSubmit((data) => {
     const submitData = data as ReceiptFormData;
@@ -70,22 +75,46 @@ export function ReceiptForm({ onSuccess }: ReceiptFormProps) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {/* Warehouse Selection */}
+      <div className="space-y-2">
+        <Controller
+          name="warehouse_id"
+          control={control}
+          render={({ field }) => (
+            <WarehouseSelect
+              value={field.value}
+              onValueChange={field.onChange}
+              label="Raktár"
+              required
+            />
+          )}
+        />
+        {errors.warehouse_id && (
+          <p className="text-sm text-error">{errors.warehouse_id.message as string}</p>
+        )}
+      </div>
+
+      {/* Bin Selection (disabled until warehouse selected) */}
       <div className="space-y-2">
         <Controller
           name="bin_id"
           control={control}
           render={({ field }) => (
             <BinSelect
+              warehouseId={selectedWarehouseId}
               value={field.value}
               onValueChange={field.onChange}
               label="Tárolóhely"
               required
-              statusFilter="empty"
+              disabled={!selectedWarehouseId}
             />
           )}
         />
         {errors.bin_id && (
           <p className="text-sm text-error">{errors.bin_id.message as string}</p>
+        )}
+        {!selectedWarehouseId && (
+          <p className="text-sm text-muted-foreground">Először válasszon raktárat</p>
         )}
       </div>
 

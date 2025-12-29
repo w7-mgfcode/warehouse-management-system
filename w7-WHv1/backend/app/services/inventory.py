@@ -377,37 +377,36 @@ async def get_stock_levels(
     db: AsyncSession,
     warehouse_id: UUID | None = None,
     product_id: UUID | None = None,
+    search: str | None = None,
 ) -> list[StockLevel]:
     """
-    Get aggregated stock levels by product.
+    Get detailed stock levels for each bin content (individual records).
 
     Args:
         db: Async database session.
         warehouse_id: Optional warehouse filter.
         product_id: Optional product filter.
+        search: Optional search string for product name, bin code, or batch number.
 
     Returns:
-        list[StockLevel]: Aggregated stock levels.
+        list[StockLevel]: Individual stock records per bin/batch combination.
     """
+    from datetime import date as date_type, timedelta
+
     query = (
-        select(
-            BinContent.product_id,
-            Product.name,
-            Product.sku,
-            BinContent.unit,
-            func.sum(BinContent.quantity).label("total_quantity"),
-            func.count(func.distinct(BinContent.bin_id)).label("bin_count"),
-            func.count(func.distinct(BinContent.batch_number)).label("batch_count"),
-            func.min(BinContent.use_by_date).label("oldest_expiry"),
-            func.max(BinContent.use_by_date).label("newest_expiry"),
+        select(BinContent)
+        .options(
+            selectinload(BinContent.bin).selectinload(Bin.warehouse),
+            selectinload(BinContent.product),
+            selectinload(BinContent.supplier),
         )
-        .join(Product, BinContent.product_id == Product.id)
         .join(Bin, BinContent.bin_id == Bin.id)
+        .join(Product, BinContent.product_id == Product.id)
         .where(
             BinContent.status == "available",
             BinContent.quantity > 0,
         )
-        .group_by(BinContent.product_id, Product.name, Product.sku, BinContent.unit)
+        .order_by(BinContent.use_by_date.asc(), Product.name)
     )
 
     if warehouse_id:
@@ -415,40 +414,43 @@ async def get_stock_levels(
     if product_id:
         query = query.where(BinContent.product_id == product_id)
 
+    # Add search filter (case-insensitive search in product name, bin code, and batch number)
+    if search:
+        search_pattern = f"%{search.lower()}%"
+        query = query.where(
+            func.lower(Product.name).like(search_pattern)
+            | func.lower(Bin.code).like(search_pattern)
+            | func.lower(BinContent.batch_number).like(search_pattern)
+        )
+
     result = await db.execute(query)
-    rows = result.all()
+    bin_contents = result.scalars().all()
 
     stock_levels: list[StockLevel] = []
-    for row in rows:
-        # Get locations for this product
-        locations_query = (
-            select(Bin.code)
-            .join(BinContent, Bin.id == BinContent.bin_id)
-            .where(
-                BinContent.product_id == row.product_id,
-                BinContent.status == "available",
-                BinContent.quantity > 0,
-            )
-            .distinct()
-        )
-        if warehouse_id:
-            locations_query = locations_query.where(Bin.warehouse_id == warehouse_id)
+    today = date_type.today()
 
-        locations_result = await db.execute(locations_query)
-        locations = [loc[0] for loc in locations_result.all()]
+    for bc in bin_contents:
+        # Calculate days until expiry
+        days_until_expiry = 999  # Default for None
+        if bc.use_by_date:
+            days_until_expiry = (bc.use_by_date - today).days
 
         stock_levels.append(
             StockLevel(
-                product_id=row.product_id,
-                product_name=row.name,
-                sku=row.sku,
-                total_quantity=row.total_quantity or Decimal(0),
-                unit=row.unit,
-                bin_count=row.bin_count or 0,
-                batch_count=row.batch_count or 0,
-                oldest_expiry=row.oldest_expiry,
-                newest_expiry=row.newest_expiry,
-                locations=locations,
+                bin_content_id=bc.id,
+                bin_code=bc.bin.code,
+                warehouse_id=bc.bin.warehouse_id,
+                warehouse_name=bc.bin.warehouse.name,
+                product_id=bc.product_id,
+                product_name=bc.product.name,
+                sku=bc.product.sku,
+                batch_number=bc.batch_number,
+                quantity=bc.quantity,
+                unit=bc.unit,
+                weight_kg=bc.weight_kg or bc.quantity,  # Use weight_kg if available, fallback to quantity
+                use_by_date=bc.use_by_date,
+                days_until_expiry=days_until_expiry,
+                status=bc.status,
             )
         )
 

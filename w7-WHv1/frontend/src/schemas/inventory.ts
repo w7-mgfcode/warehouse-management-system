@@ -13,6 +13,7 @@ export const UNIT_OPTIONS = [
 // Receipt schema
 export const receiptSchema = z
   .object({
+    warehouse_id: z.string().min(1, HU.validation.required),
     bin_id: z.string().min(1, HU.validation.required),
     product_id: z.string().min(1, HU.validation.required),
     supplier_id: z.string().optional().or(z.literal("")),

@@ -175,18 +175,22 @@ class FEFORecommendationResponse(BaseModel):
 
 
 class StockLevel(BaseModel):
-    """Stock level summary for a product."""
+    """Detailed stock level for individual bin content."""
 
+    bin_content_id: UUID
+    bin_code: str
+    warehouse_id: UUID
+    warehouse_name: str
     product_id: UUID
     product_name: str
     sku: str | None
-    total_quantity: Decimal
+    batch_number: str
+    quantity: Decimal
     unit: str
-    bin_count: int
-    batch_count: int
-    oldest_expiry: date | None
-    newest_expiry: date | None
-    locations: list[str]
+    weight_kg: Decimal
+    use_by_date: date | None
+    days_until_expiry: int
+    status: str
 
     model_config = ConfigDict(from_attributes=True)
 

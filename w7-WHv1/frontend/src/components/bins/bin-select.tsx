@@ -27,19 +27,30 @@ function BinSelectContent({
   statusFilter,
   disabled,
 }: Omit<BinSelectProps, "label" | "required">) {
-  // CONSTRAINT: Hard limit of 500 bins for dropdown performance.
-  // Bins are warehouse-specific, so 500 per warehouse is more reasonable than 1000.
-  // If more than 500 bins exist, results will be truncated and a warning displayed.
+  // CONSTRAINT: Backend max page_size is 200.
+  // Hard limit of 200 bins for dropdown performance.
+  // Bins are warehouse-specific, so 200 per warehouse is reasonable.
+  // If more than 200 bins exist, results will be truncated and a warning displayed.
   // TODO: Consider implementing Combobox with search for better UX with large bin counts.
+
+  // Skip query if no warehouse selected (avoid fetching all bins)
+  if (!warehouseId) {
+    return (
+      <div className="text-sm text-muted-foreground p-4 text-center">
+        Először válasszon raktárat
+      </div>
+    );
+  }
+
   const { data } = useSuspenseQuery(
     binsQueryOptions({
       warehouse_id: warehouseId,
       status: statusFilter,
-      page_size: 500,
+      page_size: 200,
     })
   );
 
-  const isTruncated = data.total > 500;
+  const isTruncated = data.total > 200;
 
   return (
     <div className="space-y-2">
@@ -67,7 +78,7 @@ function BinSelectContent({
         <Alert variant="destructive" className="py-2">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="text-sm">
-            Figyelem! {data.total} tárolóhelyből csak az első 500 jelenik meg.
+            Figyelem! {data.total} tárolóhelyből csak az első 200 jelenik meg.
             Használja a tárolóhelyek listát részletesebb kereséséhez.
           </AlertDescription>
         </Alert>
