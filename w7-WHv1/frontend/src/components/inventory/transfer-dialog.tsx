@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -46,8 +46,8 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
   const transferMutation = useCreateTransfer();
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
 
-  // Fetch empty bins for target selection
-  const { data: binsData } = useBins({
+  // Fetch empty bins for target selection (only when dialog is open)
+  const { data: binsData, isLoading: binsLoading } = useBins({
     warehouse_id: selectedWarehouse || stock?.warehouse_id,
     status: "empty",
     page_size: 100,
@@ -57,11 +57,18 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
     resolver: zodResolver(transferSchema),
     defaultValues: {
       target_bin_id: "",
-      quantity: stock?.quantity || 0,
+      quantity: 0,
       reason: "",
       notes: "",
     },
   });
+
+  // Update quantity when stock changes
+  useEffect(() => {
+    if (stock && open) {
+      setValue("quantity", stock.quantity);
+    }
+  }, [stock, open, setValue]);
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = form;
   const targetBinId = watch("target_bin_id");
@@ -116,9 +123,21 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
             <Label htmlFor="target_bin_id">
               Cél tárolóhely <span className="text-error">*</span>
             </Label>
-            <Select value={targetBinId} onValueChange={(value) => setValue("target_bin_id", value)}>
+            <Select
+              value={targetBinId}
+              onValueChange={(value) => setValue("target_bin_id", value)}
+              disabled={binsLoading || emptyBins.length === 0}
+            >
               <SelectTrigger id="target_bin_id">
-                <SelectValue placeholder="Válasszon üres tárolóhelyet..." />
+                <SelectValue
+                  placeholder={
+                    binsLoading
+                      ? "Betöltés..."
+                      : emptyBins.length === 0
+                      ? "Nincs elérhető üres tárolóhely"
+                      : "Válasszon üres tárolóhelyet..."
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {emptyBins.map((bin) => (
@@ -128,6 +147,11 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
                 ))}
               </SelectContent>
             </Select>
+            {emptyBins.length === 0 && !binsLoading && (
+              <p className="text-sm text-warning">
+                Nincs elérhető üres tárolóhely ebben a raktárban.
+              </p>
+            )}
             {errors.target_bin_id && (
               <p className="text-sm text-error">{errors.target_bin_id.message}</p>
             )}

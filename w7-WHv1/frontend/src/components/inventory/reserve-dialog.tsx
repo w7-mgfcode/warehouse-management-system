@@ -53,13 +53,18 @@ export function ReserveDialog({ stock, open, onOpenChange }: ReserveDialogProps)
   const onSubmit = handleSubmit((data) => {
     if (!stock) return;
 
+    // Convert datetime-local string to ISO datetime format
+    const reservedUntilISO = data.reserved_until
+      ? new Date(data.reserved_until).toISOString()
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // Default: 7 days from now
+
     reserveMutation.mutate(
       {
         product_id: stock.product_id,
         quantity: data.quantity,
         order_reference: data.order_reference,
         customer_name: data.customer_name,
-        reserved_until: data.reserved_until,
+        reserved_until: reservedUntilISO,
         notes: data.notes,
       },
       {
@@ -141,7 +146,7 @@ export function ReserveDialog({ stock, open, onOpenChange }: ReserveDialogProps)
             </Label>
             <Input
               id="reserved_until"
-              type="date"
+              type="datetime-local"
               {...register("reserved_until")}
             />
             {errors.reserved_until && (
