@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Edit, Trash2 } from "lucide-react";
+import { Archive, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
   Table,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -30,22 +31,29 @@ interface BinListProps {
   bins: Bin[];
   isLoading?: boolean;
   onDelete: (id: string) => void;
+  onArchive: (id: string) => void;
   onBulkDelete?: (ids: string[]) => void;
+  onBulkArchive?: (ids: string[]) => void;
   isDeleting?: boolean;
   isBulkDeleting?: boolean;
+  isBulkArchiving?: boolean;
 }
 
 export function BinList({
   bins,
   isLoading,
   onDelete,
+  onArchive,
   onBulkDelete,
+  onBulkArchive,
   isDeleting,
   isBulkDeleting,
+  isBulkArchiving,
 }: BinListProps) {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [showBulkArchiveDialog, setShowBulkArchiveDialog] = useState(false);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -75,6 +83,14 @@ export function BinList({
     }
   };
 
+  const handleBulkArchive = () => {
+    if (onBulkArchive && selectedIds.size > 0) {
+      onBulkArchive(Array.from(selectedIds));
+      setSelectedIds(new Set());
+      setShowBulkArchiveDialog(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -97,21 +113,32 @@ export function BinList({
 
   return (
     <>
-      {/* Bulk delete button */}
+      {/* Bulk action buttons */}
       {selectedIds.size > 0 && (
         <div className="mb-4 flex items-center justify-between bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
           <span className="text-sm font-medium">
             {selectedIds.size} tárolóhely kiválasztva
           </span>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowBulkDeleteDialog(true)}
-            disabled={isBulkDeleting}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Kiválasztottak törlése
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowBulkArchiveDialog(true)}
+              disabled={isBulkArchiving}
+            >
+              <Archive className="h-4 w-4 mr-2" />
+              Kiválasztottak archiválása
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowBulkDeleteDialog(true)}
+              disabled={isBulkDeleting}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Kiválasztottak törlése
+            </Button>
+          </div>
         </div>
       )}
 
@@ -152,7 +179,14 @@ export function BinList({
                   />
                 </TableCell>
                 <TableCell className="font-mono font-medium">
-                  {bin.code}
+                  <div className="flex items-center gap-2">
+                    {bin.code}
+                    {bin.is_archived && (
+                      <Badge variant="secondary" className="text-xs">
+                        Archivált
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell
                   className="text-sm"
@@ -203,6 +237,18 @@ export function BinList({
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onArchive(bin.id);
+                      }}
+                      disabled={bin.is_archived}
+                      title={bin.is_archived ? "Már archivált" : "Archiválás"}
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
                     <DeleteDialog
                       entityName={bin.code}
                       onConfirm={() => onDelete(bin.id)}
@@ -245,6 +291,37 @@ export function BinList({
               disabled={isBulkDeleting}
             >
               {isBulkDeleting ? "Törlés..." : "Törlés"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk archive confirmation dialog */}
+      <Dialog
+        open={showBulkArchiveDialog}
+        onOpenChange={setShowBulkArchiveDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Biztosan archiválja a kiválasztott tárolóhelyeket?
+            </DialogTitle>
+            <DialogDescription>
+              {selectedIds.size} tárolóhely archivált lesz. Az archivált
+              tárolóhelyek nem jelennek meg alapértelmezésben, de az előzmények
+              megmaradnak.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowBulkArchiveDialog(false)}
+              disabled={isBulkArchiving}
+            >
+              Mégse
+            </Button>
+            <Button onClick={handleBulkArchive} disabled={isBulkArchiving}>
+              {isBulkArchiving ? "Archiválás..." : "Archiválás"}
             </Button>
           </DialogFooter>
         </DialogContent>

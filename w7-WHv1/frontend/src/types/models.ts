@@ -84,6 +84,10 @@ export interface Bin {
   accessibility: string | null;
   notes: string | null;
   is_active: boolean;
+  is_archived: boolean;
+  archived_at: string | null;
+  archived_by: string | null;
+  archive_reason: string | null;
   created_at: string;
   updated_at: string;
 }

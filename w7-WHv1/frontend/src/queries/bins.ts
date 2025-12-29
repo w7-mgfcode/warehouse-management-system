@@ -18,6 +18,7 @@ export interface BinFilters {
   search?: string;
   page?: number;
   page_size?: number;
+  include_archived?: boolean;
 }
 
 export interface BinCreate {
@@ -163,6 +164,23 @@ export function useDeleteBin() {
   return useMutation({
     mutationFn: async (id: string) => {
       await apiClient.delete(`/bins/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: binKeys.all });
+    },
+  });
+}
+
+export function useArchiveBin() {
+  const queryClient = useQueryClient();
+  return useMutation<Bin, Error, { id: string; reason?: string }>({
+    mutationFn: async ({ id, reason }) => {
+      const { data } = await apiClient.post<any>(
+        `/bins/${id}/archive`,
+        undefined,
+        { params: { reason } }
+      );
+      return transformBin(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: binKeys.all });
