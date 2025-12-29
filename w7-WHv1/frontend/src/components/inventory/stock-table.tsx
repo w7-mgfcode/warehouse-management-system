@@ -14,6 +14,7 @@ import { BinStatusBadge } from "@/components/bins/bin-status-badge";
 import { StockRowActions } from "./stock-row-actions";
 import { StockDetailsDialog } from "./stock-details-dialog";
 import { FEFOWarningIndicator } from "./fefo-warning-indicator";
+import { StockMobileCard } from "./stock-mobile-card";
 import type { StockLevel } from "@/queries/inventory";
 import type { BinStatus } from "@/types";
 import { HU } from "@/lib/i18n";
@@ -234,8 +235,8 @@ export function StockTable({
 
   return (
     <div className="space-y-4">
-      {/* Column visibility controls */}
-      <div className="flex justify-end">
+      {/* Column visibility controls - hidden on mobile */}
+      <div className="hidden md:flex justify-end">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
@@ -296,8 +297,30 @@ export function StockTable({
         </DropdownMenu>
       </div>
 
-      {/* Table */}
-      <div className="rounded-md border">
+      {/* Mobile Cards View - shown on small screens */}
+      <div className="md:hidden space-y-3">
+        {sortedData.map((stock) => (
+          <StockMobileCard
+            key={stock.bin_content_id}
+            stock={stock}
+            selected={onSelectionChange ? selectedItems.has(stock.bin_content_id) : undefined}
+            onSelectChange={
+              onSelectionChange
+                ? (checked: boolean) => handleSelectItem(stock.bin_content_id, checked)
+                : undefined
+            }
+            onViewDetails={handleViewDetails}
+            onTransfer={handleTransfer}
+            onIssue={handleIssue}
+            onScrap={handleScrap}
+            onReserve={handleReserve}
+            onViewHistory={handleViewHistory}
+          />
+        ))}
+      </div>
+
+      {/* Table View - hidden on mobile */}
+      <div className="hidden md:block rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>

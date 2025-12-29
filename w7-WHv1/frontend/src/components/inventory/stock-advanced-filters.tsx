@@ -60,7 +60,7 @@ export function StockAdvancedFilters({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <h3 className="text-sm font-medium">Szűrők</h3>
@@ -75,7 +75,7 @@ export function StockAdvancedFilters({
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="h-8 px-2"
+            className="h-8 px-2 w-full sm:w-auto"
           >
             <X className="h-4 w-4 mr-1" />
             Törlés
@@ -83,7 +83,7 @@ export function StockAdvancedFilters({
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Status Filter */}
         <div className="space-y-2">
           <Label htmlFor="status-filter" className="text-xs text-muted-foreground">
