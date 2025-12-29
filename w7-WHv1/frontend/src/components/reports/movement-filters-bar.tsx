@@ -167,15 +167,16 @@ export function MovementFiltersBar({
 
           {/* Date Presets */}
           <div className="space-y-2">
-            <Label>
-              <Calendar className="inline h-4 w-4 mr-1" />
+            <Label className="text-xs md:text-sm">
+              <Calendar className="inline h-3 w-3 md:h-4 md:w-4 mr-1" />
               Időszak
             </Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 md:flex md:flex-wrap gap-2">
               <Button
                 type="button"
                 variant={datePreset === "today" ? "default" : "outline"}
                 size="sm"
+                className="text-xs h-8"
                 onClick={() => handleDatePresetChange("today")}
               >
                 Ma
@@ -184,6 +185,7 @@ export function MovementFiltersBar({
                 type="button"
                 variant={datePreset === "yesterday" ? "default" : "outline"}
                 size="sm"
+                className="text-xs h-8"
                 onClick={() => handleDatePresetChange("yesterday")}
               >
                 Tegnap
@@ -192,30 +194,34 @@ export function MovementFiltersBar({
                 type="button"
                 variant={datePreset === "last7" ? "default" : "outline"}
                 size="sm"
+                className="text-xs h-8"
                 onClick={() => handleDatePresetChange("last7")}
               >
-                Utolsó 7 nap
+                7 nap
               </Button>
               <Button
                 type="button"
                 variant={datePreset === "last30" ? "default" : "outline"}
                 size="sm"
+                className="text-xs h-8"
                 onClick={() => handleDatePresetChange("last30")}
               >
-                Utolsó 30 nap
+                30 nap
               </Button>
               <Button
                 type="button"
                 variant={datePreset === "thisMonth" ? "default" : "outline"}
                 size="sm"
+                className="text-xs h-8"
                 onClick={() => handleDatePresetChange("thisMonth")}
               >
-                Ez a hónap
+                E. hónap
               </Button>
               <Button
                 type="button"
                 variant={datePreset === "custom" ? "default" : "outline"}
                 size="sm"
+                className="text-xs h-8"
                 onClick={() => setDatePreset("custom")}
               >
                 Egyedi
@@ -224,13 +230,16 @@ export function MovementFiltersBar({
           </div>
 
           {/* Custom Date Range */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="start_date">Kezdő dátum</Label>
+              <Label htmlFor="start_date" className="text-xs md:text-sm">
+                Kezdő dátum
+              </Label>
               <Input
                 id="start_date"
                 type="date"
                 value={startDate}
+                className="h-9 text-sm"
                 onChange={(e) => {
                   setStartDate(e.target.value);
                   setDatePreset("custom");
@@ -238,11 +247,14 @@ export function MovementFiltersBar({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="end_date">Záró dátum</Label>
+              <Label htmlFor="end_date" className="text-xs md:text-sm">
+                Záró dátum
+              </Label>
               <Input
                 id="end_date"
                 type="date"
                 value={endDate}
+                className="h-9 text-sm"
                 onChange={(e) => {
                   setEndDate(e.target.value);
                   setDatePreset("custom");
@@ -255,10 +267,11 @@ export function MovementFiltersBar({
           {hasActiveFilters && (
             <Button
               variant="outline"
+              size="sm"
               onClick={handleClearFilters}
-              className="w-full"
+              className="w-full text-xs md:text-sm h-9"
             >
-              <X className="h-4 w-4 mr-2" />
+              <X className="h-3 w-3 md:h-4 md:w-4 mr-2" />
               Szűrők törlése
             </Button>
           )}

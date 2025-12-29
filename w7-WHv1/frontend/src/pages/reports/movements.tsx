@@ -68,30 +68,32 @@ export default function MovementsReportPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 pb-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3 md:gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("/reports")}
+            className="shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
               Mozgási riport
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Készletmozgások részletes áttekintése és elemzése
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">
+              Készletmozgások részletes áttekintése
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 self-end md:self-auto">
           <Button
             onClick={handlePrint}
             variant="outline"
+            size="sm"
             className="hidden md:flex print:hidden"
           >
             <FileText className="h-4 w-4 mr-2" />
@@ -100,10 +102,12 @@ export default function MovementsReportPage() {
           <Button
             onClick={handleExport}
             variant="outline"
+            size="sm"
             className="print:hidden"
           >
-            <Download className="h-4 w-4 mr-2" />
-            Exportálás CSV
+            <Download className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Exportálás CSV</span>
+            <span className="md:hidden">Export</span>
           </Button>
         </div>
       </div>
