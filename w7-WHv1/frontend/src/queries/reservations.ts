@@ -1,6 +1,15 @@
-import { queryOptions, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useMutation,
+  useQueryClient,
+  useQuery,
+} from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import type { StockReservation, PaginatedResponse } from "@/types";
+import type {
+  StockReservation,
+  ReservationDetail,
+  PaginatedResponse,
+} from "@/types";
 
 export interface ReservationCreate {
   product_id: string;
@@ -18,6 +27,7 @@ export interface ReservationFulfill {
 export interface ReservationFilters {
   status?: "active" | "fulfilled" | "cancelled" | "expired";
   product_id?: string;
+  order_reference?: string;
   page?: number;
   page_size?: number;
 }
@@ -26,7 +36,8 @@ export interface ReservationFilters {
 export const reservationKeys = {
   all: ["reservations"] as const,
   lists: () => [...reservationKeys.all, "list"] as const,
-  list: (filters: ReservationFilters) => [...reservationKeys.lists(), filters] as const,
+  list: (filters: ReservationFilters) =>
+    [...reservationKeys.lists(), filters] as const,
   expiring: () => [...reservationKeys.all, "expiring"] as const,
   details: () => [...reservationKeys.all, "detail"] as const,
   detail: (id: string) => [...reservationKeys.details(), id] as const,
@@ -49,7 +60,9 @@ export const reservationQueryOptions = (id: string) =>
   queryOptions({
     queryKey: reservationKeys.detail(id),
     queryFn: async () => {
-      const { data } = await apiClient.get<StockReservation>(`/reservations/${id}/`);
+      const { data } = await apiClient.get<ReservationDetail>(
+        `/reservations/${id}/`
+      );
       return data;
     },
     enabled: !!id,
@@ -59,7 +72,9 @@ export const expiringReservationsQueryOptions = () =>
   queryOptions({
     queryKey: reservationKeys.expiring(),
     queryFn: async () => {
-      const { data } = await apiClient.get<StockReservation[]>("/reservations/expiring/");
+      const { data } = await apiClient.get<StockReservation[]>(
+        "/reservations/expiring/"
+      );
       return data;
     },
   });
@@ -83,7 +98,10 @@ export function useFulfillReservation(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: ReservationFulfill) => {
-      const response = await apiClient.post(`/reservations/${id}/fulfill`, data);
+      const response = await apiClient.post(
+        `/reservations/${id}/fulfill`,
+        data
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -97,9 +115,17 @@ export function useFulfillReservation(id: string) {
 export function useCancelReservation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+    mutationFn: async ({
+      id,
+      reason,
+      notes,
+    }: {
+      id: string;
+      reason: string;
+      notes?: string;
+    }) => {
       const { data } = await apiClient.delete(`/reservations/${id}`, {
-        data: { reason },
+        data: { reason, notes },
       });
       return data;
     },

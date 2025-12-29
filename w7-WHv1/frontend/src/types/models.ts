@@ -106,7 +106,12 @@ export interface BinContent {
 }
 
 // Movement types
-export type MovementType = "receipt" | "issue" | "adjustment" | "transfer" | "scrap";
+export type MovementType =
+  | "receipt"
+  | "issue"
+  | "adjustment"
+  | "transfer"
+  | "scrap";
 
 export interface BinMovement {
   id: string;
@@ -177,25 +182,51 @@ export interface BinWithContent extends Bin {
 }
 
 // Stock Reservation types
-export type ReservationStatus = "active" | "fulfilled" | "cancelled" | "expired";
+export type ReservationStatus =
+  | "active"
+  | "fulfilled"
+  | "cancelled"
+  | "expired";
 
 export interface StockReservation {
   id: string;
-  product_id: string;
-  warehouse_id: string;
-  requested_quantity: number;
-  reserved_quantity: number;
+  product_name: string;
+  sku: string | null;
+  order_reference: string;
+  customer_name: string | null;
+  total_quantity: number;
+  reserved_until: string;
   status: ReservationStatus;
-  customer_reference: string | null;
-  notes: string | null;
-  expires_at: string;
-  created_by: string;
   created_at: string;
+}
+
+export interface ReservationItem {
+  id: string;
+  bin_content_id: string;
+  bin_code: string;
+  batch_number: string;
+  use_by_date: string;
+  quantity_reserved: number;
+  days_until_expiry: number;
+}
+
+export interface ReservationDetail extends StockReservation {
+  product_id: string;
+  fulfilled_at: string | null;
+  cancelled_at: string | null;
+  cancellation_reason: string | null;
+  items: ReservationItem[];
+  created_by: string;
+  notes: string | null;
   updated_at: string;
 }
 
 // Warehouse Transfer types
-export type TransferStatus = "pending" | "dispatched" | "completed" | "cancelled";
+export type TransferStatus =
+  | "pending"
+  | "dispatched"
+  | "completed"
+  | "cancelled";
 
 export interface WarehouseTransfer {
   id: string;

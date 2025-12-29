@@ -1,14 +1,26 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from "lucide-react";
 import type { StockReservation } from "@/types";
 import { HU } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/date";
 import { formatNumber } from "@/lib/number";
+import { ReservationRowActions } from "./reservation-row-actions";
 
 interface ReservationListProps {
   reservations: StockReservation[];
   isLoading?: boolean;
+  onViewDetails?: (reservation: StockReservation) => void;
+  onFulfill?: (reservation: StockReservation) => void;
+  onCancel?: (reservation: StockReservation) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -25,7 +37,21 @@ const statusLabels: Record<string, string> = {
   expired: HU.status.expired,
 };
 
-export function ReservationList({ reservations, isLoading }: ReservationListProps) {
+function isExpiringSoon(reservedUntil: string): boolean {
+  const expiryDate = new Date(reservedUntil);
+  const now = new Date();
+  const hoursUntilExpiry =
+    (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+  return hoursUntilExpiry <= 24 && hoursUntilExpiry > 0;
+}
+
+export function ReservationList({
+  reservations,
+  isLoading,
+  onViewDetails,
+  onFulfill,
+  onCancel,
+}: ReservationListProps) {
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -53,35 +79,75 @@ export function ReservationList({ reservations, isLoading }: ReservationListProp
             <TableHead>Vevő</TableHead>
             <TableHead>Termék</TableHead>
             <TableHead>Mennyiség</TableHead>
-            <TableHead>Lefoglalva</TableHead>
-            <TableHead>Lejárat</TableHead>
+            <TableHead>Létrehozva</TableHead>
+            <TableHead>Foglalva eddig</TableHead>
             <TableHead>Státusz</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {reservations.map((reservation) => (
-            <TableRow key={reservation.id}>
-              <TableCell className="font-medium">
-                {reservation.customer_reference}
-              </TableCell>
-              <TableCell>{reservation.notes || "—"}</TableCell>
-              <TableCell>{reservation.product_id}</TableCell>
-              <TableCell>
-                {formatNumber(reservation.requested_quantity, 0)} kg
-              </TableCell>
-              <TableCell>
-                {formatNumber(reservation.reserved_quantity, 0)} kg
-              </TableCell>
-              <TableCell className="text-sm">
-                {formatDateTime(reservation.expires_at)}
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline" className={statusColors[reservation.status]}>
-                  {statusLabels[reservation.status] || reservation.status}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          ))}
+          {reservations.map((reservation) => {
+            const expiringSoon =
+              reservation.status === "active" &&
+              isExpiringSoon(reservation.reserved_until);
+
+            return (
+              <TableRow
+                key={reservation.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onViewDetails?.(reservation)}
+              >
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    {reservation.order_reference}
+                    {expiringSoon && (
+                      <AlertCircle className="h-4 w-4 text-warning" />
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>{reservation.customer_name || "—"}</TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">
+                      {reservation.product_name}
+                    </div>
+                    {reservation.sku && (
+                      <div className="text-xs text-muted-foreground">
+                        {reservation.sku}
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {formatNumber(reservation.total_quantity, 0)} kg
+                </TableCell>
+                <TableCell>{formatDateTime(reservation.created_at)}</TableCell>
+                <TableCell className="text-sm">
+                  <div
+                    className={expiringSoon ? "text-warning font-medium" : ""}
+                  >
+                    {formatDateTime(reservation.reserved_until)}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={statusColors[reservation.status]}
+                  >
+                    {statusLabels[reservation.status] || reservation.status}
+                  </Badge>
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <ReservationRowActions
+                    reservation={reservation}
+                    onViewDetails={onViewDetails}
+                    onFulfill={onFulfill}
+                    onCancel={onCancel}
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
