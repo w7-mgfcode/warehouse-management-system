@@ -56,7 +56,7 @@ export function WarehouseList({ warehouses, isLoading, onDelete, isDeleting }: W
               className="cursor-pointer hover:bg-secondary/50"
               onClick={() => navigate(`/warehouses/${warehouse.id}`)}
             >
-              <TableCell className="font-medium">{warehouse.name}</TableCell>
+              <TableCell className="font-medium text-foreground">{warehouse.name}</TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 {warehouse.location || "—"}
               </TableCell>
