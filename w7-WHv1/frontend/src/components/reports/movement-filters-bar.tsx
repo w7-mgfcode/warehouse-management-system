@@ -33,10 +33,19 @@ type DatePreset =
 export function MovementFiltersBar({
   onFiltersChange,
 }: MovementFiltersBarProps) {
+  const today = new Date().toISOString().split("T")[0];
   const [movementType, setMovementType] = useState<MovementType | "all">("all");
-  const [datePreset, setDatePreset] = useState<DatePreset>("custom");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [datePreset, setDatePreset] = useState<DatePreset>("today");
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
+
+  // Initialize with default "today" filter on mount
+  useEffect(() => {
+    onFiltersChange({
+      start_date: today,
+      end_date: today,
+    });
+  }, []); // Run only once on mount
 
   // Auto-apply filters when dates change (with debounce)
   useEffect(() => {

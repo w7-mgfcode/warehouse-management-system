@@ -12,11 +12,15 @@ import { toast } from "sonner";
 
 export default function MovementsReportPage() {
   const navigate = useNavigate();
+  const today = new Date().toISOString().split("T")[0];
   const [filters, setFilters] = useState<{
     movement_type?: MovementType;
     start_date?: string;
     end_date?: string;
-  }>({});
+  }>({
+    start_date: today,
+    end_date: today,
+  });
 
   // Fetch data with current filters for stats and export
   const { data, isLoading } = useMovements({
