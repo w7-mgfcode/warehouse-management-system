@@ -1,6 +1,6 @@
 """Movement history API endpoints."""
 
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -27,8 +27,8 @@ async def list_movements(
     product_id: UUID | None = Query(None, description="Filter by product"),
     bin_id: UUID | None = Query(None, description="Filter by bin"),
     movement_type: MovementType | None = Query(None, description="Filter by type"),
-    start_date: date | None = Query(None, description="Filter by start date"),
-    end_date: date | None = Query(None, description="Filter by end date"),
+    start_date: str | None = Query(None, description="Filter by start date (YYYY-MM-DD)"),
+    end_date: str | None = Query(None, description="Filter by end date (YYYY-MM-DD)"),
     created_by: UUID | None = Query(None, description="Filter by user"),
 ) -> MovementListResponse:
     """
@@ -36,6 +36,28 @@ async def list_movements(
 
     Immutable audit trail of inventory transactions.
     """
+    # Parse date strings to date objects
+    parsed_start_date: date | None = None
+    parsed_end_date: date | None = None
+    
+    if start_date:
+        try:
+            parsed_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid start_date format. Use YYYY-MM-DD",
+            )
+    
+    if end_date:
+        try:
+            parsed_end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid end_date format. Use YYYY-MM-DD",
+            )
+    
     movements, total = await get_movements(
         db=db,
         page=page,
@@ -43,8 +65,8 @@ async def list_movements(
         product_id=product_id,
         bin_id=bin_id,
         movement_type=movement_type,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=parsed_start_date,
+        end_date=parsed_end_date,
         created_by=created_by,
     )
 
