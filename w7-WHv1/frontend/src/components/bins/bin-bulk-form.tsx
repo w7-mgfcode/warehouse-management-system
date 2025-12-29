@@ -355,6 +355,8 @@ export function BinBulkForm({
     : null;
 
   const handlePreview = () => {
+    console.log("🔍 Preview Debug:", { template, fieldRanges });
+
     if (!template) {
       toast.error("Kérem válasszon raktárt először");
       return;
@@ -365,10 +367,13 @@ export function BinBulkForm({
       .filter((field) => field.required)
       .filter((field) => {
         const range = fieldRanges[field.name];
+        console.log(`🔍 Field ${field.name}:`, { field, range });
         if (!range) return true;
         if (range.text !== undefined) return !range.text.trim();
         return range.start === undefined || range.end === undefined;
       });
+
+    console.log("🔍 Missing fields:", missingFields);
 
     if (missingFields.length > 0) {
       toast.error(
@@ -380,7 +385,9 @@ export function BinBulkForm({
     }
 
     try {
+      console.log("🔍 Generating preview with:", { template, fieldRanges });
       const previewData = generateTemplatePreview(template, fieldRanges);
+      console.log("🔍 Preview generated:", previewData.length, "bins");
 
       if (previewData.length === 0) {
         toast.error("Nincs létrehozható tárolóhely a megadott tartományokkal");
