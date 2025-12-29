@@ -19,15 +19,16 @@ export interface BinColorConfig {
 
 /**
  * Get the highest priority urgency from bin contents
+ * Only considers contents with quantity > 0
  */
-function getHighestUrgency(
-  bin: BinWithContent
-): ExpiryUrgency | null {
+function getHighestUrgency(bin: BinWithContent): ExpiryUrgency | null {
   if (!bin.contents || bin.contents.length === 0) {
     return null;
   }
 
+  // Only consider contents with quantity > 0
   const urgencies = bin.contents
+    .filter((c) => c.quantity > 0)
     .map((c) => c.urgency)
     .filter((u): u is ExpiryUrgency => u !== null);
 

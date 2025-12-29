@@ -44,7 +44,10 @@ export function BinDetailsDialog({
 }: BinDetailsDialogProps) {
   if (!bin) return null;
 
-  const hasContents = bin.contents && bin.contents.length > 0;
+  // Filter out contents with zero quantity
+  const activeContents =
+    bin.contents?.filter((content) => content.quantity > 0) || [];
+  const hasContents = activeContents.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -65,10 +68,10 @@ export function BinDetailsDialog({
                 {bin.status === "empty"
                   ? "Üres"
                   : bin.status === "occupied"
-                    ? "Foglalt"
-                    : bin.status === "reserved"
-                      ? "Fenntartva"
-                      : "Inaktív"}
+                  ? "Foglalt"
+                  : bin.status === "reserved"
+                  ? "Fenntartva"
+                  : "Inaktív"}
               </Badge>
             </div>
 
@@ -95,7 +98,9 @@ export function BinDetailsDialog({
 
             {bin.accessibility && (
               <div className="col-span-2">
-                <p className="text-sm text-muted-foreground">Megközelíthetőség</p>
+                <p className="text-sm text-muted-foreground">
+                  Megközelíthetőség
+                </p>
                 <p className="mt-1 font-medium">{bin.accessibility}</p>
               </div>
             )}
@@ -125,11 +130,13 @@ export function BinDetailsDialog({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bin.contents.map((content) => (
+                    {activeContents.map((content) => (
                       <TableRow key={content.id}>
                         <TableCell>
                           <div>
-                            <p className="font-medium">{content.product_name}</p>
+                            <p className="font-medium">
+                              {content.product_name}
+                            </p>
                             {content.product_sku && (
                               <p className="text-xs text-muted-foreground">
                                 SKU: {content.product_sku}
@@ -172,12 +179,12 @@ export function BinDetailsDialog({
                               {content.urgency === "expired"
                                 ? "Lejárt"
                                 : content.urgency === "critical"
-                                  ? "Kritikus"
-                                  : content.urgency === "high"
-                                    ? "Magas"
-                                    : content.urgency === "medium"
-                                      ? "Közepes"
-                                      : "Alacsony"}
+                                ? "Kritikus"
+                                : content.urgency === "high"
+                                ? "Magas"
+                                : content.urgency === "medium"
+                                ? "Közepes"
+                                : "Alacsony"}
                             </Badge>
                           ) : (
                             <span className="text-muted-foreground">-</span>
@@ -190,7 +197,7 @@ export function BinDetailsDialog({
               </div>
 
               {/* Warning for expired/critical items */}
-              {bin.contents.some(
+              {activeContents.some(
                 (c) => c.urgency === "expired" || c.urgency === "critical"
               ) && (
                 <div className="mt-2 flex items-start gap-2 rounded-md bg-destructive/10 p-3 text-sm text-destructive">

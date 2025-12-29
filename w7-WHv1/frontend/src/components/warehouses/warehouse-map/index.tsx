@@ -26,7 +26,9 @@ const DEFAULT_ZOOM_INDEX = 3; // 100px
 
 export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
   // Fetch warehouse data for template
-  const { data: warehouse } = useSuspenseQuery(warehouseQueryOptions(warehouseId));
+  const { data: warehouse } = useSuspenseQuery(
+    warehouseQueryOptions(warehouseId)
+  );
 
   // State management
   const [search, setSearch] = useState("");
@@ -50,13 +52,16 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
     const levelSet = new Set<string>();
     binsData.items.forEach((bin) => {
       // Check common level field names
-      const level = bin.structure_data.level ||
-                    bin.structure_data.szint ||
-                    bin.structure_data.floor ||
-                    bin.structure_data.emelet;
+      const level =
+        bin.structure_data.level ||
+        bin.structure_data.szint ||
+        bin.structure_data.floor ||
+        bin.structure_data.emelet;
       if (level) levelSet.add(String(level));
     });
-    return Array.from(levelSet).sort((a, b) => a.localeCompare(b, "hu", { numeric: true }));
+    return Array.from(levelSet).sort((a, b) =>
+      a.localeCompare(b, "hu", { numeric: true })
+    );
   }, [binsData.items]);
 
   // 🎯 Enhancement 2: Auto-select first level on load (default to Level 01)
@@ -73,9 +78,7 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
     // Filter by search
     if (search) {
       const searchLower = search.toLowerCase();
-      bins = bins.filter((bin) =>
-        bin.code.toLowerCase().includes(searchLower)
-      );
+      bins = bins.filter((bin) => bin.code.toLowerCase().includes(searchLower));
     }
 
     // Filter by status
@@ -86,10 +89,11 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
     // Filter by level
     if (levelFilter !== "all") {
       bins = bins.filter((bin) => {
-        const level = bin.structure_data.level ||
-                      bin.structure_data.szint ||
-                      bin.structure_data.floor ||
-                      bin.structure_data.emelet;
+        const level =
+          bin.structure_data.level ||
+          bin.structure_data.szint ||
+          bin.structure_data.floor ||
+          bin.structure_data.emelet;
         return String(level) === levelFilter;
       });
     }
@@ -133,17 +137,31 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
     <div className="warehouse-map-container space-y-3 sm:space-y-4">
       {/* Mobile tip */}
       <div className="md:hidden bg-muted/50 border border-border rounded-lg p-3 text-sm text-muted-foreground">
-        💡 <strong>Tipp:</strong> Forgasd el a készülékedet fekvő módba a jobb térképnézetért, vagy használd a zoom gombokat.
+        💡 <strong>Tipp:</strong> Forgasd el a készülékedet fekvő módba a jobb
+        térképnézetért, vagy használd a zoom gombokat.
       </div>
 
       {/* 🎯 Level Tabs for floor selection */}
       {uniqueLevels.length > 0 && (
-        <Tabs value={levelFilter} onValueChange={setLevelFilter} className="w-full">
+        <Tabs
+          value={levelFilter}
+          onValueChange={setLevelFilter}
+          className="w-full"
+        >
           <div className="overflow-x-auto pb-1">
             <TabsList className="w-full sm:w-auto inline-flex">
-              <TabsTrigger value="all" className="whitespace-nowrap text-xs sm:text-sm">Összes szint</TabsTrigger>
+              <TabsTrigger
+                value="all"
+                className="whitespace-nowrap text-xs sm:text-sm"
+              >
+                Összes szint
+              </TabsTrigger>
               {uniqueLevels.map((level) => (
-                <TabsTrigger key={level} value={level} className="whitespace-nowrap text-xs sm:text-sm">
+                <TabsTrigger
+                  key={level}
+                  value={level}
+                  className="whitespace-nowrap text-xs sm:text-sm"
+                >
                   Szint {level}
                 </TabsTrigger>
               ))}
@@ -179,18 +197,26 @@ export function WarehouseMap({ warehouseId }: WarehouseMapProps) {
         </div>
 
         {/* Legend */}
-        <WarehouseMapLegend />
+        <WarehouseMapLegend bins={filteredBins} />
       </div>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-sm">
         <div className="rounded-lg border bg-card p-2 sm:p-3">
-          <p className="text-muted-foreground text-xs sm:text-sm">Összes tárolóhely</p>
-          <p className="text-xl sm:text-2xl font-bold text-card-foreground">{binsData.items.length}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm">
+            Összes tárolóhely
+          </p>
+          <p className="text-xl sm:text-2xl font-bold text-card-foreground">
+            {binsData.items.length}
+          </p>
         </div>
         <div className="rounded-lg border bg-card p-2 sm:p-3">
-          <p className="text-muted-foreground text-xs sm:text-sm">Megjelenítve</p>
-          <p className="text-xl sm:text-2xl font-bold text-card-foreground">{filteredBins.length}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm">
+            Megjelenítve
+          </p>
+          <p className="text-xl sm:text-2xl font-bold text-card-foreground">
+            {filteredBins.length}
+          </p>
         </div>
         <div className="rounded-lg border bg-card p-2 sm:p-3">
           <p className="text-muted-foreground text-xs sm:text-sm">Foglalt</p>
