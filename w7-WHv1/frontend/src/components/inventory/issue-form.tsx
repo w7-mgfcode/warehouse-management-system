@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ interface IssueFormProps {
 }
 
 export function IssueForm({ onSuccess }: IssueFormProps) {
+  const [searchParams] = useSearchParams();
   const [selectedProduct, setSelectedProduct] = useState("");
   const [requestedQuantity, setRequestedQuantity] = useState<number>(0);
   const [showFEFO, setShowFEFO] = useState(false);
@@ -50,8 +52,16 @@ export function IssueForm({ onSuccess }: IssueFormProps) {
     },
   });
 
-  const { register, handleSubmit, watch, formState: { errors } } = form;
+  const { register, handleSubmit, watch, formState: { errors }, setValue } = form;
   const forceNonFEFO = watch("force_non_fefo");
+
+  // Pre-fill bin_content_id from URL parameter if provided
+  useEffect(() => {
+    const binContentId = searchParams.get("bin_content_id");
+    if (binContentId) {
+      setValue("bin_content_id", binContentId);
+    }
+  }, [searchParams, setValue]);
 
   const handleShowFEFO = () => {
     if (!selectedProduct || requestedQuantity <= 0) {

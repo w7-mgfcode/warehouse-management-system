@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import { ExpiryBadge } from "./expiry-badge";
 import { BinStatusBadge } from "@/components/bins/bin-status-badge";
 import { StockRowActions } from "./stock-row-actions";
 import { StockDetailsDialog } from "./stock-details-dialog";
+import { MovementHistoryDialog } from "./movement-history-dialog";
 import { FEFOWarningIndicator } from "./fefo-warning-indicator";
 import { StockMobileCard } from "./stock-mobile-card";
 import type { StockLevel } from "@/queries/inventory";
@@ -62,11 +64,13 @@ export function StockTable({
   selectedItems = new Set(),
   onSelectionChange,
 }: StockTableProps) {
+  const navigate = useNavigate();
   const [sortField, setSortField] = useState<SortField>("none");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
   const [selectedStock, setSelectedStock] = useState<StockLevel | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [movementHistoryDialogOpen, setMovementHistoryDialogOpen] = useState(false);
 
   // Sorting logic
   const sortedData = useMemo(() => {
@@ -169,8 +173,8 @@ export function StockTable({
   };
 
   const handleIssue = (stock: StockLevel) => {
-    toast.info(`Kiadás funkció hamarosan elérhető: ${stock.product_name}`);
-    // TODO: Open issue dialog
+    // Navigate to issue page with pre-filled bin_content_id
+    navigate(`/inventory/issue?bin_content_id=${stock.bin_content_id}`);
   };
 
   const handleScrap = (stock: StockLevel) => {
@@ -184,8 +188,8 @@ export function StockTable({
   };
 
   const handleViewHistory = (stock: StockLevel) => {
-    toast.info(`Mozgástörténet funkció hamarosan elérhető: ${stock.product_name}`);
-    // TODO: Open movement history dialog
+    setSelectedStock(stock);
+    setMovementHistoryDialogOpen(true);
   };
 
   // Selection handlers
@@ -446,6 +450,13 @@ export function StockTable({
         stock={selectedStock}
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
+      />
+
+      {/* Movement History Dialog */}
+      <MovementHistoryDialog
+        stock={selectedStock}
+        open={movementHistoryDialogOpen}
+        onOpenChange={setMovementHistoryDialogOpen}
       />
     </div>
   );
