@@ -474,7 +474,10 @@ export function BinBulkForm({
             ranges[field.name] = values;
           } else {
             // Comma-separated
-            ranges[field.name] = trimmed.split(",").map((v) => v.trim()).filter(Boolean);
+            ranges[field.name] = trimmed
+              .split(",")
+              .map((v) => v.trim())
+              .filter(Boolean);
           }
         } else if (range.start !== undefined && range.end !== undefined) {
           // Numeric range
@@ -489,9 +492,7 @@ export function BinBulkForm({
     const submitData = {
       warehouse_id: data.warehouse_id,
       ranges,
-      defaults: data.capacity_kg
-        ? { max_weight: data.capacity_kg }
-        : null,
+      defaults: data.capacity_kg ? { max_weight: data.capacity_kg } : null,
     };
 
     console.log("🔍 Submitting bulk create:", submitData);
@@ -909,6 +910,14 @@ export function BinBulkForm({
           <Button
             type="submit"
             disabled={bulkMutation.isPending || !showPreview}
+            onClick={() =>
+              console.log("🔍 Create button clicked:", {
+                isPending: bulkMutation.isPending,
+                showPreview,
+                previewLength: preview.length,
+                disabled: bulkMutation.isPending || !showPreview,
+              })
+            }
           >
             {bulkMutation.isPending ? (
               <>
