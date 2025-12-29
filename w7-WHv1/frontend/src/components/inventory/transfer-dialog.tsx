@@ -63,15 +63,15 @@ export function TransferDialog({ stock, open, onOpenChange }: TransferDialogProp
     },
   });
 
+  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = form;
+  const targetBinId = watch("target_bin_id");
+
   // Update quantity when stock changes
   useEffect(() => {
     if (stock && open) {
       setValue("quantity", stock.quantity);
     }
   }, [stock, open, setValue]);
-
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = form;
-  const targetBinId = watch("target_bin_id");
 
   const onSubmit = handleSubmit((data) => {
     if (!stock) return;
