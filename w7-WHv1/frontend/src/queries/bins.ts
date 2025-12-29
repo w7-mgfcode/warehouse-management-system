@@ -173,23 +173,30 @@ export function useDeleteBin() {
 export function useBulkCreateBins() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (bulkData: BulkBinCreate) => {
-      // Transform frontend format to backend format
-      const backendData = {
-        warehouse_id: bulkData.warehouse_id,
-        ranges: {
-          aisle: bulkData.aisles,
-          rack: { start: bulkData.rack_start, end: bulkData.rack_end },
-          level: { start: bulkData.level_start, end: bulkData.level_end },
-          position: {
-            start: bulkData.position_start,
-            end: bulkData.position_end,
+    mutationFn: async (bulkData: BulkBinCreate | any) => {
+      // Check if template-aware mode (has 'ranges' already)
+      let backendData;
+      if ("ranges" in bulkData && typeof bulkData.ranges === "object") {
+        // Template-aware mode: use data as-is
+        backendData = bulkData;
+      } else {
+        // Legacy mode: transform frontend format to backend format
+        backendData = {
+          warehouse_id: bulkData.warehouse_id,
+          ranges: {
+            aisle: bulkData.aisles,
+            rack: { start: bulkData.rack_start, end: bulkData.rack_end },
+            level: { start: bulkData.level_start, end: bulkData.level_end },
+            position: {
+              start: bulkData.position_start,
+              end: bulkData.position_end,
+            },
           },
-        },
-        defaults: bulkData.capacity_kg
-          ? { max_weight: bulkData.capacity_kg }
-          : null,
-      };
+          defaults: bulkData.capacity_kg
+            ? { max_weight: bulkData.capacity_kg }
+            : null,
+        };
+      }
       const { data } = await apiClient.post("/bins/bulk", backendData);
       return data;
     },
