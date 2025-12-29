@@ -1,26 +1,39 @@
 import { useState } from "react";
-import { Download, ArrowLeft } from "lucide-react";
+import { Download, ArrowLeft, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { MovementHistory } from "@/components/inventory/movement-history";
+import { MovementStats } from "@/components/reports/movement-stats";
+import { MovementFiltersBar } from "@/components/reports/movement-filters-bar";
 import { useMovements } from "@/queries/movements";
+import type { MovementType } from "@/types";
 import { exportToCSV } from "@/lib/export";
 import { toast } from "sonner";
 
 export default function MovementsReportPage() {
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [filters, setFilters] = useState<{
+    movement_type?: MovementType;
+    search?: string;
+    start_date?: string;
+    end_date?: string;
+  }>({});
 
-  const { data } = useMovements({
-    start_date: startDate,
-    end_date: endDate,
+  // Fetch data with current filters
+  const { data, isLoading } = useMovements({
+    ...filters,
     page: 1,
     page_size: 500,
   });
+
+  const handleFiltersChange = (newFilters: {
+    movement_type?: MovementType;
+    search?: string;
+    start_date?: string;
+    end_date?: string;
+  }) => {
+    setFilters(newFilters);
+  };
 
   const handleExport = () => {
     if (!data || data.items.length === 0) {
@@ -28,73 +41,98 @@ export default function MovementsReportPage() {
       return;
     }
 
-    exportToCSV(
-      data.items,
-      "mozgasi_riport",
-      {
-        created_at: "Dátum",
-        movement_type: "Típus",
-        product_name: "Termék",
-        bin_code: "Tárolóhely",
-        batch_number: "Sarzs",
-        quantity: "Mennyiség",
-        unit: "Egység",
-        quantity_before: "Készlet előtte",
-        quantity_after: "Készlet utána",
-        created_by: "Felhasználó",
-        reason: "Indok",
-      }
-    );
+    const timestamp = new Date().toISOString().split("T")[0];
+    exportToCSV(data.items, `mozgasi_riport_${timestamp}`, {
+      created_at: "Dátum",
+      movement_type: "Típus",
+      product_name: "Termék",
+      sku: "SKU",
+      bin_code: "Tárolóhely",
+      batch_number: "Sarzs",
+      quantity: "Mennyiség",
+      unit: "Egység",
+      quantity_before: "Készlet előtte",
+      quantity_after: "Készlet utána",
+      created_by: "Felhasználó",
+      reason: "Indok",
+      notes: "Megjegyzések",
+    });
 
-    toast.success("Riport exportálva");
+    toast.success(`Riport exportálva: ${data.items.length} mozgás`);
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/reports")}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold text-foreground">Mozgási riport</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">
+              Mozgási riport
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Készletmozgások részletes áttekintése és elemzése
+            </p>
+          </div>
         </div>
-        <Button onClick={handleExport} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Exportálás CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handlePrint}
+            variant="outline"
+            className="hidden md:flex print:hidden"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Nyomtatás
+          </Button>
+          <Button
+            onClick={handleExport}
+            variant="outline"
+            className="print:hidden"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportálás CSV
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="start_date">Kezdő dátum</Label>
-              <Input
-                id="start_date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="end_date">Záró dátum</Label>
-              <Input
-                id="end_date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filters */}
+      <div className="print:hidden">
+        <MovementFiltersBar onFiltersChange={handleFiltersChange} />
+      </div>
 
-      <MovementHistory
-        filters={{
-          start_date: startDate,
-          end_date: endDate,
-        }}
-      />
+      {/* Statistics Dashboard */}
+      {data && data.items.length > 0 && (
+        <MovementStats movements={data.items} />
+      )}
+
+      {/* Loading state */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <div className="text-muted-foreground">Mozgások betöltése...</div>
+        </div>
+      )}
+
+      {/* Movement History Table */}
+      {!isLoading && (
+        <MovementHistory
+          filters={{
+            ...filters,
+            page: 1,
+            page_size: 500,
+          }}
+        />
+      )}
     </div>
   );
 }
